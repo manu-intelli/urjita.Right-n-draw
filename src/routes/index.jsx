@@ -9,7 +9,7 @@ import RightDrawWrapper from "../pages/RightDrawWrapper";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
-const About = lazy(() => import("../pages/About"));
+//const About = lazy(() => import("../pages/About"));
 const Login = lazy(() => import("../pages/Login"));
 
 export const router = createBrowserRouter([
@@ -45,14 +45,14 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      {
-        path: "about",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <About />
-          </Suspense>
-        ),
-      },
+      // {
+      //   path: "about",
+      //   element: (
+      //     <Suspense fallback={<LoadingSpinner />}>
+      //       <About />
+      //     </Suspense>
+      //   ),
+      // },
       {
         path: "login",
         element: (
