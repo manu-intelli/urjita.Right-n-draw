@@ -39,7 +39,14 @@ const UpdatedSelect = ({
     <div className="relative">
       <select
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          const selectedValue = Number(e.target.value); // Convert to Number
+          const selectedOption = options.find(
+            (option) => option.value === selectedValue
+          );
+          console.log("selectedOption", selectedOption.des);
+          onChange(e.target.value, selectedOption.des);
+        }}
         className={`
           w-full px-4 py-2.5 rounded-lg appearance-none
           border border-neutral-200
@@ -83,7 +90,7 @@ const ApproverInterface = () => {
     modelName: "",
     partNumber: "",
     revisionNumber: "",
-    component: '',
+    component: "",
   });
 
   const [templateData, setTemplateData] = useState(null);
@@ -100,8 +107,8 @@ const ApproverInterface = () => {
   const [actionType, setActionType] = useState("");
   const [templateExists, setTemplateExists] = useState(false);
   const [checkingTemplate, setCheckingTemplate] = useState(false);
-  const [components,setComponents] = useState([])
-
+  const [components, setComponents] = useState([]);
+  const [selectedComponent, setSelectedComponent] = useState("");
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -221,7 +228,8 @@ const ApproverInterface = () => {
 
       await approverAPI.submitApproverTemplate(submitData);
       setActionType("approved");
-      handleExportPDF();
+
+      // handleExportPDF();
       setShowSuccessModal(true);
       setApprovalStatus({ verifyDesignFields: {}, verifiedQueryData: {} });
       setShowApprovalModal(false);
@@ -290,7 +298,7 @@ const ApproverInterface = () => {
       await approverAPI.submitApproverTemplate(submitData);
       setActionType("rejected");
       setShowSuccessModal(true);
-      handleExportPDF();
+      // handleExportPDF();
       setApprovalStatus({ verifyDesignFields: {}, verifiedQueryData: {} });
       setShowRejectionModal(false);
     } catch (error) {
@@ -314,7 +322,13 @@ const ApproverInterface = () => {
     };
 
     const user = JSON.parse(localStorage.getItem("user"));
-    generatePDF(pdfData, templateData, actionType, user?.email);
+    generatePDF(
+      pdfData,
+      templateData,
+      actionType,
+      user?.full_name,
+      selectedComponent
+    );
 
     // Reset states after PDF generation
     // Reset other states as needed
@@ -335,13 +349,12 @@ const ApproverInterface = () => {
 
   const fetchInitialData = React.useCallback(async () => {
     try {
-      const res = await componentsAPI.getAll()
-      setComponents(res)
+      const res = await componentsAPI.getAll();
+      setComponents(res);
     } catch (error) {
       toast.error("Failed to load initial data");
     }
   }, []);
-
 
   const { isDesignFieldsDataAvailable, isVerifiedQueryDataAvailable } =
     React.useMemo(() => {
@@ -362,6 +375,12 @@ const ApproverInterface = () => {
     fetchInitialData();
   }, []);
 
+  React.useEffect(() => {
+    if (actionType.length > 0) {
+      handleExportPDF();
+    }
+  }, [actionType]);
+
   return (
     <div
       className="bg-neutral-900"
@@ -373,7 +392,7 @@ const ApproverInterface = () => {
       <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">
         <div className="px-4 sm:px-6 md:px-8 py-6 border-b border-neutral-200">
           <h1 className="text-3xl font-display font-semibold text-neutral-900 text-center">
-            PCB Approver Interface
+            {selectedComponent} Approver Interface
           </h1>
         </div>
 
@@ -382,28 +401,30 @@ const ApproverInterface = () => {
             <div className="max-w-5xl mx-auto">
               <div className="space-y-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    {basicInfoFields.map(itr => (
+                  {basicInfoFields.map((itr) => (
                     <Input
                       label={itr.label}
                       value={formData[itr.key]}
-                      onChange={(value) =>
-                        handleInputChange(itr.key, value)
-                      }
+                      onChange={(value) => handleInputChange(itr.key, value)}
                       required
                       placeholder={`Enter ${itr.label}`}
                     />
-                    ))}
+                  ))}
                 </div>
 
                 <div>
                   <UpdatedSelect
                     label="Component"
                     value={formData.component}
-                    onChange={(value) => handleInputChange("component", value)}
+                    onChange={(value, des) => {
+                      setSelectedComponent(des);
+                      handleInputChange("component", value);
+                    }}
                     required
                     options={components.map((each) => ({
                       value: each.id,
                       label: each.component_name,
+                      des: each.description,
                     }))}
                     className="w-full md:w-1/2"
                   />
@@ -694,7 +715,7 @@ const ApproverInterface = () => {
         isOpen={showApprovalModal}
         // onClose={() => setShowApprovalModal(false)}
         title="Approval Confirmation"
-        styleClass='max-w-md'
+        styleClass="max-w-md"
       >
         <div className="p-6">
           <TextArea
@@ -732,7 +753,7 @@ const ApproverInterface = () => {
         isOpen={showRejectionModal}
         // onClose={() => setShowRejectionModal(false)}
         title="Rejection Confirmation"
-        styleClass='max-w-md'
+        styleClass="max-w-md"
       >
         <div className="p-6">
           <TextArea
@@ -766,7 +787,7 @@ const ApproverInterface = () => {
           actionType === "approved" ? "Approved" : "Rejected"
         } Successfully`}
         closeOnOverlayClick={false}
-        styleClass='max-w-md'
+        styleClass="max-w-md"
       >
         <div className="p-6 ">
           <div className="flex flex-col items-center gap-4">

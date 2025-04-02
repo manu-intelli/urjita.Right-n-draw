@@ -9,6 +9,7 @@ export const BASIC_KEY_LABEL = {
   component: "COMPONENT",
   revisionNumber: "REVISION Number",
   rejectionComment: "Rejection Comment",
+  approvalComment: "Approval Comment",
 };
 
 export const USER_COLS = [
@@ -33,21 +34,26 @@ export const USER_COLS = [
 export const basicInfoFields = [
   {
     label: "OPP Number",
-    key: 'oppNumber'
-  }, {
-    label: "OPU Number",
-    key: 'opuNumber'
-  }, {
-    label: "EDU Number",
-    key: 'eduNumber'
-  }, {
-    label: "Model Name",
-    key: 'modelName'
-  }, {
-    label: "Part Number",
-    key: 'partNumber'
-  }, {
-    label: "Revision Number",
-    key: 'revisionNumber'
+    key: "oppNumber",
   },
-]
+  {
+    label: "OPU Number",
+    key: "opuNumber",
+  },
+  {
+    label: "EDU Number",
+    key: "eduNumber",
+  },
+  {
+    label: "Model Name",
+    key: "modelName",
+  },
+  {
+    label: "Part Number",
+    key: "partNumber",
+  },
+  {
+    label: "Revision Number",
+    key: "revisionNumber",
+  },
+];

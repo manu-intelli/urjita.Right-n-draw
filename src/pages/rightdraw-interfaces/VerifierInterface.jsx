@@ -97,6 +97,7 @@ const VerifierInterface = () => {
   const [submitted, setSubmitted] = useState(false);
   const [templateExists, setTemplateExists] = useState(false);
   const [checkingTemplate, setCheckingTemplate] = useState(false);
+  const [selectedComponent, setSelectedComponent] = useState("");
   const navigate = useNavigate();
 
   console.log("formData", formData);
@@ -104,9 +105,7 @@ const VerifierInterface = () => {
 
   const fetchInitialData = useCallback(async () => {
     try {
-      const [components] = await Promise.all([
-        componentsAPI.getAll(),
-      ]);
+      const [components] = await Promise.all([componentsAPI.getAll()]);
       setApiData((prev) => ({ ...prev, components }));
     } catch (error) {
       toast.error("Failed to load initial data");
@@ -120,12 +119,17 @@ const VerifierInterface = () => {
   }, []);
 
   const fetchVerifierFields = async (catId, subCatId) => {
-
-
     setLoading((prev) => ({ ...prev, verifierFields: true }));
     try {
-      const fields = await verifierAPI.getVerifierFields(formData[STEPS.BASIC_INFO]?.component, catId, subCatId);
-      setApiData((prev) => ({ ...prev, verifierFields: [...prev.verifierFields, ...fields] }));
+      const fields = await verifierAPI.getVerifierFields(
+        formData[STEPS.BASIC_INFO]?.component,
+        catId,
+        subCatId
+      );
+      setApiData((prev) => ({
+        ...prev,
+        verifierFields: [...prev.verifierFields, ...fields],
+      }));
       setHasVerifierFields(true);
     } catch (error) {
       toast.error("Failed to fetch verifier fields");
@@ -134,9 +138,6 @@ const VerifierInterface = () => {
       setLoading((prev) => ({ ...prev, verifierFields: false }));
     }
   };
-
-
-
 
   const handleFieldChange = (step, field, value) => {
     setFormData((prev) => ({
@@ -190,7 +191,12 @@ const VerifierInterface = () => {
       const results = await verifierAPI.getVerifyResults(submitData);
       setApiData((prev) => ({ ...prev, verifyResults: results.res }));
 
-      generatePDF(formData, results.res, apiData.specifications);
+      generatePDF(
+        formData,
+        results.res,
+        apiData.specifications,
+        selectedComponent
+      );
 
       setCurrentStep((prev) => prev + 1);
       setSubmitted(true);
@@ -216,11 +222,14 @@ const VerifierInterface = () => {
           "A template with these details already exists! or Designer template not available!"
         );
       } else {
-        const res = await pcbAPI.getSpecification(formData[STEPS.BASIC_INFO]?.component, "verifier")
-        setApiData(prev => ({
+        const res = await pcbAPI.getSpecification(
+          formData[STEPS.BASIC_INFO]?.component,
+          "verifier"
+        );
+        setApiData((prev) => ({
           ...prev,
-          specifications: res
-        }))
+          specifications: res,
+        }));
         setCurrentStep((prev) => prev + 1);
       }
     } catch (error) {
@@ -231,37 +240,39 @@ const VerifierInterface = () => {
   };
 
   const checkVerifierFieldsExists = (cat, subCatLabel) => {
-    const subCat = cat.subcategories.find(itr => itr?.name === subCatLabel)
+    const subCat = cat.subcategories.find((itr) => itr?.name === subCatLabel);
     if (subCat?.has_verifier_fields) {
       fetchVerifierFields(cat?.category_id, subCat?.id);
     }
-  }
+  };
 
   const renderStepContent = () => {
     switch (STEP_ORDER[currentStep]) {
       case STEPS.BASIC_INFO:
         return (
           <FormSection title="Basic Information">
-            {basicInfoFields.map(itr => (
-            <Input
-              label={itr.label}
-              value={formData[STEPS.BASIC_INFO][itr.key]}
-              onChange={(value) =>
-                handleFieldChange(STEPS.BASIC_INFO, itr.key, value)
-              }
-              required
-            />
+            {basicInfoFields.map((itr) => (
+              <Input
+                label={itr.label}
+                value={formData[STEPS.BASIC_INFO][itr.key]}
+                onChange={(value) =>
+                  handleFieldChange(STEPS.BASIC_INFO, itr.key, value)
+                }
+                required
+              />
             ))}
             <Select
               label="Component"
               options={apiData.components.map((each) => ({
                 value: each.id,
                 label: each.component_name,
+                des: each.description,
               }))}
               value={formData[STEPS.BASIC_INFO].component}
-              onChange={(value) =>
-                handleFieldChange(STEPS.BASIC_INFO, "component", value)
-              }
+              onChange={(value, text, des) => {
+                setSelectedComponent(des);
+                handleFieldChange(STEPS.BASIC_INFO, "component", value);
+              }}
               required
             />
             {templateExists && (
@@ -277,7 +288,7 @@ const VerifierInterface = () => {
 
       case STEPS.PCB_SPECS:
         return (
-          <FormSection title="PCB Specifications">
+          <FormSection title={`${selectedComponent} Specifications`}>
             {apiData.specifications
               .filter((spec) => !INPUT_FIELD_SPECS.includes(spec.category_name))
               .map((spec) => (
@@ -292,14 +303,13 @@ const VerifierInterface = () => {
                     formData[STEPS.PCB_SPECS].selectedSpecs[spec.category_id] ||
                     ""
                   }
-                  onChange={(value,label) => {
-                    checkVerifierFieldsExists(spec,label)
+                  onChange={(value, label) => {
+                    checkVerifierFieldsExists(spec, label);
                     handleFieldChange(STEPS.PCB_SPECS, "selectedSpecs", {
                       ...formData[STEPS.PCB_SPECS].selectedSpecs,
                       [spec.category_id]: value,
-                    })
-                  }
-                  }
+                    });
+                  }}
                   required
                 />
               ))}
@@ -309,10 +319,11 @@ const VerifierInterface = () => {
               .map((spec) => (
                 <Input
                   key={spec.category_id}
-                  label={`${spec.category_name}${spec.category_name === "Dielectric Thickness"
-                    ? " (inches)"
-                    : ""
-                    }`}
+                  label={`${spec.category_name}${
+                    spec.category_name === "Dielectric Thickness"
+                      ? " (inches)"
+                      : ""
+                  }`}
                   type="number"
                   step="0.001"
                   min="0"
@@ -351,7 +362,7 @@ const VerifierInterface = () => {
                   step="any"
                   value={
                     formData[STEPS.VERIFIER_FIELDS].verifierQueryData[
-                    field.id
+                      field.id
                     ] ?? ""
                   }
                   onChange={(value) => {
@@ -390,108 +401,108 @@ const VerifierInterface = () => {
               {apiData.verifyResults?.verified_query_data.some(
                 (item) => item.is_deviated
               ) && (
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-red-600 mb-2">
-                      Deviated Values
-                    </h3>
-                    {apiData.verifyResults?.verified_query_data
-                      .filter((item) => item.is_deviated)
-                      .map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-3 p-3 rounded-lg border border-red-500 mb-2"
-                        >
-                          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-sm text-gray-600">
-                              Value: {item.value}
-                            </p>
-                          </div>
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-red-600 mb-2">
+                    Deviated Values
+                  </h3>
+                  {apiData.verifyResults?.verified_query_data
+                    .filter((item) => item.is_deviated)
+                    .map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-red-500 mb-2"
+                      >
+                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                        <div className="flex-grow">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-gray-600">
+                            Value: {item.value}
+                          </p>
                         </div>
-                      ))}
-                  </div>
-                )}
+                      </div>
+                    ))}
+                </div>
+              )}
 
               {apiData.verifyResults?.verified_query_data.some(
                 (item) => !item.is_deviated
               ) && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-green-600 mb-2">
-                      Compliant Values
-                    </h3>
-                    {apiData.verifyResults?.verified_query_data
-                      .filter((item) => !item.is_deviated)
-                      .map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-3 p-3 rounded-lg border border-green-500 mb-2"
-                        >
-                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-sm text-gray-600">
-                              Value: {item.value}
-                            </p>
-                          </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-green-600 mb-2">
+                    Compliant Values
+                  </h3>
+                  {apiData.verifyResults?.verified_query_data
+                    .filter((item) => !item.is_deviated)
+                    .map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-green-500 mb-2"
+                      >
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <div className="flex-grow">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-gray-600">
+                            Value: {item.value}
+                          </p>
                         </div>
-                      ))}
-                  </div>
-                )}
+                      </div>
+                    ))}
+                </div>
+              )}
             </FormSection>
 
             <FormSection title="Verify Design Fields">
               {apiData.verifyResults?.verify_design_fields_data.some(
                 (item) => item.is_deviated
               ) && (
-                  <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-red-600 mb-2">
-                      Deviated Design Fields
-                    </h3>
-                    {apiData.verifyResults?.verify_design_fields_data
-                      .filter((item) => item.is_deviated)
-                      .map((item) => (
-                        <div
-                          key={item.categor_id}
-                          className="flex items-center gap-3 p-3 rounded-lg border border-red-500 mb-2"
-                        >
-                          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-sm text-gray-600">
-                              Selected: {item.selected_deviation_name}
-                            </p>
-                          </div>
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-red-600 mb-2">
+                    Deviated Design Fields
+                  </h3>
+                  {apiData.verifyResults?.verify_design_fields_data
+                    .filter((item) => item.is_deviated)
+                    .map((item) => (
+                      <div
+                        key={item.categor_id}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-red-500 mb-2"
+                      >
+                        <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                        <div className="flex-grow">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-gray-600">
+                            Selected: {item.selected_deviation_name}
+                          </p>
                         </div>
-                      ))}
-                  </div>
-                )}
+                      </div>
+                    ))}
+                </div>
+              )}
 
               {apiData.verifyResults?.verify_design_fields_data.some(
                 (item) => !item.is_deviated
               ) && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-green-600 mb-2">
-                      Compliant Design Fields
-                    </h3>
-                    {apiData.verifyResults?.verify_design_fields_data
-                      .filter((item) => !item.is_deviated)
-                      .map((item) => (
-                        <div
-                          key={item.categor_id}
-                          className="flex items-center gap-3 p-3 rounded-lg border border-green-500 mb-2"
-                        >
-                          <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <div className="flex-grow">
-                            <p className="font-medium">{item.name}</p>
-                            <p className="text-sm text-gray-600">
-                              Selected: {item.selected_deviation_name}
-                            </p>
-                          </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-green-600 mb-2">
+                    Compliant Design Fields
+                  </h3>
+                  {apiData.verifyResults?.verify_design_fields_data
+                    .filter((item) => !item.is_deviated)
+                    .map((item) => (
+                      <div
+                        key={item.categor_id}
+                        className="flex items-center gap-3 p-3 rounded-lg border border-green-500 mb-2"
+                      >
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <div className="flex-grow">
+                          <p className="font-medium">{item.name}</p>
+                          <p className="text-sm text-gray-600">
+                            Selected: {item.selected_deviation_name}
+                          </p>
                         </div>
-                      ))}
-                  </div>
-                )}
+                      </div>
+                    ))}
+                </div>
+              )}
             </FormSection>
           </div>
         );
@@ -524,9 +535,10 @@ const VerifierInterface = () => {
           <div
             className={`
               w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-              ${currentStep === index
-                ? "bg-blue-600 text-white ring-2 ring-blue-100"
-                : currentStep > index
+              ${
+                currentStep === index
+                  ? "bg-blue-600 text-white ring-2 ring-blue-100"
+                  : currentStep > index
                   ? "bg-green-400 text-white"
                   : "bg-white border border-gray-200 text-gray-400"
               }
@@ -537,8 +549,9 @@ const VerifierInterface = () => {
           {index < STEP_ORDER.length - 1 && (
             <div className="flex-1 h-0.5 mx-2 bg-gray-200">
               <div
-                className={`h-full transition-all duration-300 ${currentStep > index ? "bg-green-400" : ""
-                  }`}
+                className={`h-full transition-all duration-300 ${
+                  currentStep > index ? "bg-green-400" : ""
+                }`}
               />
             </div>
           )}
@@ -553,7 +566,7 @@ const VerifierInterface = () => {
         <div className="px-4 sm:px-6 md:px-8 py-4 border-b border-neutral-200">
           <div className="w-full text-center">
             <h1 className="text-2xl font-semibold text-neutral-900 mb-6">
-              PCB Verifier Interface
+              {selectedComponent} Verifier Interface
             </h1>
             {renderStepIndicator()}
           </div>
@@ -593,7 +606,8 @@ const VerifierInterface = () => {
                     generatePDF(
                       formData,
                       apiData.verifyResults,
-                      apiData.specifications
+                      apiData.specifications,
+                      selectedComponent
                     )
                   }
                   contentClassName="flex items-center gap-2"
@@ -617,28 +631,28 @@ const VerifierInterface = () => {
                   currentStep === 0
                     ? checkTemplateExistence
                     : currentStep === STEP_ORDER.length - 2
-                      ? handleSubmit
-                      : () => setCurrentStep((prev) => prev + 1)
+                    ? handleSubmit
+                    : () => setCurrentStep((prev) => prev + 1)
                 }
                 disabled={
                   loading.submission ||
                   checkingTemplate ||
                   (currentStep === 0 &&
                     7 !==
-                    Object.values(formData?.[STEPS.BASIC_INFO]).filter(
-                      (itr) => itr
-                    ).length) ||
+                      Object.values(formData?.[STEPS.BASIC_INFO]).filter(
+                        (itr) => itr
+                      ).length) ||
                   templateExists ||
                   (currentStep === 1 &&
                     apiData.specifications?.length !==
-                    Object.values(
-                      formData?.[STEPS.PCB_SPECS]?.selectedSpecs
-                    ).filter((itr) => itr).length) ||
+                      Object.values(
+                        formData?.[STEPS.PCB_SPECS]?.selectedSpecs
+                      ).filter((itr) => itr).length) ||
                   (currentStep === 2 &&
                     apiData.verifierFields.length !==
-                    Object.values(
-                      formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
-                    ).filter((itr) => itr).length)
+                      Object.values(
+                        formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
+                      ).filter((itr) => itr).length)
                 }
               >
                 {checkingTemplate ? (
