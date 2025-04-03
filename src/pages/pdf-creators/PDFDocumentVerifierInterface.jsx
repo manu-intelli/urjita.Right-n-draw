@@ -210,7 +210,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         </View>
 
-        {deviatedResults.length > 0 && (
+        {(deviatedResults.length > 0||deviatedDesignFields.length > 0) && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: "#dc2626" }]}>
               Deviated Values
@@ -242,7 +242,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         )}
 
-        {compliantResults.length > 0 && (
+        {(compliantResults.length > 0 ||compliantDesignFields.length > 0) && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: "#16a34a" }]}>
               Compliant Values
