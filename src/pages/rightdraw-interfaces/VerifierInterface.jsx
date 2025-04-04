@@ -126,9 +126,13 @@ const VerifierInterface = () => {
         catId,
         subCatId
       );
+      // setApiData((prev) => ({
+      //   ...prev,
+      //   verifierFields: [...prev.verifierFields, ...fields],
+      // }));
       setApiData((prev) => ({
         ...prev,
-        verifierFields: [...prev.verifierFields, ...fields],
+        verifierFields: fields,
       }));
       setHasVerifierFields(true);
     } catch (error) {
@@ -245,6 +249,8 @@ const VerifierInterface = () => {
       fetchVerifierFields(cat?.category_id, subCat?.id);
     }
   };
+
+  console.log("Current Step:", STEP_ORDER[currentStep]);
 
   const renderStepContent = () => {
     switch (STEP_ORDER[currentStep]) {
