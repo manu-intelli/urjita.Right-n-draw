@@ -378,7 +378,17 @@ const DesignerInterface = () => {
       const response = await rulesAPI.getDesignOptions(id);
       setApiData((prev) => ({
         ...prev,
-        designOptions: [...prev.designOptions, ...response],
+        designOptions: response,
+        designRules: [],
+      }));
+
+      setFormData((prev) => ({
+        ...prev,
+        [STEPS.DESIGN_RULES]: {
+          selectedCheckboxes: {},
+          selectedSubCategory: "",
+          acknowledge: false,
+        },
       }));
     } catch (error) {
       console.error("Error fetching design options:", error);

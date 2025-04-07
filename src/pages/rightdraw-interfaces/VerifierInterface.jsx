@@ -134,6 +134,13 @@ const VerifierInterface = () => {
         ...prev,
         verifierFields: fields,
       }));
+
+      setFormData((prev) => ({
+        ...prev,
+        [STEPS.VERIFIER_FIELDS]: {
+          verifierQueryData: {},
+        },
+      }));
       setHasVerifierFields(true);
     } catch (error) {
       toast.error("Failed to fetch verifier fields");
@@ -564,6 +571,18 @@ const VerifierInterface = () => {
         </div>
       ))}
     </div>
+  );
+  console.log("apiData.verifierFields.length", apiData.verifierFields.length);
+  console.log(
+    "formdatalength",
+
+    Object.values(formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData).filter(
+      (itr) => itr
+    ).length
+  );
+  console.log(
+    "formData[STEPS.VERIFIER_FIELDS].verifierQueryData",
+    formData[STEPS.VERIFIER_FIELDS].verifierQueryData
   );
 
   return (
