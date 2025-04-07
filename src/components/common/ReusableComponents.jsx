@@ -129,7 +129,13 @@ const Select = ({
           id={selectId}
           value={value}
           onChange={(e) => {
-            onChange(e.target.value,e.target?.selectedOptions?.[0]?.innerText)
+            const selectedValue = Number(e.target.value); // Convert to Number
+            const selectedOption = options.find(
+              (option) => option.value === selectedValue
+            );
+            console.log("selectedOption",selectedOption);
+            
+            onChange(e.target.value, e.target?.selectedOptions?.[0]?.innerText,selectedOption?.des);
           }}
           disabled={disabled}
           className={`

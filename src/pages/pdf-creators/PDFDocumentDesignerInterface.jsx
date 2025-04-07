@@ -54,12 +54,12 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     fontSize: 8,
-    padding: '4px 0'
+    padding: "4px 0",
   },
   label: {
     width: "60%",
     color: "#64748b",
-    paddingRight: '6px'
+    paddingRight: "6px",
   },
   value: {
     width: "40%",
@@ -160,9 +160,6 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
-
 const RuleComponent = ({ rule, isLast }) => (
   <View style={isLast ? styles.ruleBoxLast : styles.ruleBox}>
     <View style={styles.ruleHeader}>
@@ -199,13 +196,19 @@ const PDFDocumentDesignerInterface = ({
     (option) => formData.designRules.selectedCheckboxes[option.design_option_id]
   );
 
-  const component = JSON.parse(localStorage.getItem('components')).find(comp => comp.id == formData.basicInfo.component).component_name
+  const component = JSON.parse(localStorage.getItem("components")).find(
+    (comp) => comp.id == formData.basicInfo.component
+  ).component_name;
+
+  const compDescription = JSON.parse(localStorage.getItem("components")).find(
+    (comp) => comp.id == formData.basicInfo.component
+  ).description;
 
   const metricValues = {
-    "Dielectric Thickness" : '(Inches)',
-    "Copper Thickness" : '(OZ)',
-    [`${component} Size`] : '(Inches)'
-  }
+    "Dielectric Thickness": "(Inches)",
+    "Copper Thickness": "(OZ)",
+    [`${component} Size`]: "(Inches)",
+  };
 
   // Helper function to find specification name by ID
   const findSpecificationName = (categoryId, specId) => {
@@ -227,7 +230,7 @@ const PDFDocumentDesignerInterface = ({
       <Page size="A4" style={styles.page} wrap>
         <View style={styles.contentWrapper}>
           <View style={styles.header}>
-            <Text style={styles.title}>PCB Design Document</Text>
+            <Text style={styles.title}>{compDescription} Design Document</Text>
             <Text style={styles.subtitle}>Generated on {timestamp}</Text>
             <Text style={styles.metadata}>Created by: {user?.full_name}</Text>
           </View>
@@ -240,7 +243,9 @@ const PDFDocumentDesignerInterface = ({
                   <View style={styles.infoRow}>
                     <Text style={styles.label}>{BASIC_KEY_LABEL?.[key]}:</Text>
                     <Text style={styles.value}>
-                      {key.toLowerCase() === "component" ? `${component} (PCB)` : value}
+                      {key.toLowerCase() === "component"
+                        ? `${component} (${compDescription})`
+                        : value}
                     </Text>
                   </View>
                 </View>
@@ -249,7 +254,7 @@ const PDFDocumentDesignerInterface = ({
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>PCB Specifications</Text>
+            <Text style={styles.sectionTitle}>{component} Specifications</Text>
             <View style={styles.infoGrid}>
               {specifications.map((spec) => (
                 <View key={spec.category_id} style={styles.infoItem}>
@@ -316,7 +321,13 @@ const PDFDocumentDesignerInterface = ({
   );
 };
 
-const generatePDF = async (formData, specifications, rules, designOptions) => {
+const generatePDF = async (
+  formData,
+  specifications,
+  rules,
+  designOptions,
+  selectedComponent
+) => {
   const blob = await pdf(
     <PDFDocumentDesignerInterface
       formData={formData}
@@ -327,7 +338,7 @@ const generatePDF = async (formData, specifications, rules, designOptions) => {
   ).toBlob();
   saveAs(
     blob,
-    `PCB_Specification_${formData.basicInfo.partNumber}_${formData.basicInfo.revisionNumber}.pdf`
+    `${selectedComponent}_Specification_${formData.basicInfo.partNumber}_${formData.basicInfo.revisionNumber}.pdf`
   );
 };
 

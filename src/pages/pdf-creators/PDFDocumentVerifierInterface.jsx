@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     fontSize: 8,
-    padding: '4px 0'
+    padding: "4px 0",
   },
   resultItem: {
     marginBottom: 5,
@@ -103,8 +103,13 @@ const PDFDocumentVerifierInterface = ({
   verifyResults,
   specifications,
 }) => {
+  const component = JSON.parse(localStorage.getItem("components")).find(
+    (comp) => comp.id == formData.basicInfo.component
+  ).component_name;
 
-  const component = JSON.parse(localStorage.getItem('components')).find(comp => comp.id == formData.basicInfo.component).component_name
+  const compDescription = JSON.parse(localStorage.getItem("components")).find(
+    (comp) => comp.id == formData.basicInfo.component
+  ).description;
   // Helper function to find specification name and value
   const getSpecificationDetails = (categoryId, value) => {
     const spec = specifications.find(
@@ -158,7 +163,9 @@ const PDFDocumentVerifierInterface = ({
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>PCB Verification Document</Text>
+          <Text style={styles.title}>
+            {compDescription} Verification Document
+          </Text>
           <Text style={styles.subtitle}>Generated on {timestamp}</Text>
           <Text style={styles.metadata}>Created by: {user?.full_name}</Text>
         </View>
@@ -173,7 +180,9 @@ const PDFDocumentVerifierInterface = ({
                     {BASIC_KEY_LABEL?.[key]}:{" "}
                   </Text>
                   <Text style={styles.itemValue}>
-                    {key.toLowerCase() === "component" ? `${component} (PCB)` : value}
+                    {key.toLowerCase() === "component"
+                      ? `${component} (${compDescription})`
+                      : value}
                   </Text>
                 </View>
               </View>
@@ -182,7 +191,7 @@ const PDFDocumentVerifierInterface = ({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>PCB Specifications</Text>
+          <Text style={styles.sectionTitle}>{compDescription} Specifications</Text>
           <View style={styles.infoGrid}>
             {Object.entries(formData[STEPS.PCB_SPECS].selectedSpecs).map(
               ([key, value]) => {
@@ -201,7 +210,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         </View>
 
-        {deviatedResults.length > 0 && (
+        {(deviatedResults.length > 0||deviatedDesignFields.length > 0) && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: "#dc2626" }]}>
               Deviated Values
@@ -211,7 +220,11 @@ const PDFDocumentVerifierInterface = ({
                 key={index}
                 style={[styles.resultItem, styles.deviatedItem]}
               >
-                <Text style={styles.itemName}>{item.name.replace(/Enter\s+(\w)/, (match, p1) => p1.toUpperCase())}</Text>
+                <Text style={styles.itemName}>
+                  {item.name.replace(/Enter\s+(\w)/, (match, p1) =>
+                    p1.toUpperCase()
+                  )}
+                </Text>
                 <Text style={styles.itemValue}>Value: {item.value}</Text>
               </View>
             ))}
@@ -229,7 +242,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         )}
 
-        {compliantResults.length > 0 && (
+        {(compliantResults.length > 0 ||compliantDesignFields.length > 0) && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: "#16a34a" }]}>
               Compliant Values
@@ -238,9 +251,13 @@ const PDFDocumentVerifierInterface = ({
               <View
                 key={index}
                 style={[styles.resultItem, styles.compliantItem]}
-              > 
-              {/* regex used to replace "Enter" and making next word 1st char into caps */}
-                <Text style={styles.itemName}>{item.name.replace(/Enter\s+(\w)/, (match, p1) => p1.toUpperCase())}</Text>  
+              >
+                {/* regex used to replace "Enter" and making next word 1st char into caps */}
+                <Text style={styles.itemName}>
+                  {item.name.replace(/Enter\s+(\w)/, (match, p1) =>
+                    p1.toUpperCase()
+                  )}
+                </Text>
                 <Text style={styles.itemValue}>Value: {item.value}</Text>
               </View>
             ))}
@@ -270,7 +287,12 @@ const PDFDocumentVerifierInterface = ({
   );
 };
 
-const generatePDF = async (formData, verifyResults, specifications) => {
+const generatePDF = async (
+  formData,
+  verifyResults,
+  specifications,
+  selectedComponent
+) => {
   console.log("In PDF Document Verifier Interface");
   const blob = await pdf(
     <PDFDocumentVerifierInterface
@@ -281,9 +303,9 @@ const generatePDF = async (formData, verifyResults, specifications) => {
   ).toBlob();
   saveAs(
     blob,
-    `PCB_Verification_${formData[STEPS.BASIC_INFO].partNumber}_${
-      formData[STEPS.BASIC_INFO].revisionNumber
-    }.pdf`
+    `${selectedComponent}_Verification_${
+      formData[STEPS.BASIC_INFO].partNumber
+    }_${formData[STEPS.BASIC_INFO].revisionNumber}.pdf`
   );
 };
 

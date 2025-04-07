@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: "row",
     fontSize: 8,
-    padding: '4px 0'
+    padding: "4px 0",
   },
   resultItem: {
     marginBottom: 5,
@@ -73,12 +73,16 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   itemName: {
+    maxWidth: "40%", // Ensures correct layout
     fontSize: 10,
     fontWeight: "bold",
+    flexShrink: 1, // Prevents overflow
   },
   itemValue: {
     fontSize: 9,
     color: "#374151",
+    flexGrow: 1, // Ensures it takes remaining space
+    maxWidth: "50%", // Ensures correct layout
   },
   status: {
     fontSize: 10,
@@ -96,6 +100,7 @@ const styles = StyleSheet.create({
     color: "#4b5563",
     marginTop: 2,
     fontStyle: "italic",
+    flexWrap: "wrap",
   },
   pageNumber: {
     position: "absolute",
@@ -118,7 +123,13 @@ const PDFDocumentApproverInterface = ({
   userEmail,
 }) => {
   const timestamp = new Date().toLocaleString();
-  const component = JSON.parse(localStorage.getItem('components')).find(comp => comp.id == formData.component).component_name
+  const component = JSON.parse(localStorage.getItem("components")).find(
+    (comp) => comp.id == formData.component
+  ).component_name;
+
+  const compDescription = JSON.parse(localStorage.getItem("components")).find(
+    (comp) => comp.id == formData.component
+  ).description;
 
   // Add null checks and default to empty arrays if data is missing
   const deviatedDesignFields =
@@ -159,7 +170,7 @@ const PDFDocumentApproverInterface = ({
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.header}>
-          <Text style={styles.title}>PCB Approval Report</Text>
+          <Text style={styles.title}>{compDescription} Approval Report</Text>
           <Text style={styles.subtitle}>Generated on {timestamp}</Text>
           <Text style={styles.metadata}>
             {actionType === "approved" ? "Approved By: " : "Rejected By: "}
@@ -175,7 +186,9 @@ const PDFDocumentApproverInterface = ({
                 <View style={styles.infoRow}>
                   <Text style={styles.itemName}>{BASIC_KEY_LABEL[key]}: </Text>
                   <Text style={styles.itemValue}>
-                    {key.toLowerCase() === "component" ? `${component} (PCB)` : value}
+                    {key.toLowerCase() === "component"
+                      ? `${component} (${compDescription})`
+                      : value}
                   </Text>
                 </View>
               </View>
@@ -320,7 +333,13 @@ const PDFDocumentApproverInterface = ({
   );
 };
 
-const generatePDF = async (formData, templateData, actionType, userEmail) => {
+const generatePDF = async (
+  formData,
+  templateData,
+  actionType,
+  userEmail,
+  selectedComponent
+) => {
   const blob = await pdf(
     <PDFDocumentApproverInterface
       formData={formData}
@@ -331,7 +350,9 @@ const generatePDF = async (formData, templateData, actionType, userEmail) => {
   ).toBlob();
   saveAs(
     blob,
-    `PCB_${actionType === "approved" ? "Approved" : "Rejected"}_${formData.partNumber}_${formData.revisionNumber}.pdf`
+    `${selectedComponent}_${
+      actionType === "approved" ? "Approved" : "Rejected"
+    }_${formData.partNumber}_${formData.revisionNumber}.pdf`
   );
 };
 

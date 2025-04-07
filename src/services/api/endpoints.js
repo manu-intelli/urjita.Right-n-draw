@@ -199,7 +199,7 @@ export const componentsAPI = {
   getAll: async () => {
     try {
       const response = await axiosInstance.get("/masters/components/");
-      localStorage.setItem('components',JSON.stringify(response.data))
+      localStorage.setItem("components", JSON.stringify(response.data));
       return response.data;
     } catch (error) {
       const errorMessage =
