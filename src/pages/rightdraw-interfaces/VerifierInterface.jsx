@@ -572,22 +572,10 @@ const VerifierInterface = () => {
       ))}
     </div>
   );
-  console.log("apiData.verifierFields.length", apiData.verifierFields.length);
+  console.log("Verifier Fields:", apiData.verifierFields);
   console.log(
-    "formdatalength",
-
-    Object.values(formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData).filter(
-      (itr) => itr
-    ).length
-  );
-  console.log(
-    "formData[STEPS.VERIFIER_FIELDS].verifierQueryData",
-    formData[STEPS.VERIFIER_FIELDS].verifierQueryData,
-    Object.values(
-      formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
-    ).filter((itr) => itr).length,apiData.verifierFields.length,apiData.verifierFields?.filter(
-      f => ![9,14,15,18].includes(Number(f))
-    ).some(f => !formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[f])
+    "Query Data:",
+    formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
   );
 
   return (
@@ -679,10 +667,15 @@ const VerifierInterface = () => {
                         formData?.[STEPS.PCB_SPECS]?.selectedSpecs
                       ).filter((itr) => itr).length) ||
                   (currentStep === 2 &&
-                    apiData.verifierFields?.filter(
-                      f => ![9,14,15,18].includes(Number(f))
-                    ).some(f => formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[f])
-                  )
+                    !apiData.verifierFields.every(({ id }) => {
+                      const val =
+                        formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[
+                          id
+                        ];
+                      return [9, 15, 16, 18].includes(id)
+                        ? val !== null && val !== undefined && val !== ""
+                        : Number(val) > 0;
+                    }))
                 }
               >
                 {checkingTemplate ? (
