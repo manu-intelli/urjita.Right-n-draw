@@ -582,7 +582,12 @@ const VerifierInterface = () => {
   );
   console.log(
     "formData[STEPS.VERIFIER_FIELDS].verifierQueryData",
-    formData[STEPS.VERIFIER_FIELDS].verifierQueryData
+    formData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+    Object.values(
+      formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
+    ).filter((itr) => itr).length,apiData.verifierFields.length,apiData.verifierFields?.filter(
+      f => ![9,14,15,18].includes(Number(f))
+    ).some(f => !formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[f])
   );
 
   return (
@@ -674,10 +679,10 @@ const VerifierInterface = () => {
                         formData?.[STEPS.PCB_SPECS]?.selectedSpecs
                       ).filter((itr) => itr).length) ||
                   (currentStep === 2 &&
-                    apiData.verifierFields.length !==
-                      Object.values(
-                        formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
-                      ).filter((itr) => itr).length)
+                    apiData.verifierFields?.filter(
+                      f => ![9,14,15,18].includes(Number(f))
+                    ).some(f => formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[f])
+                  )
                 }
               >
                 {checkingTemplate ? (

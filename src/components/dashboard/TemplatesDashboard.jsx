@@ -43,6 +43,10 @@ const TemplatesDashboard = () => {
     fetchTemplates();
   }, []);
 
+  useEffect(() => {
+setCurrentPage(1)
+  }, [activeTab]);
+
   const filterTemplates = (templatesList) => {
     return templatesList.filter((template) =>
       Object.values(template).some((value) =>
