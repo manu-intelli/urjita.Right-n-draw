@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // Configuration
-const BASE_URL = "http://173.248.136.190:80";
+const BASE_URL = "http://172.17.71.55:96";
 
 // Create axios instance
 const axiosInstance = axios.create({
@@ -135,7 +135,7 @@ export const authAPI = {
       toast.success("User edited successfully!");
       return res;
     } catch (err) {
-      toast.error("Failed to delete a user!");
+      toast.error("Failed to update a user!");
       console.log(err);
     }
   },
@@ -199,7 +199,7 @@ export const componentsAPI = {
   getAll: async () => {
     try {
       const response = await axiosInstance.get("/masters/components/");
-      localStorage.setItem("components", JSON.stringify(response.data));
+      localStorage.setItem('components',JSON.stringify(response.data))
       return response.data;
     } catch (error) {
       const errorMessage =
