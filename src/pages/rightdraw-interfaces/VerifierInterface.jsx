@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   FormSection,
+  TextArea,
 } from "../../components/common/ReusableComponents";
 import {
   pcbAPI,
@@ -27,6 +28,7 @@ import generatePDF from "../pdf-creators/PDFDocumentVerifierInterface";
 import { useNavigate } from "react-router-dom";
 import { BASIC_DETAILS_LENGTH, basicInfoFields } from "../../constants";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import Modal from "../../components/common/Modal";
 
 const STEPS = {
   BASIC_INFO: "basicInfo",
@@ -98,11 +100,15 @@ const VerifierInterface = () => {
   const [templateExists, setTemplateExists] = useState(false);
   const [checkingTemplate, setCheckingTemplate] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState("");
+
+  const [isRemarksReq, setIsRemarksReq] = useState(false);
+  const [openRemarksModal, setOpenRemarksModal] = useState(false);
+  const [pendingSubmit, setPendingSubmit] = useState(false);
   const navigate = useNavigate();
 
   console.log("formData", formData);
   console.log("ApiData", apiData);
-
+  let mapForZero = {};
   const fetchInitialData = useCallback(async () => {
     try {
       const [components] = await Promise.all([componentsAPI.getAll()]);
@@ -345,7 +351,8 @@ const VerifierInterface = () => {
                     ""
                   }
                   onChange={(value) => {
-                    if (value === "" || !isNaN(value)) {
+                    const numValue = Number(value);
+                    if (value === "" || (!isNaN(numValue) && numValue > 0)) {
                       handleFieldChange(STEPS.PCB_SPECS, "selectedSpecs", {
                         ...formData[STEPS.PCB_SPECS].selectedSpecs,
                         [spec.category_id]: value,
@@ -389,6 +396,21 @@ const VerifierInterface = () => {
                           [field.id]: value === "" ? "" : numValue,
                         }
                       );
+                    }
+
+                    if (numValue === 0) {
+                      setIsRemarksReq(true);
+                      mapForZero = {
+                        ...mapForZero,
+                        [field.field_name]: numValue,
+                      };
+                    } else {
+                      if (mapForZero?.[field.field_name]) {
+                        delete mapForZero[field.field_name];
+                        if (!Object.keys(mapForZero).length) {
+                          setIsRemarksReq(false);
+                        }
+                      }
                     }
                   }}
                   required
@@ -578,6 +600,61 @@ const VerifierInterface = () => {
     formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
   );
 
+  const RemarksModal = () => {
+    const [value, setValue] = useState("");
+
+    // ✅ Async helper to "await" setFormData
+    const setFormDataAsync = (newData) => {
+      return new Promise((resolve) => {
+        setFormData((prev) => {
+          resolve(); // wait here
+          return { ...prev, ...newData };
+        });
+      });
+    };
+
+    const handleRemarksSave = async () => {
+      setOpenRemarksModal(false);
+      await setFormDataAsync({ remarks: value });
+
+      if (pendingSubmit) {
+        handleSubmit();
+        setPendingSubmit(false);
+      } else {
+        setCurrentStep((prev) => prev + 1);
+      }
+    };
+    return (
+      <Modal isOpen title="Remarks" styleClass="max-w-md">
+        <div className="p-6">
+          <TextArea
+            label="Remarks"
+            value={value}
+            onChange={setValue}
+            multiline
+            required
+            placeholder="Remarks regarding zero values entered."
+          />
+          <div className="flex justify-end gap-4 mt-6">
+            <Button
+              variant="secondary"
+              onClick={() => setOpenRemarksModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleRemarksSave}
+              disabled={!value.trim()}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
       <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">
@@ -645,13 +722,20 @@ const VerifierInterface = () => {
             ) : (
               <Button
                 variant="primary"
-                onClick={
-                  currentStep === 0
-                    ? checkTemplateExistence
-                    : currentStep === STEP_ORDER.length - 2
-                    ? handleSubmit
-                    : () => setCurrentStep((prev) => prev + 1)
-                }
+                onClick={() => {
+                  if (currentStep === 0) {
+                    checkTemplateExistence();
+                  } else if (currentStep === STEP_ORDER.length - 2) {
+                    if (isRemarksReq) {
+                      setPendingSubmit(true); // <- mark that we're going to submit
+                      setOpenRemarksModal(true);
+                      return;
+                    }
+                    handleSubmit(); // <- no remarks needed
+                  } else {
+                    setCurrentStep((prev) => prev + 1);
+                  }
+                }}
                 disabled={
                   loading.submission ||
                   checkingTemplate ||
@@ -672,7 +756,7 @@ const VerifierInterface = () => {
                         formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[
                           id
                         ];
-                      return [9, 15, 16, 18].includes(id)
+                      return [9, 14, 15, 18].includes(id)
                         ? val !== null && val !== undefined && val !== ""
                         : Number(val) > 0;
                     }))
@@ -697,6 +781,7 @@ const VerifierInterface = () => {
           </div>
         </div>
       </div>
+      {openRemarksModal && <RemarksModal />}
     </div>
   );
 };
