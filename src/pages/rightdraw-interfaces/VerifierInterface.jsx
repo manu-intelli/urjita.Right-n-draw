@@ -175,11 +175,65 @@ const VerifierInterface = () => {
     navigate("/");
   };
 
-  const handleSubmit = async () => {
+  // const handleSubmit = async () => {
+  //   setLoading((prev) => ({ ...prev, submission: true }));
+  //   try {
+  //     const processedSpecs = Object.entries(
+  //       formData[STEPS.PCB_SPECS].selectedSpecs
+  //     ).reduce((acc, [key, value]) => {
+  //       const spec = apiData.specifications.find(
+  //         (s) => s.category_id.toString() === key
+  //       );
+  //       if (spec && INPUT_FIELD_SPECS.includes(spec.category_name)) {
+  //         acc[key] = parseFloat(value);
+  //       } else {
+  //         acc[key] = value;
+  //       }
+  //       return acc;
+  //     }, {});
+
+  //     const submitData = {
+  //       oppNumber: formData[STEPS.BASIC_INFO].oppNumber,
+  //       opuNumber: formData[STEPS.BASIC_INFO].opuNumber,
+  //       eduNumber: formData[STEPS.BASIC_INFO].eduNumber,
+  //       modelName: formData[STEPS.BASIC_INFO].modelName,
+  //       partNumber: formData[STEPS.BASIC_INFO].partNumber,
+  //       component: formData[STEPS.BASIC_INFO].component,
+  //       revisionNumber: formData[STEPS.BASIC_INFO].revisionNumber,
+  //       componentSpecifications: processedSpecs,
+  //       verifierQueryData: formData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+  //       ...(formData?.remarks && { remarks: formData.remarks }),
+  //     };
+
+  //     await verifierAPI.createVerifierTemplate(submitData);
+  //     const results = await verifierAPI.getVerifyResults(submitData);
+  //     setApiData((prev) => ({ ...prev, verifyResults: results.res }));
+
+  //     generatePDF(
+  //       formData,
+  //       results.res,
+  //       apiData.specifications,
+  //       selectedComponent
+  //     );
+
+  //     setCurrentStep((prev) => prev + 1);
+  //     setSubmitted(true);
+  //     toast.success("Successfully submitted the details!");
+  //   } catch (error) {
+  //     toast.error(
+  //       error.message || "An error occurred while creating the template"
+  //     );
+  //   } finally {
+  //     setLoading((prev) => ({ ...prev, submission: false }));
+  //   }
+  // };
+
+
+  const handleSubmit = async (incomingFormData = formData) => {
     setLoading((prev) => ({ ...prev, submission: true }));
     try {
       const processedSpecs = Object.entries(
-        formData[STEPS.PCB_SPECS].selectedSpecs
+        incomingFormData[STEPS.PCB_SPECS].selectedSpecs
       ).reduce((acc, [key, value]) => {
         const spec = apiData.specifications.find(
           (s) => s.category_id.toString() === key
@@ -191,30 +245,31 @@ const VerifierInterface = () => {
         }
         return acc;
       }, {});
-
+  
       const submitData = {
-        oppNumber: formData[STEPS.BASIC_INFO].oppNumber,
-        opuNumber: formData[STEPS.BASIC_INFO].opuNumber,
-        eduNumber: formData[STEPS.BASIC_INFO].eduNumber,
-        modelName: formData[STEPS.BASIC_INFO].modelName,
-        partNumber: formData[STEPS.BASIC_INFO].partNumber,
-        component: formData[STEPS.BASIC_INFO].component,
-        revisionNumber: formData[STEPS.BASIC_INFO].revisionNumber,
+        oppNumber: incomingFormData[STEPS.BASIC_INFO].oppNumber,
+        opuNumber: incomingFormData[STEPS.BASIC_INFO].opuNumber,
+        eduNumber: incomingFormData[STEPS.BASIC_INFO].eduNumber,
+        modelName: incomingFormData[STEPS.BASIC_INFO].modelName,
+        partNumber: incomingFormData[STEPS.BASIC_INFO].partNumber,
+        component: incomingFormData[STEPS.BASIC_INFO].component,
+        revisionNumber: incomingFormData[STEPS.BASIC_INFO].revisionNumber,
         componentSpecifications: processedSpecs,
-        verifierQueryData: formData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+        verifierQueryData: incomingFormData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+        ...(incomingFormData?.remarks && { remarks: incomingFormData.remarks }),
       };
-
+  
       await verifierAPI.createVerifierTemplate(submitData);
       const results = await verifierAPI.getVerifyResults(submitData);
       setApiData((prev) => ({ ...prev, verifyResults: results.res }));
-
+  
       generatePDF(
-        formData,
+        incomingFormData,
         results.res,
         apiData.specifications,
         selectedComponent
       );
-
+  
       setCurrentStep((prev) => prev + 1);
       setSubmitted(true);
       toast.success("Successfully submitted the details!");
@@ -226,6 +281,7 @@ const VerifierInterface = () => {
       setLoading((prev) => ({ ...prev, submission: false }));
     }
   };
+  
 
   const checkTemplateExistence = async () => {
     setCheckingTemplate(true);
@@ -603,27 +659,25 @@ const VerifierInterface = () => {
   const RemarksModal = () => {
     const [value, setValue] = useState("");
 
-    // ✅ Async helper to "await" setFormData
-    const setFormDataAsync = (newData) => {
-      return new Promise((resolve) => {
-        setFormData((prev) => {
-          resolve(); // wait here
-          return { ...prev, ...newData };
-        });
-      });
-    };
-
-    const handleRemarksSave = async () => {
+    const handleRemarksSubmit = () => {
+      const updatedFormData = {
+        ...formData, // use latest formData from state
+        remarks: value,
+      };
+    
+      // Submit with the new data
+      handleSubmit(updatedFormData);
+    
+      // Update local state for future reference
+      setFormData(updatedFormData);
+    
+      // Close modal
       setOpenRemarksModal(false);
-      await setFormDataAsync({ remarks: value });
-
-      if (pendingSubmit) {
-        handleSubmit();
-        setPendingSubmit(false);
-      } else {
-        setCurrentStep((prev) => prev + 1);
-      }
     };
+    
+
+    console.log("value", value);
+    console.log("firmdata", formData.remarks);
     return (
       <Modal isOpen title="Remarks" styleClass="max-w-md">
         <div className="p-6">
@@ -644,10 +698,10 @@ const VerifierInterface = () => {
             </Button>
             <Button
               variant="primary"
-              onClick={handleRemarksSave}
+              onClick={handleRemarksSubmit}
               disabled={!value.trim()}
             >
-              Next
+              Submit
             </Button>
           </div>
         </div>
@@ -723,15 +777,14 @@ const VerifierInterface = () => {
               <Button
                 variant="primary"
                 onClick={() => {
+                  if (isRemarksReq) {
+                    setOpenRemarksModal(true);
+                    return;
+                  }
                   if (currentStep === 0) {
                     checkTemplateExistence();
                   } else if (currentStep === STEP_ORDER.length - 2) {
-                    if (isRemarksReq) {
-                      setPendingSubmit(true); // <- mark that we're going to submit
-                      setOpenRemarksModal(true);
-                      return;
-                    }
-                    handleSubmit(); // <- no remarks needed
+                    handleSubmit(formData); // <- no remarks needed
                   } else {
                     setCurrentStep((prev) => prev + 1);
                   }

@@ -282,7 +282,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         )}
 
-        <Text style={styles.comments}>Remarks: {formData.remarks}</Text>
+        <Text style={styles.comments}>Remarks: {formData?.remarks}</Text>
         <Text
           style={styles.pageNumber}
           render={({ pageNumber, totalPages }) =>
