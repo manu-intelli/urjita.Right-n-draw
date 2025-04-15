@@ -103,12 +103,14 @@ const VerifierInterface = () => {
 
   const [isRemarksReq, setIsRemarksReq] = useState(false);
   const [openRemarksModal, setOpenRemarksModal] = useState(false);
-  const [pendingSubmit, setPendingSubmit] = useState(false);
+  const [mapForZero, setMapForZero] = useState({});
   const navigate = useNavigate();
 
   console.log("formData", formData);
   console.log("ApiData", apiData);
-  let mapForZero = {};
+  console.log("isRemarksReq", isRemarksReq);
+  console.log("openRemarksModal", openRemarksModal);
+
   const fetchInitialData = useCallback(async () => {
     try {
       const [components] = await Promise.all([componentsAPI.getAll()]);
@@ -228,7 +230,6 @@ const VerifierInterface = () => {
   //   }
   // };
 
-
   const handleSubmit = async (incomingFormData = formData) => {
     setLoading((prev) => ({ ...prev, submission: true }));
     try {
@@ -245,7 +246,7 @@ const VerifierInterface = () => {
         }
         return acc;
       }, {});
-  
+
       const submitData = {
         oppNumber: incomingFormData[STEPS.BASIC_INFO].oppNumber,
         opuNumber: incomingFormData[STEPS.BASIC_INFO].opuNumber,
@@ -255,21 +256,22 @@ const VerifierInterface = () => {
         component: incomingFormData[STEPS.BASIC_INFO].component,
         revisionNumber: incomingFormData[STEPS.BASIC_INFO].revisionNumber,
         componentSpecifications: processedSpecs,
-        verifierQueryData: incomingFormData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+        verifierQueryData:
+          incomingFormData[STEPS.VERIFIER_FIELDS].verifierQueryData,
         ...(incomingFormData?.remarks && { remarks: incomingFormData.remarks }),
       };
-  
+
       await verifierAPI.createVerifierTemplate(submitData);
       const results = await verifierAPI.getVerifyResults(submitData);
       setApiData((prev) => ({ ...prev, verifyResults: results.res }));
-  
+
       generatePDF(
         incomingFormData,
         results.res,
         apiData.specifications,
         selectedComponent
       );
-  
+
       setCurrentStep((prev) => prev + 1);
       setSubmitted(true);
       toast.success("Successfully submitted the details!");
@@ -281,7 +283,6 @@ const VerifierInterface = () => {
       setLoading((prev) => ({ ...prev, submission: false }));
     }
   };
-  
 
   const checkTemplateExistence = async () => {
     setCheckingTemplate(true);
@@ -442,7 +443,7 @@ const VerifierInterface = () => {
                     ] ?? ""
                   }
                   onChange={(value) => {
-                    const numValue = Number(value);
+                    var numValue = Number(value);
                     if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
                       handleFieldChange(
                         STEPS.VERIFIER_FIELDS,
@@ -453,20 +454,27 @@ const VerifierInterface = () => {
                         }
                       );
                     }
-
+                    console.log("mapForZero", mapForZero, field.field_name);
+                    // If the value is 0, add it to the map and show modal
                     if (numValue === 0) {
-                      setIsRemarksReq(true);
-                      mapForZero = {
-                        ...mapForZero,
-                        [field.field_name]: numValue,
-                      };
+                      setMapForZero((prev) => {
+                        const updated = {
+                          ...prev,
+                          [field.field_name]: numValue,
+                        };
+                        setIsRemarksReq(true); // Show modal
+                        return updated;
+                      });
                     } else {
-                      if (mapForZero?.[field.field_name]) {
-                        delete mapForZero[field.field_name];
-                        if (!Object.keys(mapForZero).length) {
-                          setIsRemarksReq(false);
+                      // If it's not 0, remove it from the map and close modal if empty
+                      setMapForZero((prev) => {
+                        const updated = { ...prev };
+                        delete updated[field.field_name];
+                        if (Object.keys(updated).length === 0) {
+                          setIsRemarksReq(false); // Close modal
                         }
-                      }
+                        return updated;
+                      });
                     }
                   }}
                   required
@@ -664,17 +672,16 @@ const VerifierInterface = () => {
         ...formData, // use latest formData from state
         remarks: value,
       };
-    
+
       // Submit with the new data
       handleSubmit(updatedFormData);
-    
+
       // Update local state for future reference
       setFormData(updatedFormData);
-    
+
       // Close modal
       setOpenRemarksModal(false);
     };
-    
 
     console.log("value", value);
     console.log("firmdata", formData.remarks);
