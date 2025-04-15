@@ -89,6 +89,11 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: "#374151",
   },
+  comments: {
+    fontSize: 9,
+    color: "#64748b",
+    fontStyle: "italic",
+  },
   pageNumber: {
     position: "absolute",
     bottom: 10,
@@ -191,7 +196,9 @@ const PDFDocumentVerifierInterface = ({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{compDescription} Specifications</Text>
+          <Text style={styles.sectionTitle}>
+            {compDescription} Specifications
+          </Text>
           <View style={styles.infoGrid}>
             {Object.entries(formData[STEPS.PCB_SPECS].selectedSpecs).map(
               ([key, value]) => {
@@ -210,7 +217,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         </View>
 
-        {(deviatedResults.length > 0||deviatedDesignFields.length > 0) && (
+        {(deviatedResults.length > 0 || deviatedDesignFields.length > 0) && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: "#dc2626" }]}>
               Deviated Values
@@ -242,7 +249,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         )}
 
-        {(compliantResults.length > 0 ||compliantDesignFields.length > 0) && (
+        {(compliantResults.length > 0 || compliantDesignFields.length > 0) && (
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: "#16a34a" }]}>
               Compliant Values
@@ -275,6 +282,7 @@ const PDFDocumentVerifierInterface = ({
           </View>
         )}
 
+        <Text style={styles.comments}>Remarks: {formData?.remarks}</Text>
         <Text
           style={styles.pageNumber}
           render={({ pageNumber, totalPages }) =>
