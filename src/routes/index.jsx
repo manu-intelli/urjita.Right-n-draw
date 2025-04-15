@@ -6,6 +6,7 @@ import ProtectedRoute from "../components/auth/ProtectedRoute";
 
 import { Sample } from "../pages/Sample";
 import RightDrawWrapper from "../pages/RightDrawWrapper";
+import CreationInterface from "../pages/page21-interfaces/Page21Creation/CreationInterface";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
@@ -45,14 +46,14 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      // {
-      //   path: "about",
-      //   element: (
-      //     <Suspense fallback={<LoadingSpinner />}>
-      //       <About />
-      //     </Suspense>
-      //   ),
-      // },
+      {
+        path: "page21",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <CreationInterface />
+          </Suspense>
+        ),
+      },
       {
         path: "login",
         element: (

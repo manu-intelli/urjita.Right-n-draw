@@ -1,23 +1,55 @@
+import React from "react";
+import { usePage21Context } from "../../../context/Page21Context";
 import { FormSection } from "../../../components/common/ReusableComponents";
 import PartDetails from "./Parts";
+import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 
-
-const renderStepContent = () => {
-  switch (STEP_ORDER[currentStep]) {
-    case STEPS.BASIC_INFO:
-      return (
-        <FormSection title="Basic Information">
-    <PartDetails type={type} index={index} item={item} />
-
-        </FormSection>
-      );
-    default:
-      return null;
-  }
+export const STEPS = {
+  GENERAL_DETAILS: "general_details",
+  CHIP_AIRCOILS: "chip_aircoils",
+  CHIP_INDUCTORS: "chip_inductors",
+  CHIP_CAPACITORS: "chip_capacitors",
+  TRANSFORMER_WOUND_INDUCTORS: "transformer_wound_inductors",
+  OTHERS: "others",
 };
 
+export const STEP_ORDER = [
+  STEPS.GENERAL_DETAILS,
+  STEPS.CHIP_AIRCOILS,
+  STEPS.CHIP_INDUCTORS,
+  STEPS.CHIP_CAPACITORS,
+  STEPS.TRANSFORMER_WOUND_INDUCTORS,
+  STEPS.OTHERS,
+];
 
-const renderStepIndicator = () => (
+const CreationInterface = () => {
+  const { state, dispatch } = usePage21Context();
+  const { currentStep, submitted } = state;
+
+  const handleSubmit = () => {
+    dispatch({ type: "SET_SUBMITTED", payload: true });
+  };
+
+  const setCurrentStep = (step) => {
+    dispatch({ type: "SET_CURRENT_STEP", payload: step });
+  };
+
+  const renderStepContent = () => {
+    const stepKey = STEP_ORDER[currentStep];
+    switch (stepKey) {
+      case STEPS.GENERAL_DETAILS:
+        return (
+          <FormSection title="Basic Information">
+            <PartDetails partIndex={0} partType={stepKey} />
+          </FormSection>
+        );
+      // Add more cases for other step types if needed
+      default:
+        return null;
+    }
+  };
+
+  const renderStepIndicator = () => (
     <div className="flex justify-between items-center mb-4 px-4">
       {STEP_ORDER.map((stepKey, index) => (
         <div key={stepKey} className="flex items-center flex-1 last:flex-none">
@@ -68,101 +100,50 @@ const renderStepIndicator = () => (
     </div>
   );
 
-
-  const CreationInterface =()=>{
-    return (
-        <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
-          <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">
-            <div className="px-4 sm:px-6 md:px-8 py-4 border-b border-neutral-200">
-              <div className="w-full text-center">
-                <h1 className="text-2xl font-semibold text-neutral-900 mb-6">
-                  Page 21 Creation Interface
-                </h1>
-                {renderStepIndicator()}
-              </div>
-            </div>
-    
-            <div className="flex-1">
-              <div className="px-4 sm:px-6 md:px-8 py-6">
-                {loading.initial ? (
-                  <div className="flex justify-center py-12">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-                  </div>
-                ) : (
-                  renderStepContent()
-                )}
-              </div>
-            </div>
-    
-            <div className="px-4 sm:px-6 md:px-8 py-4 border-t border-neutral-200">
-              <div className="max-w-7xl mx-auto flex justify-between">
-                <div>
-                  {!submitted && currentStep > 0 && (
-                    <Button
-                      variant="secondary"
-                      onClick={() => setCurrentStep((prev) => prev - 1)}
-                      disabled={currentStep === 0}
-                    >
-                      Previous
-                    </Button>
-                  )}
-                </div>
-    
-            
-                  <Button
-                    variant="primary"
-                    onClick={
-                      currentStep === 0
-                        ? checkTemplateExistence
-                        : currentStep === STEP_ORDER.length - 2
-                        ? handleSubmit
-                        : () => setCurrentStep((prev) => prev + 1)
-                    }
-                    disabled={
-                      loading.submission ||
-                      checkingTemplate ||
-                      (currentStep === 0 &&
-                        7 !==
-                          Object.values(formData?.[STEPS.BASIC_INFO]).filter(
-                            (itr) => itr
-                          ).length) ||
-                      templateExists ||
-                      (currentStep === 1 &&
-                        apiData.specifications?.length !==
-                          Object.values(
-                            formData?.[STEPS.PCB_SPECS]?.selectedSpecs
-                          ).filter((itr) => itr).length) ||
-                      (currentStep === 2 &&
-                        !apiData.verifierFields.every(({ id }) => {
-                          const val =
-                            formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[
-                              id
-                            ];
-                          return [9, 15, 16, 18].includes(id)
-                            ? val !== null && val !== undefined && val !== ""
-                            : Number(val) > 0;
-                        }))
-                    }
-                  >
-                    {checkingTemplate ? (
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                        <span>Checking...</span>
-                      </div>
-                    ) : loading.submission ? (
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                      </div>
-                    ) : currentStep === STEP_ORDER.length - 2 ? (
-                      "Submit"
-                    ) : (
-                      "Next"
-                    )}
-                  </Button>
-                
-              </div>
-            </div>
+  return (
+    <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
+      <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">
+        <div className="px-4 sm:px-6 md:px-8 py-4 border-b border-neutral-200">
+          <div className="w-full text-center">
+            <h1 className="text-2xl font-semibold text-neutral-900 mb-6">
+              Page 21 Creation Interface
+            </h1>
+            {renderStepIndicator()}
           </div>
         </div>
-      );
-  }
+
+        <div className="flex-1">
+          <div className="px-4 sm:px-6 md:px-8 py-6">{renderStepContent()}</div>
+        </div>
+
+        <div className="px-4 sm:px-6 md:px-8 py-4 border-t border-neutral-200">
+          <div className="max-w-7xl mx-auto flex justify-between">
+            <div>
+              {!submitted && currentStep > 0 && (
+                <Button
+                  variant="secondary"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                >
+                  Previous
+                </Button>
+              )}
+            </div>
+
+            <Button
+              variant="primary"
+              onClick={
+                currentStep === STEP_ORDER.length - 1
+                  ? handleSubmit
+                  : () => setCurrentStep(currentStep + 1)
+              }
+            >
+              {currentStep === STEP_ORDER.length - 1 ? "Submit" : "Next"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreationInterface;

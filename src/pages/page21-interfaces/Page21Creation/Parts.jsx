@@ -1,15 +1,16 @@
 import React from "react";
-import { usePartContext } from "./PartContext";
+import { usePage21Context } from "../../../context/Page21Context";
 import { Input, Select } from "../../../components/common/ReusableComponents";
 
-const PartDetails = ({ type, index, item }) => {
-  const { dispatch } = usePartContext();
+const PartDetails = ({ partIndex, partType }) => {
+  const { state, dispatch } = usePage21Context();
+  const item = state?.[partType]?.[partIndex] || {};
 
   const handleChange = (field, value) => {
     dispatch({
       type: "UPDATE_PART",
-      partType: type,
-      index,
+      partType,
+      index: partIndex,
       payload: { [field]: value },
     });
   };
@@ -25,11 +26,11 @@ const PartDetails = ({ type, index, item }) => {
   ];
 
   return (
-    <div>
+    <div className="grid gap-4">
       {/* Has BP/N? */}
       <Select
         label="Has BP/N?"
-        value={item.hasBp}
+        value={item.hasBp || ""}
         options={yesNoOptions}
         onChange={(value) => handleChange("hasBp", value)}
         required
@@ -48,7 +49,7 @@ const PartDetails = ({ type, index, item }) => {
       {/* Supplier Available? */}
       <Select
         label="Supplier Available?"
-        value={item.hasSupplier}
+        value={item.hasSupplier || ""}
         options={yesNoOptions}
         onChange={(value) => handleChange("hasSupplier", value)}
         required
@@ -67,7 +68,7 @@ const PartDetails = ({ type, index, item }) => {
       {/* Qualification Status */}
       <Select
         label="Qualification Status"
-        value={item.qualification}
+        value={item.qualification || ""}
         options={qualificationOptions}
         onChange={(value) => handleChange("qualification", value)}
         required
