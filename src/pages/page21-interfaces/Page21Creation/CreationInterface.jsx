@@ -36,17 +36,44 @@ const CreationInterface = () => {
 
   const renderStepContent = () => {
     const stepKey = STEP_ORDER[currentStep];
+    let partType = null;
+
     switch (stepKey) {
-      case STEPS.GENERAL_DETAILS:
-        return (
-          <FormSection title="Basic Information">
-            <PartDetails partIndex={0} partType={stepKey} />
-          </FormSection>
-        );
-      // Add more cases for other step types if needed
+      case STEPS.CHIP_CAPACITORS:
+        partType = "Capacitor";
+        break;
+      case STEPS.CHIP_AIRCOILS:
+        partType = "AirCoil";
+        break;
+      case STEPS.CHIP_INDUCTORS:
+        partType = "Inductor";
+        break;
       default:
-        return null;
+        return <p className="text-gray-500 p-4">No content for this step.</p>;
     }
+
+    return (
+      <>
+        <div className="flex justify-end">
+          <Button
+            variant="secondary"
+            onClick={() => dispatch({ type: "ADD_PART", partType })}
+          >
+            + Add {partType}
+          </Button>
+        </div>
+        <FormSection
+          title={`${partType} Details`}
+      
+        >
+          {state[partType]?.map((item, index) => (
+            <>
+              <PartDetails item={item} index={index} partType={partType} />
+            </>
+          ))}
+        </FormSection>
+      </>
+    );
   };
 
   const renderStepIndicator = () => (

@@ -11,47 +11,34 @@ const initialState = {
 };
 
 const reducer = (state, action) => {
-  const { type, payload, partType, index } = action;
-
-  switch (type) {
+  switch (action.type) {
     case "SET_CURRENT_STEP":
-      return { ...state, currentStep: payload };
-
+      return { ...state, currentStep: action.payload };
     case "SET_SUBMITTED":
-      return { ...state, submitted: payload };
-
+      return { ...state, submitted: action.payload };
     case "ADD_PART":
       return {
         ...state,
-        [partType]: [
-          ...state[partType],
-          {
-            hasBp: "No",
-            hasSupplier: "No",
-            qualification: "Qualification",
-          },
-        ],
+        [action.partType]: [...(state[action.partType] || []), {}],
       };
-
     case "REMOVE_PART":
       return {
         ...state,
-        [partType]: state[partType].filter((_, i) => i !== index),
+        [action.partType]: state[action.partType].filter(
+          (_, i) => i !== action.index
+        ),
       };
-
     case "UPDATE_PART":
       return {
         ...state,
-        [partType]: state[partType].map((item, i) =>
-          i === index ? { ...item, ...payload } : item
+        [action.partType]: state[action.partType].map((part, i) =>
+          i === action.index ? { ...part, [action.field]: action.value } : part
         ),
       };
-
     default:
       return state;
   }
 };
-
 export const Page21Provider = ({ children }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 

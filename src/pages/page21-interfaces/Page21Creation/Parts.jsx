@@ -2,16 +2,16 @@ import React from "react";
 import { usePage21Context } from "../../../context/Page21Context";
 import { Input, Select } from "../../../components/common/ReusableComponents";
 
-const PartDetails = ({ partIndex, partType }) => {
-  const { state, dispatch } = usePage21Context();
-  const item = state?.[partType]?.[partIndex] || {};
+const PartDetails = ({ item, index, partType }) => {
+  const { dispatch } = usePage21Context();
 
   const handleChange = (field, value) => {
     dispatch({
       type: "UPDATE_PART",
       partType,
-      index: partIndex,
-      payload: { [field]: value },
+      index,
+      field,
+      value,
     });
   };
 
@@ -26,8 +26,7 @@ const PartDetails = ({ partIndex, partType }) => {
   ];
 
   return (
-    <div className="grid gap-4">
-      {/* Has BP/N? */}
+    <div  className=" grid gap-4 p-4 border rounded-md mb-4 bg-gray-50">
       <Select
         label="Has BP/N?"
         value={item.hasBp || ""}
@@ -36,17 +35,13 @@ const PartDetails = ({ partIndex, partType }) => {
         required
       />
 
-      {/* BP Number */}
-      {item.hasBp === "Yes" && (
-        <Input
-          label="BP Number"
-          value={item.bpNumber || ""}
-          onChange={(e) => handleChange("bpNumber", e.target.value)}
-          required
-        />
-      )}
+      <Input
+        label="BP Number"
+        value={item.bpNumber || ""}
+        onChange={(e) => handleChange("bpNumber", e.target.value)}
+        required
+      />
 
-      {/* Supplier Available? */}
       <Select
         label="Supplier Available?"
         value={item.hasSupplier || ""}
@@ -55,7 +50,6 @@ const PartDetails = ({ partIndex, partType }) => {
         required
       />
 
-      {/* Supplier Number */}
       {item.hasSupplier === "Yes" && (
         <Input
           label="Supplier Number"
@@ -65,7 +59,6 @@ const PartDetails = ({ partIndex, partType }) => {
         />
       )}
 
-      {/* Qualification Status */}
       <Select
         label="Qualification Status"
         value={item.qualification || ""}
