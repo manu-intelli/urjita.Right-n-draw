@@ -403,7 +403,13 @@ const DesignerInterface = () => {
       .filter(([_, isSelected]) => isSelected)
       .map(([id]) => id);
 
-    if (!selectedOptions.length) return;
+    if (!selectedOptions.length){
+
+      setApiData((prev) => ({
+        ...prev,
+        designRules: [],
+      }));
+     return;} 
 
     setLoadingStates((prev) => ({ ...prev, rules: true }));
     setErrors((prev) => ({ ...prev, rules: null }));
