@@ -102,7 +102,7 @@ const RulesComponent = ({ rules, selectedCheckboxes }) => {
 
       {/* Rules List */}
       <div className="flex-1 overflow-y-auto p-4">
-        {filteredRules.length ? (
+        {filteredRules?.length ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredRules
               ?.sort((a, b) => a.id - b.id)
