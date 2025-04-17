@@ -3,9 +3,11 @@ import { usePage21Context } from "../../../context/Page21Context";
 import { FormSection } from "../../../components/common/ReusableComponents";
 import PartDetails from "./Parts";
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
+import ComponentsDetails from "./Components";
 
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
+  COMPONENTS: "components",
   CHIP_AIRCOILS: "chip_aircoils",
   CHIP_INDUCTORS: "chip_inductors",
   CHIP_CAPACITORS: "chip_capacitors",
@@ -15,6 +17,7 @@ export const STEPS = {
 
 export const STEP_ORDER = [
   STEPS.GENERAL_DETAILS,
+  STEPS.COMPONENTS,
   STEPS.CHIP_AIRCOILS,
   STEPS.CHIP_INDUCTORS,
   STEPS.CHIP_CAPACITORS,
@@ -36,8 +39,20 @@ const CreationInterface = () => {
 
   const renderStepContent = () => {
     const stepKey = STEP_ORDER[currentStep];
-    let partType = null;
 
+    // Handle COMPONENTS step separately
+    if (stepKey === STEPS.COMPONENTS) {
+      return (
+        <FormSection title={`${STEPS.COMPONENTS} Details`}>
+          <div  className="md:col-span-2">
+          <ComponentsDetails />
+          </div>
+        </FormSection>
+      );
+    }
+
+    // Handle all other part-based steps
+    let partType = null;
     switch (stepKey) {
       case STEPS.CHIP_CAPACITORS:
         partType = "Capacitor";
@@ -48,30 +63,29 @@ const CreationInterface = () => {
       case STEPS.CHIP_INDUCTORS:
         partType = "Inductor";
         break;
+      case STEPS.TRANSFORMER_WOUND_INDUCTORS:
+        partType = "Transformer";
+        break;
       default:
         return <p className="text-gray-500 p-4">No content for this step.</p>;
     }
 
     return (
       <>
-        <div className="flex justify-end">
-          <Button
-            variant="secondary"
-            onClick={() => dispatch({ type: "ADD_PART", partType })}
-          >
-            + Add {partType}
-          </Button>
-        </div>
-        <FormSection
-          title={`${partType} Details`}
-      
-        >
+        <FormSection title={`${partType} Details`}>
           {state[partType]?.map((item, index) => (
-            <>
+            <div key={index} className="md:col-span-2">
               <PartDetails item={item} index={index} partType={partType} />
-            </>
+            </div>
           ))}
         </FormSection>
+
+        <Button
+          variant="primary"
+          onClick={() => dispatch({ type: "ADD_PART", partType })}
+        >
+          + Add {partType}
+        </Button>
       </>
     );
   };
