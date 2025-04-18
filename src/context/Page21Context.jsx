@@ -5,6 +5,30 @@ const Page21Context = createContext();
 const initialState = {
   currentStep: 0,
   submitted: false,
+
+  opNumber: "",
+  opuNumber: "",
+  eduNumber: "",
+  modelFamily: "",
+  modelName: "",
+  impedance: "",
+  customImpedance: "",
+  package: "",
+  caseStyle: "existing",
+  selectedCaseStyle: "",
+  caseDimensions: {
+    length: "",
+    width: "",
+    height: "",
+  },
+  bottomSolderMask: "",
+  halfMoonRequirement: "",
+  viaHolesRequirement: "",
+  signalPassing: "",
+  coverType: "",
+  designRuleViolation: "",
+  schematicFile: null,
+  similarModel: "",
   components: [],
   Inductor: [],
   Capacitor: [],
@@ -12,6 +36,7 @@ const initialState = {
   Transformer: [],
   canMaterial: "",
   canProcess: "",
+  customCanMaterial: "",
   pcbList: [
     {
       name: "Base PCB",
@@ -31,14 +56,37 @@ const initialState = {
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case "SET_FIELD":
+      return {
+        ...state,
+        [action.payload.field]: action.payload.value,
+      };
+    case "SET_CASE_DIMENSIONS":
+      return {
+        ...state,
+        caseDimensions: {
+          ...state.caseDimensions,
+          [action.payload.field]: action.payload.value,
+        },
+      };
+    case "SET_FILE":
+      return {
+        ...state,
+        schematicFile: action.payload.file,
+      };
+    case "REMOVE_FILE":
+      return {
+        ...state,
+        schematicFile: null,
+      };
     case "SET_CURRENT_STEP":
       return { ...state, currentStep: action.payload };
     case "SET_SUBMITTED":
       return { ...state, submitted: action.payload };
-
     case "SET_CAN_MATERIAL":
       return { ...state, canMaterial: action.payload };
-
+    case "SET_CUSTOM_CAN_MATERIAL":
+      return { ...state, customCanMaterial: action.payload };
     case "SET_CAN_PROCESS":
       return { ...state, canProcess: action.payload };
 

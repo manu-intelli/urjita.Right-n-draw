@@ -299,6 +299,7 @@ const ComponentsDetails = () => {
           options={[
             { label: "Aluminum", value: "Aluminum" },
             { label: "Tin", value: "Tin" },
+            { label: "Others", value: "Others" },
           ]}
           onChange={(value) =>
             dispatch({ type: "SET_CAN_MATERIAL", payload: value })
@@ -311,10 +312,23 @@ const ComponentsDetails = () => {
             { label: "Deep Drawing", value: "Deep Drawing" },
             { label: "Impact Extrusion", value: "Impact Extrusion" },
           ]}
-          onChange={(value) =>
-            dispatch({ type: "SET_CAN_PROCESS", payload: value })
-          }
+          onChange={(value) => {
+            if (val === "Others") {
+              dispatch({ type: "SET_CAN_PROCESS", payload: "" });
+            }
+            dispatch({ type: "SET_CAN_PROCESS", payload: value });
+          }}
         />
+        {canMaterial === "Others" && (
+          <Input
+            label="Custom can Material"
+            value={state.customCanMaterial || ""}
+            onChange={(val) =>
+              dispatch({ type: "SET_CUSTOM_CAN_MATERIAL", payload: val })
+            }
+            placeholder="Enter custom material"
+          />
+        )}
       </div>
 
       <div className="flex items-center justify-between mb-4">

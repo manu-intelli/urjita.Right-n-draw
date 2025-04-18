@@ -5,6 +5,7 @@ import PartDetails from "./Parts";
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
 import OtherDetails from "./OthersData";
+import ProjectForm from "./GeneralDetails";
 
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
@@ -40,6 +41,15 @@ const CreationInterface = () => {
 
   const renderStepContent = () => {
     const stepKey = STEP_ORDER[currentStep];
+    if (stepKey === STEPS.GENERAL_DETAILS) {
+      return (
+        <FormSection title={`${STEPS.GENERAL_DETAILS}`}>
+          <div className="md:col-span-2">
+            <ProjectForm />
+          </div>
+        </FormSection>
+      );
+    }
 
     // Handle COMPONENTS step separately
     if (stepKey === STEPS.COMPONENTS) {
