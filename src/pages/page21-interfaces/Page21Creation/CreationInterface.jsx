@@ -43,7 +43,7 @@ const CreationInterface = () => {
     const stepKey = STEP_ORDER[currentStep];
     if (stepKey === STEPS.GENERAL_DETAILS) {
       return (
-        <FormSection title={`${STEPS.GENERAL_DETAILS}`}>
+        <FormSection title={`Project Details`}>
           <div className="md:col-span-2">
             <ProjectForm />
           </div>
