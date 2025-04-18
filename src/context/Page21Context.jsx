@@ -23,7 +23,7 @@ const initialState = {
     },
   ],
   others: {
-    shieldRequired: "No",
+    shieldRequired: "Yes",
     numberOfShields: "",
     shields: [],
   },
@@ -76,6 +76,17 @@ const reducer = (state, action) => {
           i === action.index ? { ...part, ...action.fields } : part
         ),
       };
+    case "UPDATE_OTHERS":
+      console.log("Updated others field", action.payload);
+
+      return {
+        ...state,
+        others: {
+          ...state.others,
+          ...action.payload.others, // Spread to update the entire 'others' object
+        },
+      };
+
     default:
       return state;
   }

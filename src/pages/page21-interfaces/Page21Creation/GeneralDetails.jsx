@@ -7,7 +7,7 @@ const yesNoOptions = [
   { label: "No", value: "No" },
 ];
 
-const OtherDetails = () => {
+const GeneralDetails = () => {
   const { state, dispatch } = usePage21Context();
   const { others } = state;
   const { shieldRequired, numberOfShields, shields } = others;
@@ -175,4 +175,4 @@ const OtherDetails = () => {
   );
 };
 
-export default OtherDetails;
+export default GeneralDetails;

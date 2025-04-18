@@ -4,6 +4,7 @@ import { FormSection } from "../../../components/common/ReusableComponents";
 import PartDetails from "./Parts";
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
+import OtherDetails from "./OthersData";
 
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
@@ -44,8 +45,17 @@ const CreationInterface = () => {
     if (stepKey === STEPS.COMPONENTS) {
       return (
         <FormSection title={`${STEPS.COMPONENTS} Details`}>
-          <div  className="md:col-span-2">
-          <ComponentsDetails />
+          <div className="md:col-span-2">
+            <ComponentsDetails />
+          </div>
+        </FormSection>
+      );
+    }
+    if (stepKey === STEPS.OTHERS) {
+      return (
+        <FormSection title={`${STEPS.COMPONENTS} Details`}>
+          <div className="md:col-span-2">
+            <OtherDetails />
           </div>
         </FormSection>
       );
