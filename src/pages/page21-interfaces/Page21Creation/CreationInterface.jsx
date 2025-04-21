@@ -4,8 +4,12 @@ import { FormSection } from "../../../components/common/ReusableComponents";
 import PartDetails from "./Parts";
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
-import OtherDetails from "./OthersData";
 import ProjectForm from "./GeneralDetails";
+import ShieldDetails from "./ShieldDetails";
+import FingerDetails from "./FingerDetails";
+import CooperFlapDetails from "./CooperFlapDetails";
+import ResonatorDetails from "./ResonatorDetails";
+import LtccDetails from "./LTCC";
 
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
@@ -13,7 +17,13 @@ export const STEPS = {
   CHIP_AIRCOILS: "chip_aircoils",
   CHIP_INDUCTORS: "chip_inductors",
   CHIP_CAPACITORS: "chip_capacitors",
+  CHIP_RESISTORS: "chip_resistor",
   TRANSFORMER_WOUND_INDUCTORS: "transformer_wound_inductors",
+  SHEIDS: "shields",
+  FINGERS: "fingers",
+  COPPER_FLAPS: "cooper_Flaps",
+  RESONATORS: "resonators",
+  LTCC: "ltcc",
   OTHERS: "others",
 };
 
@@ -23,8 +33,13 @@ export const STEP_ORDER = [
   STEPS.CHIP_AIRCOILS,
   STEPS.CHIP_INDUCTORS,
   STEPS.CHIP_CAPACITORS,
+  STEPS.CHIP_RESISTORS,
   STEPS.TRANSFORMER_WOUND_INDUCTORS,
-  STEPS.OTHERS,
+  STEPS.SHEIDS,
+  STEPS.FINGERS,
+  STEPS.COPPER_FLAPS,
+  STEPS.RESONATORS,
+  STEPS.LTCC,
 ];
 
 const CreationInterface = () => {
@@ -61,11 +76,50 @@ const CreationInterface = () => {
         </FormSection>
       );
     }
-    if (stepKey === STEPS.OTHERS) {
+    if (stepKey === STEPS.SHEIDS) {
       return (
-        <FormSection title={`${STEPS.COMPONENTS} Details`}>
+        <FormSection title={`Shield Details`}>
           <div className="md:col-span-2">
-            <OtherDetails />
+            <ShieldDetails />
+          </div>
+        </FormSection>
+      );
+    }
+
+    if (stepKey === STEPS.FINGERS) {
+      return (
+        <FormSection title={`Fingers Details`}>
+          <div className="md:col-span-2">
+            <FingerDetails />
+          </div>
+        </FormSection>
+      );
+    }
+
+    if (stepKey === STEPS.COPPER_FLAPS) {
+      return (
+        <FormSection title={`Copper Flaps Details`}>
+          <div className="md:col-span-2">
+            <CooperFlapDetails />
+          </div>
+        </FormSection>
+      );
+    }
+
+    if (stepKey === STEPS.RESONATORS) {
+      return (
+        <FormSection title={`Resonator Details`}>
+          <div className="md:col-span-2">
+            <ResonatorDetails />
+          </div>
+        </FormSection>
+      );
+    }
+    if (stepKey === STEPS.LTCC) {
+      return (
+        <FormSection title={`Ltcc Details`}>
+          <div className="md:col-span-2">
+            <LtccDetails />
           </div>
         </FormSection>
       );
@@ -76,6 +130,9 @@ const CreationInterface = () => {
     switch (stepKey) {
       case STEPS.CHIP_CAPACITORS:
         partType = "Capacitor";
+        break;
+      case STEPS.CHIP_RESISTORS:
+        partType = "Resistor";
         break;
       case STEPS.CHIP_AIRCOILS:
         partType = "AirCoil";
@@ -109,6 +166,57 @@ const CreationInterface = () => {
       </>
     );
   };
+
+  // const renderStepIndicator = () => (
+  //   <div className="flex justify-between items-center mb-4 px-4">
+  //     {STEP_ORDER.map((stepKey, index) => (
+  //       <div key={stepKey} className="flex items-center flex-1 last:flex-none">
+  //         <div
+  //           className={`
+  //             w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm
+  //             ${
+  //               currentStep === index
+  //                 ? "bg-blue-600 text-white ring-4 ring-blue-100"
+  //                 : currentStep > index
+  //                 ? "bg-green-400 text-white"
+  //                 : "bg-white border-2 border-gray-200 text-gray-400"
+  //             }
+  //             transition-all duration-200 relative z-10
+  //           `}
+  //         >
+  //           {currentStep > index ? (
+  //             <svg
+  //               className="w-5 h-5"
+  //               fill="none"
+  //               viewBox="0 0 24 24"
+  //               stroke="currentColor"
+  //             >
+  //               <path
+  //                 strokeLinecap="round"
+  //                 strokeLinejoin="round"
+  //                 strokeWidth={2}
+  //                 d="M5 13l4 4L19 7"
+  //               />
+  //             </svg>
+  //           ) : (
+  //             index + 1
+  //           )}
+  //         </div>
+  //         {index < STEP_ORDER.length - 1 && (
+  //           <div className="flex-1 relative">
+  //             <div
+  //               className={`
+  //                 absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1
+  //                 ${currentStep > index ? "bg-green-400" : "bg-gray-200"}
+  //                 transition-colors duration-300
+  //               `}
+  //             />
+  //           </div>
+  //         )}
+  //       </div>
+  //     ))}
+  //   </div>
+  // );
 
   const renderStepIndicator = () => (
     <div className="flex justify-between items-center mb-4 px-4">
@@ -144,6 +252,9 @@ const CreationInterface = () => {
             ) : (
               index + 1
             )}
+          </div>
+          <div className="mt-2 text-center text-sm text-gray-500">
+            {STEPS[stepKey]} {/* Assuming STEPS is an object with step names */}
           </div>
           {index < STEP_ORDER.length - 1 && (
             <div className="flex-1 relative">

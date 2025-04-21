@@ -7,37 +7,22 @@ const yesNoOptions = [
   { label: "No", value: "No" },
 ];
 
-const OtherDetails = () => {
+const ShieldDetails = () => {
   const { state, dispatch } = usePage21Context();
-  const { others } = state;
-  const { shieldRequired, numberOfShields, shields } = others;
+  const { shieldsList } = state;
+  const { shieldRequired, numberOfShields, shields } = shieldsList;
 
   const handleOthersChange = (field, value) => {
     dispatch({
-      type: "UPDATE_OTHERS",
+      type: "UPDATE_SHIELDS",
       payload: {
-        others: {
-          ...others,
+        shieldsList: {
+          ...shieldsList,
           [field]: value,
         },
       },
     });
   };
-
-  // const handleShieldChange = (index, field, value) => {
-  //   const updatedShields = shields.map((shield, i) =>
-  //     i === index ? { ...shield, [field]: value } : shield
-  //   );
-  //   dispatch({
-  //     type: "UPDATE_OTHERS",
-  //     payload: {
-  //       others: {
-  //         ...others,
-  //         shields: updatedShields,
-  //       },
-  //     },
-  //   });
-  // };
 
   const handleShieldChange = (index, field, value) => {
     const updatedShields = shields.map((shield, i) => {
@@ -48,7 +33,7 @@ const OtherDetails = () => {
         return {
           ...shield,
           partType: value,
-          partNumber: value === "Existing" ? "TBD" : "", // Set based on selection
+          partNumber: value === "New" ? "TBD" : "", // Set based on selection
         };
       }
 
@@ -60,10 +45,10 @@ const OtherDetails = () => {
     });
 
     dispatch({
-      type: "UPDATE_OTHERS",
+      type: "UPDATE_SHIELDS",
       payload: {
-        others: {
-          ...others,
+        shieldsList: {
+          ...shieldsList,
           shields: updatedShields,
         },
       },
@@ -74,10 +59,10 @@ const OtherDetails = () => {
     if (shieldRequired !== "Yes") {
       // Reset shields when shieldRequired is "No"
       dispatch({
-        type: "UPDATE_OTHERS",
+        type: "UPDATE_SHIELDS",
         payload: {
-          others: {
-            ...others,
+          shieldsList: {
+            ...shieldsList,
             shields: [],
           },
         },
@@ -90,7 +75,7 @@ const OtherDetails = () => {
 
     while (updated.length < count) {
       // Initialize new shields with empty partNumber when partType is "New"
-      updated.push({ partType: "Existing", partNumber: "TBD" });
+      updated.push({ partType: "New", partNumber: "TBD" });
     }
 
     if (updated.length > count) {
@@ -98,10 +83,10 @@ const OtherDetails = () => {
     }
 
     dispatch({
-      type: "UPDATE_OTHERS",
+      type: "UPDATE_SHIELDS",
       payload: {
-        others: {
-          ...others,
+        shieldsList: {
+          ...shieldsList,
           shields: updated,
         },
       },
@@ -167,7 +152,7 @@ const OtherDetails = () => {
               onChange={(value) =>
                 handleShieldChange(index, "partNumber", value)
               }
-              disabled={shield.partType === "Existing"}
+              disabled={shield.partType === "New"}
             />
           </div>
         ))}
@@ -175,4 +160,4 @@ const OtherDetails = () => {
   );
 };
 
-export default OtherDetails;
+export default ShieldDetails;

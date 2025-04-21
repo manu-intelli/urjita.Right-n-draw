@@ -5,18 +5,76 @@ import { usePage21Context } from "../../../context/Page21Context";
 import { Input, Select } from "../../../components/common/ReusableComponents";
 
 
-const impedanceOptions = [{label:'50 ohms',value:"50 ohms"}, '75 ohms', 'Others'];
-  const packageOptions = ['SMT', 'Connectorized', 'Lead', 'Plug-in'];
-  const existingCaseStyles = [{label:'Case A',value:'Case A'},{label:'Case B',value:'Case B'}, {label:'Case C',value:'Case C'}, {label:'Case D',value:'Case D'}];
-  const coverTypeOptions = ['Open', 'Closed'];
-  const bottomSolderMaskOptions = ['Full solder mask', 'Strip solder mask', 'No solder mask'];
-  const yesNoOptions = ['Yes', 'No'];
-  const signalPassingOptions = ['PCB', 'Lead', 'Pin'];
-  const pcbNameOptions = ['Base PCB', 'Coupling PCB', 'Other PCB'];
-  const mountingOrientationOptions = ['Horizontal', 'Vertical'];
-  const canMaterialOptions = ['Metal', 'Plastic', 'Ceramic', 'Others'];
-  const canMakingProcessOptions = ['Etched', 'Stamped'];
-  const qualificationOptions = ['Qualification', 'Approval'];
+const impedanceOptions = [
+  { label: '50 ohms', value: '50 ohms' },
+  { label: '75 ohms', value: '75 ohms' },
+  { label: 'Others', value: 'Others' }
+];
+
+const packageOptions = [
+  { label: 'SMT', value: 'SMT' },
+  { label: 'Connectorized', value: 'Connectorized' },
+  { label: 'Lead', value: 'Lead' },
+  { label: 'Plug-in', value: 'Plug-in' }
+];
+
+const existingCaseStyles = [
+  { label: 'Case A', value: 'Case A' },
+  { label: 'Case B', value: 'Case B' },
+  { label: 'Case C', value: 'Case C' },
+  { label: 'Case D', value: 'Case D' }
+];
+
+const coverTypeOptions = [
+  { label: 'Open', value: 'Open' },
+  { label: 'Closed', value: 'Closed' }
+];
+
+const bottomSolderMaskOptions = [
+  { label: 'Full solder mask', value: 'Full solder mask' },
+  { label: 'Strip solder mask', value: 'Strip solder mask' },
+  { label: 'No solder mask', value: 'No solder mask' }
+];
+
+const yesNoOptions = [
+  { label: 'Yes', value: 'Yes' },
+  { label: 'No', value: 'No' }
+];
+
+const signalPassingOptions = [
+  { label: 'PCB', value: 'PCB' },
+  { label: 'Lead', value: 'Lead' },
+  { label: 'Pin', value: 'Pin' }
+];
+
+const pcbNameOptions = [
+  { label: 'Base PCB', value: 'Base PCB' },
+  { label: 'Coupling PCB', value: 'Coupling PCB' },
+  { label: 'Other PCB', value: 'Other PCB' }
+];
+
+const mountingOrientationOptions = [
+  { label: 'Horizontal', value: 'Horizontal' },
+  { label: 'Vertical', value: 'Vertical' }
+];
+
+const canMaterialOptions = [
+  { label: 'Metal', value: 'Metal' },
+  { label: 'Plastic', value: 'Plastic' },
+  { label: 'Ceramic', value: 'Ceramic' },
+  { label: 'Others', value: 'Others' }
+];
+
+const canMakingProcessOptions = [
+  { label: 'Etched', value: 'Etched' },
+  { label: 'Stamped', value: 'Stamped' }
+];
+
+const qualificationOptions = [
+  { label: 'Qualification', value: 'Qualification' },
+  { label: 'Approval', value: 'Approval' }
+];
+
 
 const ProjectForm = () => {
   const { state, dispatch } = usePage21Context();

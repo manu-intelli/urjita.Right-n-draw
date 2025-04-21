@@ -47,11 +47,29 @@ const initialState = {
       comments: "",
     },
   ],
-  others: {
+  shieldsList: {
     shieldRequired: "Yes",
     numberOfShields: "",
     shields: [],
   },
+  fingersList: {
+    fingerRequired: "No",
+    numberOfFingers: "",
+    fingers: [],
+  },
+  cooperFlapDetails: {
+    numberOfFlaps: "",
+    flaps: [],
+  },
+  resonatorList: {
+    numberOfResonators: "",
+    resonators: [], // array of resonator objects
+  },
+  ltcc: {
+    numberOfLtcc: 0,
+    ltccItems: [],
+  },
+  comments: "",
 };
 
 const reducer = (state, action) => {
@@ -124,14 +142,47 @@ const reducer = (state, action) => {
           i === action.index ? { ...part, ...action.fields } : part
         ),
       };
-    case "UPDATE_OTHERS":
+    case "UPDATE_SHIELDS":
       console.log("Updated others field", action.payload);
 
       return {
         ...state,
-        others: {
-          ...state.others,
-          ...action.payload.others, // Spread to update the entire 'others' object
+        shieldsList: {
+          ...state.shieldsList,
+          ...action.payload.shieldsList, // Spread to update the entire 'others' object
+        },
+      };
+
+    case "UPDATE_FINGERS":
+      console.log("Updated  fingers", action.payload);
+
+      return {
+        ...state,
+        fingersList: {
+          ...state.fingersList,
+          ...action.payload.fingersList, // Spread to update the entire 'others' object
+        },
+      };
+
+    case "UPDATE_COOPER_FLAP_DETAILS":
+      return {
+        ...state,
+        cooperFlapDetails: action.payload.cooperFlapDetails,
+      };
+    case "UPDATE_RESONATORS":
+      return {
+        ...state,
+        resonatorList: {
+          ...state.resonatorList,
+          ...action.payload.resonatorList,
+        },
+      };
+    case "SET_LTCC_FIELD":
+      return {
+        ...state,
+        ltcc: {
+          ...state.ltcc,
+          [action.field]: action.value,
         },
       };
 
