@@ -11,6 +11,8 @@ import CooperFlapDetails from "./CooperFlapDetails";
 import ResonatorDetails from "./ResonatorDetails";
 import LtccDetails from "./LTCC";
 
+import StudentEditableTable from "../StudentEditableTable";
+
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
   COMPONENTS: "components",
@@ -314,6 +316,7 @@ const CreationInterface = () => {
           </div>
         </div>
       </div>
+      <StudentEditableTable />
     </div>
   );
 };

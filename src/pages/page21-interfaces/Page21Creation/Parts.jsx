@@ -100,8 +100,8 @@ const PartDetails = ({ item, index, partType }) => {
     <div className="border p-4 rounded-md shadow-sm mb-6">
       {/* Header */}
       <h3 className="text-lg font-semibold capitalize">
-          Number of {partType} :
-        </h3>
+        Number of {partType} :
+      </h3>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold capitalize">
           {partType} {index + 1}
