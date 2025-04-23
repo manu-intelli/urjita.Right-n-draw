@@ -816,7 +816,7 @@ const VerifierInterface = () => {
                         formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[
                           id
                         ];
-                      return [9, 14, 15, 18].includes(id)
+                      return [9, 14, 15, 18,33,34,35].includes(id)
                         ? val !== null && val !== undefined && val !== ""
                         : Number(val) > 0;
                     }))
