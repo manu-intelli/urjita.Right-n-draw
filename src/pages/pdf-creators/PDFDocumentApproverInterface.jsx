@@ -181,7 +181,7 @@ const PDFDocumentApproverInterface = ({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Basic Information</Text>
           <View style={styles.infoGrid}>
-            {Object.entries(basicInfo).map(([key, value]) => (
+            {Object.entries(basicInfo).filter(([key])=>![ "rejectionComment","approvalComment"].includes(key)).map(([key, value]) => (
               <View key={key} style={styles.infoItem}>
                 <View style={styles.infoRow}>
                   <Text style={styles.itemName}>{BASIC_KEY_LABEL[key]}: </Text>
