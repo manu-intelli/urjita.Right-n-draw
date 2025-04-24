@@ -49,9 +49,9 @@ const Navbar = ({ showDashboard, setShowDashboard }) => {
 
   // Add this function to handle dashboard toggle
   const handleDashboardToggle = () => {
-    console.log("Current showDashboard:", showDashboard);
+ 
     setShowDashboard((prev) => {
-      console.log("Toggling to:", !prev);
+   
       return !prev;
     });
   };

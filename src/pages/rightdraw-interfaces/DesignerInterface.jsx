@@ -520,9 +520,6 @@ const DesignerInterface = () => {
     }
   };
 
-  console.log({ formData });
-  console.log({ apiData });
-
   const handleSubmit = async () => {
     setLoadingStates((prev) => ({ ...prev, submission: true }));
     setErrors((prev) => ({ ...prev, submission: null }));
@@ -560,7 +557,7 @@ const DesignerInterface = () => {
     }
   };
   const goHome = () => {
-    console.log("going home");
+ 
     navigate("/");
   };
 
@@ -588,8 +585,6 @@ const DesignerInterface = () => {
           }))}
           value={formData[STEPS.BASIC_INFO].component}
           onChange={(value, text, des) => {
-            console.log(value);
-            console.log("text", des);
             setSelectedComponent(des);
             handleFieldChange(STEPS.BASIC_INFO, "component", value);
           }}
@@ -830,7 +825,7 @@ const DesignerInterface = () => {
           formData[STEPS.BASIC_INFO]?.component,
           "designer"
         );
-        console.log(res);
+       
         setApiData((prev) => ({
           ...prev,
           specifications: res,
@@ -883,8 +878,6 @@ const DesignerInterface = () => {
       </Modal>
     );
   };
-
-  console.log(isRemarksReq);
 
   return (
     <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">

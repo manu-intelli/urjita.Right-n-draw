@@ -301,7 +301,6 @@ const generatePDF = async (
   specifications,
   selectedComponent
 ) => {
-  console.log("In PDF Document Verifier Interface");
   const blob = await pdf(
     <PDFDocumentVerifierInterface
       formData={formData}

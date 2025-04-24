@@ -133,8 +133,6 @@ const Select = ({
             const selectedOption = options.find(
               (option) => option.value === selectedValue
             );
-            console.log("selectedOption",selectedOption);
-            
             onChange(e.target.value, e.target?.selectedOptions?.[0]?.innerText,selectedOption?.des);
           }}
           disabled={disabled}

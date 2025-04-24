@@ -106,11 +106,6 @@ const VerifierInterface = () => {
   const [mapForZero, setMapForZero] = useState({});
   const navigate = useNavigate();
 
-  console.log("formData", formData);
-  console.log("ApiData", apiData);
-  console.log("isRemarksReq", isRemarksReq);
-  console.log("openRemarksModal", openRemarksModal);
-
   const fetchInitialData = useCallback(async () => {
     try {
       const [components] = await Promise.all([componentsAPI.getAll()]);
@@ -320,8 +315,6 @@ const VerifierInterface = () => {
     }
   };
 
-  console.log("Current Step:", STEP_ORDER[currentStep]);
-
   const renderStepContent = () => {
     switch (STEP_ORDER[currentStep]) {
       case STEPS.BASIC_INFO:
@@ -454,7 +447,6 @@ const VerifierInterface = () => {
                         }
                       );
                     }
-                    console.log("mapForZero", mapForZero, field.field_name);
                     // If the value is 0, add it to the map and show modal
                     if (numValue === 0) {
                       setMapForZero((prev) => {
@@ -625,7 +617,7 @@ const VerifierInterface = () => {
   //   }
   // };
 
-  // console.log({ formData });
+
 
   const renderStepIndicator = () => (
     <div className="flex items-center mb-2 px-4">
@@ -658,11 +650,7 @@ const VerifierInterface = () => {
       ))}
     </div>
   );
-  console.log("Verifier Fields:", apiData.verifierFields);
-  console.log(
-    "Query Data:",
-    formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
-  );
+
 
   const RemarksModal = () => {
     const [value, setValue] = useState("");
@@ -682,9 +670,6 @@ const VerifierInterface = () => {
       // Close modal
       setOpenRemarksModal(false);
     };
-
-    console.log("value", value);
-    console.log("firmdata", formData.remarks);
     return (
       <Modal isOpen title="Remarks" styleClass="max-w-md">
         <div className="p-6">
