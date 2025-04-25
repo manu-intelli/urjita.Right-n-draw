@@ -402,7 +402,7 @@ const VerifierInterface = () => {
                   }
                   onChange={(value) => {
                     const numValue = Number(value);
-                    if (value === "" || (!isNaN(numValue) && numValue > 0)) {
+                    if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
                       handleFieldChange(STEPS.PCB_SPECS, "selectedSpecs", {
                         ...formData[STEPS.PCB_SPECS].selectedSpecs,
                         [spec.category_id]: value,
@@ -794,7 +794,7 @@ const VerifierInterface = () => {
                     apiData.specifications?.length !==
                       Object.values(
                         formData?.[STEPS.PCB_SPECS]?.selectedSpecs
-                      ).filter((itr) => itr).length) ||
+                      ).filter((itr) => itr && itr !=="0").length) ||
                   (currentStep === 2 &&
                     !apiData.verifierFields.every(({ id }) => {
                       const val =
