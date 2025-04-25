@@ -27,7 +27,7 @@ const LoginPage = () => {
 
     try {
       const response = await authAPI.login({ email, password });
-      console.log("response", response);
+   
       if (response?.access) {
         localStorage.setItem(
           "user",
@@ -44,7 +44,7 @@ const LoginPage = () => {
         throw new Error(response?.data?.error?.message);
       }
     } catch (error) {
-      console.log("error", error);
+      console.error("error", error);
       const errorMessage =
         error.response?.data?.detail ||
         error.response?.data?.message ||
@@ -60,7 +60,6 @@ const LoginPage = () => {
   const handleForgotPassword = async (e) => {
     e.preventDefault();
     setLoading(true);
-    console.log("pass", { confirmPassword, newPassword });
     if (confirmPassword !== newPassword) {
       toast.error("Passwords did not match, try again");
       return;
