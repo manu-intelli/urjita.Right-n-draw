@@ -201,20 +201,31 @@ const qualificationOptions = [
 
 const ConditionalStudentTable = () => {
   const [students, setStudents] = useState([]);
-  const [rowsNeeded, setRowsNeeded] = useState(10); // Set the initial number of rows
+  const [rowsNeeded, setRowsNeeded] = useState(); // Set the initial number of rows
 
   useEffect(() => {
-    const initialRows = Array.from({ length: rowsNeeded }, () => ({
-      name: "",
-      hasBp: "",
-      bpNumber: "",
-      hasSupplier: "",
-      supplierName: "",
-      supplierNumber: "",
-      qualification: "",
-    }));
-    setStudents(initialRows); // Update the rows dynamically
-  }, [rowsNeeded]); // Recreate rows whenever rowsNeeded changes
+    setStudents((prevStudents) => {
+      if (rowsNeeded > prevStudents.length) {
+        // Add new blank rows
+        const newRows = Array.from(
+          { length: rowsNeeded - prevStudents.length },
+          () => ({
+            name: "",
+            hasBp: "",
+            bpNumber: "",
+            hasSupplier: "",
+            supplierName: "",
+            supplierNumber: "",
+            qualification: "",
+          })
+        );
+        return [...prevStudents, ...newRows];
+      } else {
+        // Keep only required rows (when reducing)
+        return prevStudents.slice(0, rowsNeeded);
+      }
+    });
+  }, [rowsNeeded]);
 
   const handleChange = (index, field, value) => {
     const updated = [...students];
@@ -226,6 +237,7 @@ const ConditionalStudentTable = () => {
     const updated = [...students];
     updated.splice(index, 1);
     setStudents(updated);
+    setRowsNeeded(updated.length);
   };
 
   return (
@@ -240,12 +252,18 @@ const ConditionalStudentTable = () => {
           label="Number of Capacitors Needed"
           value={rowsNeeded}
           onChange={(val) => {
-            const value = Number(val);
-            if (value > 0) setRowsNeeded(value);
+            if (val === "") {
+              setRowsNeeded(""); // allow empty
+            } else {
+              const value = Number(val);
+              if (value > 0) {
+                setRowsNeeded(value); // only set if > 0
+              }
+            }
           }}
           placeholder="Enter number of rows"
           type="number"
-          className="w-full bg-gray-200 text-black p-2 rounded-md"
+          //className="w-full bg-gray-50 text-black p-2 rounded-md"
           required
         />
       </div>
@@ -263,7 +281,7 @@ const ConditionalStudentTable = () => {
                 value={item.name}
                 onChange={(value) => handleChange(index, "name", value)}
                 placeholder="Enter Name"
-                className="w-full bg-gray-200 text-black p-2 rounded-md"
+                // className="w-full bg-gray-100 text-black p-2 rounded-md"
               />
             </div>
 
@@ -274,7 +292,7 @@ const ConditionalStudentTable = () => {
                 options={yesNoOptions}
                 value={item.hasBp}
                 onChange={(value) => handleChange(index, "hasBp", value)}
-                className="w-full bg-gray-200 text-black p-2 rounded-md"
+                // className="w-full bg-gray-100 text-black p-2 rounded-md"
               />
             </div>
 
@@ -286,7 +304,7 @@ const ConditionalStudentTable = () => {
                   value={item.bpNumber}
                   onChange={(value) => handleChange(index, "bpNumber", value)}
                   placeholder="Enter BP Number"
-                  className="w-full bg-gray-200 text-black p-2 rounded-md"
+                  // className="w-full bg-gray-100 text-black p-2 rounded-md"
                 />
               </div>
             )}
@@ -301,7 +319,7 @@ const ConditionalStudentTable = () => {
                   onChange={(value) =>
                     handleChange(index, "hasSupplier", value)
                   }
-                  className="w-full bg-gray-200 text-black p-2 rounded-md"
+                  //  className="w-full bg-gray-100 text-black p-2 rounded-md"
                 />
               </div>
             )}
@@ -317,7 +335,7 @@ const ConditionalStudentTable = () => {
                       handleChange(index, "supplierName", value)
                     }
                     placeholder="Supplier Name"
-                    className="w-full bg-gray-200 text-black p-2 rounded-md"
+                    //className="w-full bg-gray-100 text-black p-2 rounded-md"
                   />
                 </div>
                 <div className="flex-1 mx-2">
@@ -328,7 +346,7 @@ const ConditionalStudentTable = () => {
                       handleChange(index, "supplierNumber", value)
                     }
                     placeholder="Supplier P/N"
-                    className="w-full bg-gray-200 text-black p-2 rounded-md"
+                    //className="w-full bg-gray-100 text-black p-2 rounded-md"
                   />
                 </div>
               </>
@@ -344,7 +362,7 @@ const ConditionalStudentTable = () => {
                   onChange={(value) =>
                     handleChange(index, "qualification", value)
                   }
-                  className="w-full bg-gray-200 text-black p-2 rounded-md"
+                  // className="w-full bg-gray-100 text-black p-2 rounded-md"
                 />
               </div>
             )}

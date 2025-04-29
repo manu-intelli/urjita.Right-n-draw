@@ -34,6 +34,7 @@ const initialState = {
   Capacitor: [],
   AirCoil: [],
   Transformer: [],
+  isExistingCanAvailable: "No",
   canMaterial: "",
   canProcess: "",
   customCanMaterial: "",
