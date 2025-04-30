@@ -68,7 +68,7 @@ const CapacitorTables = () => {
         {/* Capacitors with BP Number */}
         {numWithBp > 0 && (
           <div>
-            <h3 className="text-md font-semibold text-gray-800">
+            <h3 className="text-md font-semibold text-gray-800 m-2">
               Capacitors with BP Number
             </h3>
 
@@ -108,7 +108,6 @@ const CapacitorTables = () => {
                       <Trash2 size={20} />
                     </button>
                   </div>
-                  ...
                 </div>
               ))}
             </div>
@@ -118,7 +117,7 @@ const CapacitorTables = () => {
         {/* Capacitors without BP Number */}
         {numWithoutBp > 0 && (
           <div>
-            <h3 className="text-md font-semibold text-gray-800">
+            <h3 className="text-md font-semibold text-gray-800 m-2">
               Capacitors without BP Number
             </h3>
 
