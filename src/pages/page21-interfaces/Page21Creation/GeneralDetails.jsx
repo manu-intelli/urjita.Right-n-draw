@@ -140,6 +140,22 @@ const ProjectForm = () => {
     });
   };
 
+  const handleEnclosureChange = (field, value) => {
+    dispatch({
+      type: "UPDATE_ENCLOSURE_DETAILS",
+      field: field,
+      value: value,
+    });
+  };
+
+  const handleTopcoverChange = (field, value) => {
+    dispatch({
+      type: "UPDATE_TOPCOVER_DETAILS",
+      field: field,
+      value: value,
+    });
+  };
+
   console.log("state.schematicFile.previewUrl", state.schematicFile);
   return (
     <div className="border p-4 rounded-md shadow-sm mb-6">
@@ -252,6 +268,116 @@ const ProjectForm = () => {
                   </div>
                 );
               })}
+
+            {/* Core Type */}
+
+            {/* Enclosure Details */}
+            <div className="flex flex-col md:flex-row gap-6 mt-6">
+              <div className="md:w-1/2">
+                <label className="block font-medium mb-1">
+                  Enclosure Details
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name={`enclosureDetails1`}
+                      value="Existing"
+                      checked={state.enclosureDetails.partType === "Existing"}
+                      onChange={() =>
+                        handleEnclosureChange("partType", "Existing")
+                      }
+                      className="form-radio text-blue-600"
+                    />
+                    Existing
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name={`enclosureDetails2`}
+                      value="New"
+                      checked={state.enclosureDetails.partType === "New"}
+                      onChange={() => handleEnclosureChange("partType", "New")}
+                      className="form-radio text-blue-600"
+                    />
+                    New
+                  </label>
+                </div>
+              </div>
+
+              <div className="md:w-1/2">
+                <Input
+                  label="Enclosure Part Number"
+                  value={
+                    state.enclosureDetails.partType === "New"
+                      ? "TBD"
+                      : state.enclosureDetails.partNumber
+                  }
+                  onChange={(value) =>
+                    handleEnclosureChange(
+                      "partNumber",
+                      state.enclosureDetails.partType === "New" ? "TBD" : value
+                    )
+                  }
+                  disabled={state.enclosureDetails.partType === "New"}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Topcover Details */}
+            <div className="flex flex-col md:flex-row gap-6 mt-6">
+              <div className="md:w-1/2">
+                <label className="block font-medium mb-1">
+                  Topcover Details
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name={`topcoverType1`}
+                      value="Existing"
+                      checked={state.topcoverDetails.partType === "Existing"}
+                      onChange={() =>
+                        handleTopcoverChange("partType", "Existing")
+                      }
+                      className="form-radio text-blue-600"
+                    />
+                    Existing
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name={`topcoverType2`}
+                      value="New"
+                      checked={state.topcoverDetails.partType === "New"}
+                      onChange={() => handleTopcoverChange("partType", "New")}
+                      className="form-radio text-blue-600"
+                    />
+                    New
+                  </label>
+                </div>
+              </div>
+
+              <div className="md:w-1/2">
+                <Input
+                  label="Topcover Part Number"
+                  value={
+                    state.topcoverDetails.partType === "New"
+                      ? "TBD"
+                      : state.topcoverDetails.partNumber
+                  }
+                  onChange={(value) =>
+                    handleTopcoverChange(
+                      "partNumber",
+                      state.topcoverDetails.partType === "New" ? "TBD" : value
+                    )
+                  }
+                  disabled={state.topcoverDetails.partType === "New"}
+                  required
+                />
+              </div>
+            </div>
           </>
         )}
 

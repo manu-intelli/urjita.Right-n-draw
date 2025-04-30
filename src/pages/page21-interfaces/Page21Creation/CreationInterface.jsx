@@ -1,6 +1,9 @@
 import React from "react";
 import { usePage21Context } from "../../../context/Page21Context";
-import { FormSection } from "../../../components/common/ReusableComponents";
+import {
+  FormSection,
+  FormSectionUpadated,
+} from "../../../components/common/ReusableComponents";
 import PartDetails from "./Parts";
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
@@ -10,8 +13,7 @@ import FingerDetails from "./FingerDetails";
 import CooperFlapDetails from "./CooperFlapDetails";
 import ResonatorDetails from "./ResonatorDetails";
 import LtccDetails from "./LTCC";
-
-import StudentEditableTable from "../StudentEditableTable";
+import CapacitorTables from "../StudentEditableTable";
 
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
@@ -60,11 +62,16 @@ const CreationInterface = () => {
     const stepKey = STEP_ORDER[currentStep];
     if (stepKey === STEPS.GENERAL_DETAILS) {
       return (
-        <FormSection title={`Project Details`}>
-          <div className="md:col-span-2">
-            <ProjectForm />
-          </div>
-        </FormSection>
+        <div className="h-screen overflow-hidden flex flex-col">
+          <main className="flex-1 overflow-y-auto p-4 ">
+            <FormSection title="Capacitor Details">
+              {/* Include Capacitor-related content here */}
+              <div className="md:col-span-2">
+                <CapacitorTables />
+              </div>
+            </FormSection>
+          </main>
+        </div>
       );
     }
 
@@ -316,7 +323,7 @@ const CreationInterface = () => {
           </div>
         </div>
       </div>
-      <StudentEditableTable />
+      {/* <CapacitorTables /> */}
     </div>
   );
 };

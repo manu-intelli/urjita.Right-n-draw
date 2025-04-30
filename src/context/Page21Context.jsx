@@ -18,6 +18,15 @@ const initialState = {
     numberOfPorts: "",
     portDetails: [], // array of { connectorType, connectorGender }
   },
+  enclosureDetails: {
+    partType: "Existing", // or "New"
+    partNumber: "",
+  },
+
+  topcoverDetails: {
+    partType: "New", // or "New"
+    partNumber: "",
+  },
   caseStyle: "Existing",
   selectedCaseStyle: "",
   caseDimensions: {
@@ -239,6 +248,24 @@ const reducer = (state, action) => {
           portDetails: state.ports.portDetails.filter(
             (_, i) => i !== action.index
           ),
+        },
+      };
+
+    case "UPDATE_ENCLOSURE_DETAILS":
+      return {
+        ...state,
+        enclosureDetails: {
+          ...state.enclosureDetails,
+          [action.field]: action.value,
+        },
+      };
+
+    case "UPDATE_TOPCOVER_DETAILS":
+      return {
+        ...state,
+        topcoverDetails: {
+          ...state.topcoverDetails,
+          [action.field]: action.value,
         },
       };
 

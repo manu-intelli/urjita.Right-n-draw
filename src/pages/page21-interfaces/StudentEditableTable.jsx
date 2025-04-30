@@ -1,193 +1,6 @@
-// import React, { useState, useEffect } from "react";
-// import { Input, Select } from "../../components/common/ReusableComponents";
-// import { Plus, Trash2 } from "lucide-react";
-
-// const yesNoOptions = [
-//   { label: "Yes", value: "Yes" },
-//   { label: "No", value: "No" },
-// ];
-
-// const qualificationOptions = [
-//   { label: "Qualified", value: "Qualified" },
-//   { label: "Unqualified", value: "Unqualified" },
-// ];
-
-// const ConditionalStudentTable = () => {
-//   const rowsNeeded = 10; // Number of rows to create
-//   const [students, setStudents] = useState([]);
-
-//   useEffect(() => {
-//     const initialRows = Array.from({ length: rowsNeeded }, () => ({
-//       name: "",
-//       hasBp: "",
-//       bpNumber: "",
-//       hasSupplier: "",
-//       supplierName: "",
-//       supplierNumber: "",
-//       qualification: "",
-//     }));
-//     setStudents(initialRows);
-//   }, []);
-
-//   const handleChange = (index, field, value) => {
-//     const updated = [...students];
-//     updated[index] = { ...updated[index], [field]: value };
-//     setStudents(updated);
-//   };
-
-//   const handleRemoveRow = (index) => {
-//     const updated = [...students];
-//     updated.splice(index, 1);
-//     setStudents(updated);
-//   };
-
-//   return (
-//     <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
-//       <div className="flex justify-between items-center mb-6">
-//         <h2 className="text-xl font-semibold">
-//           Student Information
-//         </h2>
-//         <button
-//           onClick={() =>
-//             setStudents([
-//               ...students,
-//               {
-//                 name: "",
-//                 hasBp: "",
-//                 bpNumber: "",
-//                 hasSupplier: "",
-//                 supplierName: "",
-//                 supplierNumber: "",
-//                 qualification: "",
-//               },
-//             ])
-//           }
-//           className="flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md text-sm transition"
-//         >
-//           <Plus size={18} />
-//           Add Row
-//         </button>
-//       </div>
-
-//       <div className="space-y-6">
-//         {students.map((item, index) => (
-//           <div
-//             key={index}
-//             className="flex justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-all"
-//           >
-//             {/* Name Field */}
-//             <div className="flex-1 mx-2">
-//               <Input
-//                 label={"Component Name"}
-//                 value={item.name}
-//                 onChange={(value) => handleChange(index, "name", value)}
-//                 placeholder="Enter Name"
-//                 className="w-full bg-gray-200 text-black p-2 rounded-md"
-//               />
-//             </div>
-
-//             {/* BP Field */}
-//             <div className="flex-1 mx-2">
-//               <Select
-//                 label={"Has B-P/N"}
-//                 options={yesNoOptions}
-//                 value={item.hasBp}
-//                 onChange={(value) => handleChange(index, "hasBp", value)}
-//                 className="w-full bg-gray-200 text-black p-2 rounded-md"
-//               />
-//             </div>
-
-//             {/* BP Number (Visible only when BP is Yes) */}
-//             {item.hasBp === "Yes" && (
-//               <div className="flex-1 mx-2">
-//                 <Input
-//                   label={"Bp Number"}
-//                   value={item.bpNumber}
-//                   onChange={(value) => handleChange(index, "bpNumber", value)}
-//                   placeholder="Enter BP Number"
-//                   className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                 />
-//               </div>
-//             )}
-
-//             {/* Supplier Field (Visible only when BP is No) */}
-//             {item.hasBp === "No" && (
-//               <div className="flex-1 mx-2">
-//                 <Select
-//                   label={"Has Supplier"}
-//                   options={yesNoOptions}
-//                   value={item.hasSupplier}
-//                   onChange={(value) =>
-//                     handleChange(index, "hasSupplier", value)
-//                   }
-//                   className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                 />
-//               </div>
-//             )}
-
-//             {/* Supplier Name and Supplier P/N (Visible only when BP is No and Supplier is Yes) */}
-//             {item.hasBp === "No" && item.hasSupplier === "Yes" && (
-//               <>
-//                 <div className="flex-1 mx-2">
-//                   <Input
-//                     label={"Supplier Name"}
-//                     value={item.supplierName}
-//                     onChange={(value) =>
-//                       handleChange(index, "supplierName", value)
-//                     }
-//                     placeholder="Supplier Name"
-//                     className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                   />
-//                 </div>
-//                 <div className="flex-1 mx-2">
-//                   <Input
-//                     label={"Supplier Number"}
-//                     value={item.supplierNumber}
-//                     onChange={(value) =>
-//                       handleChange(index, "supplierNumber", value)
-//                     }
-//                     placeholder="Supplier P/N"
-//                     className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                   />
-//                 </div>
-//               </>
-//             )}
-
-//             {/* Qualification Field (Visible only when BP is No and Supplier is No) */}
-//             {item.hasBp === "No" && item.hasSupplier === "No" && (
-//               <div className="flex-1 mx-2">
-//                 <Select
-//                   options={qualificationOptions}
-//                   value={item.qualification}
-//                   onChange={(value) =>
-//                     handleChange(index, "qualification", value)
-//                   }
-//                   className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                 />
-//               </div>
-//             )}
-
-//             {/* Remove Button */}
-//             <div className="flex items-center justify-center mx-2">
-//               <button
-//                 onClick={() => handleRemoveRow(index)}
-//                 className="text-red-600 hover:text-red-700 transition"
-//               >
-//                 <Trash2 size={20} />
-//               </button>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ConditionalStudentTable;
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Input, Select } from "../../components/common/ReusableComponents";
-import { Plus, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 const yesNoOptions = [
   { label: "Yes", value: "Yes" },
@@ -195,368 +8,184 @@ const yesNoOptions = [
 ];
 
 const qualificationOptions = [
-  { label: "Qualified", value: "Qualified" },
+  { label: "Qualification", value: "Qualification" },
   { label: "Approval", value: "Approval" },
 ];
 
-const ConditionalStudentTable = () => {
-  const [students, setStudents] = useState([]);
-  const [rowsNeeded, setRowsNeeded] = useState(); // Set the initial number of rows
+const CapacitorTables = () => {
+  const [numWithBp, setNumWithBp] = useState("");
+  const [numWithoutBp, setNumWithoutBp] = useState("");
+  const [studentsWithBp, setStudentsWithBp] = useState([]);
+  const [studentsWithoutBp, setStudentsWithoutBp] = useState([]);
 
-  useEffect(() => {
-    setStudents((prevStudents) => {
-      if (rowsNeeded > prevStudents.length) {
-        // Add new blank rows
-        const newRows = Array.from(
-          { length: rowsNeeded - prevStudents.length },
-          () => ({
-            name: "",
-            hasBp: "",
-            bpNumber: "",
-            hasSupplier: "",
-            supplierName: "",
-            supplierNumber: "",
-            qualification: "",
-          })
-        );
-        return [...prevStudents, ...newRows];
-      } else {
-        // Keep only required rows (when reducing)
-        return prevStudents.slice(0, rowsNeeded);
-      }
-    });
-  }, [rowsNeeded]);
-
-  const handleChange = (index, field, value) => {
-    const updated = [...students];
+  const handleChange = (index, field, value, isBpTable) => {
+    const updated = isBpTable ? [...studentsWithBp] : [...studentsWithoutBp];
     updated[index] = { ...updated[index], [field]: value };
-    setStudents(updated);
+    isBpTable ? setStudentsWithBp(updated) : setStudentsWithoutBp(updated);
   };
 
-  const handleRemoveRow = (index) => {
-    const updated = [...students];
+  const handleRemoveRow = (index, isBpTable) => {
+    const updated = isBpTable ? [...studentsWithBp] : [...studentsWithoutBp];
     updated.splice(index, 1);
-    setStudents(updated);
-    setRowsNeeded(updated.length);
+    isBpTable ? setStudentsWithBp(updated) : setStudentsWithoutBp(updated);
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
+    <div className="p-8 max-w-6xl mx-auto bg-gray-50 rounded-lg shadow-lg">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Capacitor Details</h2>
+        <h3 className="text-lg font-semibold capitalize">Chip capacitors</h3>
       </div>
 
-      {/* Input for number of rows */}
-      <div className="mb-4">
-        <Input
-          label="Number of Capacitors Needed"
-          value={rowsNeeded}
-          onChange={(val) => {
-            if (val === "") {
-              setRowsNeeded(""); // allow empty
-            } else {
-              const value = Number(val);
-              if (value > 0) {
-                setRowsNeeded(value); // only set if > 0
-              }
-            }
-          }}
-          placeholder="Enter number of rows"
-          type="number"
-          //className="w-full bg-gray-50 text-black p-2 rounded-md"
-          required
-        />
-      </div>
-
-      <div className="space-y-6">
-        {students.map((item, index) => (
-          <div
-            key={index}
-            className="flex justify-between bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md hover:shadow-lg transition-all"
-          >
-            {/* Name Field */}
-            <div className="flex-1 mx-2">
-              <Input
-                label={`Capacitor ${index + 1}`}
-                value={item.name}
-                onChange={(value) => handleChange(index, "name", value)}
-                placeholder="Enter Name"
-                // className="w-full bg-gray-100 text-black p-2 rounded-md"
-              />
-            </div>
-
-            {/* BP Field */}
-            <div className="flex-1 mx-2">
-              <Select
-                label={"Has B-P/N"}
-                options={yesNoOptions}
-                value={item.hasBp}
-                onChange={(value) => handleChange(index, "hasBp", value)}
-                // className="w-full bg-gray-100 text-black p-2 rounded-md"
-              />
-            </div>
-
-            {/* BP Number (Visible only when BP is Yes) */}
-            {item.hasBp === "Yes" && (
-              <div className="flex-1 mx-2">
-                <Input
-                  label={"Bp Number"}
-                  value={item.bpNumber}
-                  onChange={(value) => handleChange(index, "bpNumber", value)}
-                  placeholder="Enter BP Number"
-                  // className="w-full bg-gray-100 text-black p-2 rounded-md"
-                />
-              </div>
-            )}
-
-            {/* Supplier Field (Visible only when BP is No) */}
-            {item.hasBp === "No" && (
-              <div className="flex-1 mx-2">
-                <Select
-                  label={"Has Supplier"}
-                  options={yesNoOptions}
-                  value={item.hasSupplier}
-                  onChange={(value) =>
-                    handleChange(index, "hasSupplier", value)
-                  }
-                  //  className="w-full bg-gray-100 text-black p-2 rounded-md"
-                />
-              </div>
-            )}
-
-            {/* Supplier Name and Supplier P/N (Visible only when BP is No and Supplier is Yes) */}
-            {item.hasBp === "No" && item.hasSupplier === "Yes" && (
-              <>
-                <div className="flex-1 mx-2">
-                  <Input
-                    label={"Supplier Name"}
-                    value={item.supplierName}
-                    onChange={(value) =>
-                      handleChange(index, "supplierName", value)
-                    }
-                    placeholder="Supplier Name"
-                    //className="w-full bg-gray-100 text-black p-2 rounded-md"
-                  />
-                </div>
-                <div className="flex-1 mx-2">
-                  <Input
-                    label={"Supplier Number"}
-                    value={item.supplierNumber}
-                    onChange={(value) =>
-                      handleChange(index, "supplierNumber", value)
-                    }
-                    placeholder="Supplier P/N"
-                    //className="w-full bg-gray-100 text-black p-2 rounded-md"
-                  />
-                </div>
-              </>
-            )}
-
-            {/* Qualification Field (Visible only when BP is No and Supplier is No) */}
-            {item.hasBp === "No" && item.hasSupplier === "No" && (
-              <div className="flex-1 mx-2">
-                <Select
-                  label={"Qualification"}
-                  options={qualificationOptions}
-                  value={item.qualification}
-                  onChange={(value) =>
-                    handleChange(index, "qualification", value)
-                  }
-                  // className="w-full bg-gray-100 text-black p-2 rounded-md"
-                />
-              </div>
-            )}
-
-            {/* Remove Button */}
-            <div className="flex items-center justify-center mx-2">
-              <button
-                onClick={() => handleRemoveRow(index)}
-                className="text-red-600 hover:text-red-700 transition"
-              >
-                <Trash2 size={20} />
-              </button>
-            </div>
+      {/* Sticky Input Section */}
+      <div className="sticky top-0 bg-white z-20 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <div>
+            <Input
+              label="Number of Capacitors with BP Number"
+              value={numWithBp}
+              onChange={(val) => setNumWithBp(Math.max(0, Number(val)))}
+              type="number"
+              required
+              className="p-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-        ))}
+          <div>
+            <Input
+              label="Number of Capacitors without BP Number"
+              value={numWithoutBp}
+              onChange={(val) => setNumWithoutBp(Math.max(0, Number(val)))}
+              type="number"
+              required
+              className="p-3 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
       </div>
+
+      {/* Capacitors with BP Number */}
+      {numWithBp > 0 && (
+        <div className="space-y-6 mt-6">
+          <div className="sticky top-20 z-10 bg-transparent pb-2">
+            <h3 className="text-md font-semibold text-gray-800">
+              Capacitors with BP Number
+            </h3>
+          </div>
+          <div className="space-y-4">
+            {Array.from({ length: numWithBp }).map((_, index) => (
+              <div
+                key={index}
+                className="flex flex-wrap bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all hover:bg-gray-50"
+              >
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label={`Capacitor ${index + 1} Name`}
+                    value={studentsWithBp[index]?.name || ""}
+                    onChange={(value) =>
+                      handleChange(index, "name", value, true)
+                    }
+                    placeholder="Enter Name"
+                    className="p-3 text-lg border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label="BP Number"
+                    value={studentsWithBp[index]?.bpNumber || ""}
+                    onChange={(value) =>
+                      handleChange(index, "bpNumber", value, true)
+                    }
+                    placeholder="Enter BP Number"
+                    className="p-3 text-lg border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="flex items-center justify-center mx-2 mt-7">
+                  <button
+                    onClick={() => handleRemoveRow(index, true)}
+                    className="text-red-600 hover:text-red-700 transition"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Capacitors without BP Number */}
+      {numWithoutBp > 0 && (
+        <div className="space-y-6 mt-6">
+          <div className="sticky top-20 z-10 bg-transparent pb-2">
+            <h3 className="text-md font-semibold text-gray-800">
+              Capacitors without BP Number
+            </h3>
+          </div>
+          <div className="space-y-4">
+            {Array.from({ length: numWithoutBp }).map((_, index) => (
+              <div
+                key={index}
+                className="flex flex-wrap bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all hover:bg-gray-50"
+              >
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label={`Capacitor ${index + 1} Name`}
+                    value={studentsWithoutBp[index]?.name || ""}
+                    onChange={(value) =>
+                      handleChange(index, "name", value, false)
+                    }
+                    placeholder="Enter Name"
+                    className="p-3 text-lg border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label="Supplier Name"
+                    value={studentsWithoutBp[index]?.supplierName || ""}
+                    onChange={(value) =>
+                      handleChange(index, "supplierName", value, false)
+                    }
+                    placeholder="Enter Supplier Name"
+                    className="p-3 text-lg border border-gray-300 rounded-md"
+                  />
+                </div>
+
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label="Supplier P/N"
+                    value={studentsWithoutBp[index]?.supplierNumber || ""}
+                    onChange={(value) =>
+                      handleChange(index, "supplierNumber", value, false)
+                    }
+                    placeholder="Enter Supplier P/N"
+                    className="p-3 text-lg border border-gray-300 rounded-md"
+                  />
+                </div>
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Select
+                    label="Qualification Status"
+                    value={studentsWithoutBp[index]?.qualificationStaus || ""}
+                    options={qualificationOptions}
+                    onChange={(value) =>
+                      handleChange(index, "qualificationStaus", value, false)
+                    }
+                    required
+                  />
+                </div>
+                <div className="flex items-center justify-center mx-2 mt-7">
+                  <button
+                    onClick={() => handleRemoveRow(index, false)}
+                    className="text-red-600 hover:text-red-700 transition"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default ConditionalStudentTable;
-
-// import React, { useState, useEffect } from "react";
-// import { Input, Select } from "../../components/common/ReusableComponents";
-// import { Plus, Trash2 } from "lucide-react";
-
-// const yesNoOptions = [
-//   { label: "Yes", value: "Yes" },
-//   { label: "No", value: "No" },
-// ];
-
-// const qualificationOptions = [
-//   { label: "Qualified", value: "Qualified" },
-//   { label: "Unqualified", value: "Unqualified" },
-// ];
-
-// const ConditionalStudentTable = () => {
-//   const [students, setStudents] = useState([]);
-//   const [rowsNeeded, setRowsNeeded] = useState(10); // Set the initial number of rows
-
-//   useEffect(() => {
-//     const initialRows = Array.from({ length: rowsNeeded }, () => ({
-//       name: "",
-//       hasBp: "",
-//       bpNumber: "",
-//       hasSupplier: "",
-//       supplierName: "",
-//       supplierNumber: "",
-//       qualification: "",
-//     }));
-//     setStudents(initialRows); // Update the rows dynamically
-//   }, [rowsNeeded]); // Recreate rows whenever rowsNeeded changes
-
-//   const handleChange = (index, field, value) => {
-//     const updated = [...students];
-//     updated[index] = { ...updated[index], [field]: value };
-//     setStudents(updated);
-//   };
-
-//   const handleRemoveRow = (index) => {
-//     const updated = [...students];
-//     updated.splice(index, 1);
-//     setStudents(updated);
-//   };
-
-//   return (
-//     <div className="p-6 max-w-7xl mx-auto bg-white rounded-lg shadow-lg">
-//       <div className="flex justify-between items-center mb-6">
-//         <h2 className="text-xl font-semibold">Capacitor Details</h2>
-//       </div>
-
-//       {/* Input for number of rows */}
-//       <div className="mb-4">
-//         <Input
-//           label="Number of Capacitors Needed"
-//           value={rowsNeeded}
-//           onChange={(val) => {
-//             const value = Number(val);
-//             if (value > 0) setRowsNeeded(value);
-//           }}
-//           placeholder="Enter number of rows"
-//           type="number"
-//           className="w-full bg-gray-200 text-black p-2 rounded-md"
-//           required
-//         />
-//       </div>
-
-//       <div className="space-y-6">
-//         {students.map((item, index) => (
-//           <div
-//             key={index}
-//             className="flex justify-between p-4 rounded-lg transition-all"
-//           >
-//             {/* Card Wrapper for Each Field */}
-//             <div className="flex-1 mx-2 bg-white shadow-md rounded-lg p-4">
-//               {/* Name Field */}
-//               <Input
-//                 label={`Capacitor ${index + 1}`}
-//                 value={item.name}
-//                 onChange={(value) => handleChange(index, "name", value)}
-//                 placeholder="Enter Name"
-//                 className="w-full bg-gray-200 text-black p-2 rounded-md"
-//               />
-//             </div>
-
-//             <div className="flex-1 mx-2 bg-white shadow-md rounded-lg p-4">
-//               {/* BP Field */}
-//               <Select
-//                 label={"Has B-P/N"}
-//                 options={yesNoOptions}
-//                 value={item.hasBp}
-//                 onChange={(value) => handleChange(index, "hasBp", value)}
-//                 className="w-full bg-gray-200 text-black p-2 rounded-md"
-//               />
-//             </div>
-
-//             {item.hasBp === "Yes" && (
-//               <div className="flex-1 mx-2 bg-white shadow-md rounded-lg p-4">
-//                 {/* BP Number */}
-//                 <Input
-//                   label={"Bp Number"}
-//                   value={item.bpNumber}
-//                   onChange={(value) => handleChange(index, "bpNumber", value)}
-//                   placeholder="Enter BP Number"
-//                   className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                 />
-//               </div>
-//             )}
-
-//             {item.hasBp === "No" && (
-//               <div className="flex-1 mx-2 bg-white shadow-md rounded-lg p-4">
-//                 {/* Supplier Field */}
-//                 <Select
-//                   label={"Has Supplier"}
-//                   options={yesNoOptions}
-//                   value={item.hasSupplier}
-//                   onChange={(value) => handleChange(index, "hasSupplier", value)}
-//                   className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                 />
-//               </div>
-//             )}
-
-//             {item.hasBp === "No" && item.hasSupplier === "Yes" && (
-//               <>
-//                 <div className="flex-1 mx-2 bg-white shadow-md rounded-lg p-4">
-//                   {/* Supplier Name */}
-//                   <Input
-//                     label={"Supplier Name"}
-//                     value={item.supplierName}
-//                     onChange={(value) => handleChange(index, "supplierName", value)}
-//                     placeholder="Supplier Name"
-//                     className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                   />
-//                 </div>
-//                 <div className="flex-1 mx-2 bg-white shadow-md rounded-lg p-4">
-//                   {/* Supplier Number */}
-//                   <Input
-//                     label={"Supplier Number"}
-//                     value={item.supplierNumber}
-//                     onChange={(value) => handleChange(index, "supplierNumber", value)}
-//                     placeholder="Supplier P/N"
-//                     className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                   />
-//                 </div>
-//               </>
-//             )}
-
-//             {item.hasBp === "No" && item.hasSupplier === "No" && (
-//               <div className="flex-1 mx-2 bg-white shadow-md rounded-lg p-4">
-//                 {/* Qualification Field */}
-//                 <Select
-//                   label={"Qualification"}
-//                   options={qualificationOptions}
-//                   value={item.qualification}
-//                   onChange={(value) => handleChange(index, "qualification", value)}
-//                   className="w-full bg-gray-200 text-black p-2 rounded-md"
-//                 />
-//               </div>
-//             )}
-
-//             <div className="flex items-center justify-center mx-2">
-//               {/* Remove Button */}
-//               <button
-//                 onClick={() => handleRemoveRow(index)}
-//                 className="text-red-600 hover:text-red-700 transition"
-//               >
-//                 <Trash2 size={20} />
-//               </button>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ConditionalStudentTable;
+export default CapacitorTables;
