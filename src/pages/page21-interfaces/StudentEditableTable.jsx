@@ -219,6 +219,13 @@ const CapacitorTables = () => {
     const updated = isBpTable ? [...studentsWithBp] : [...studentsWithoutBp];
     updated.splice(index, 1);
     isBpTable ? setStudentsWithBp(updated) : setStudentsWithoutBp(updated);
+
+    // Update the number after removing the row
+    if (isBpTable) {
+      setNumWithBp(updated.length);
+    } else {
+      setNumWithoutBp(updated.length);
+    }
   };
 
   return (
