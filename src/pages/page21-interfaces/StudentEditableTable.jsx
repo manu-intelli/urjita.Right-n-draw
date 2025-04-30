@@ -182,8 +182,8 @@ const qualificationOptions = [
 ];
 
 const CapacitorTables = () => {
-  const [numWithBp, setNumWithBp] = useState(0);
-  const [numWithoutBp, setNumWithoutBp] = useState(0);
+  const [numWithBp, setNumWithBp] = useState("");
+  const [numWithoutBp, setNumWithoutBp] = useState("");
 
   const [studentsWithBp, setStudentsWithBp] = useState([]);
   const [studentsWithoutBp, setStudentsWithoutBp] = useState([]);
@@ -222,7 +222,7 @@ const CapacitorTables = () => {
   };
 
   return (
-    <div className="p-2 max-w-6xl mx-auto bg-gray-50 rounded-lg shadow-lg flex flex-col space-y-6">
+    <>
       {/* Ask for Number of Capacitors */}
       <div className="sticky top-0 bg-white z-10 p-6 w-full shadow-md rounded-lg">
         <div className="flex gap-6">
@@ -363,7 +363,7 @@ const CapacitorTables = () => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
