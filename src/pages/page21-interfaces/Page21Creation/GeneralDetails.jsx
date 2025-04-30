@@ -1,80 +1,80 @@
-
-
 import React, { useState, useRef } from "react";
 import { usePage21Context } from "../../../context/Page21Context";
 import { Input, Select } from "../../../components/common/ReusableComponents";
 
-
 const impedanceOptions = [
-  { label: '50 ohms', value: '50 ohms' },
-  { label: '75 ohms', value: '75 ohms' },
-  { label: 'Others', value: 'Others' }
+  { label: "50 ohms", value: "50 ohms" },
+  { label: "75 ohms", value: "75 ohms" },
+  { label: "Others", value: "Others" },
 ];
 
 const packageOptions = [
-  { label: 'SMT', value: 'SMT' },
-  { label: 'Connectorized', value: 'Connectorized' },
-  { label: 'Lead', value: 'Lead' },
-  { label: 'Plug-in', value: 'Plug-in' }
+  { label: "SMT", value: "SMT" },
+  { label: "Connectorized", value: "Connectorized" },
+  { label: "Lead", value: "Lead" },
+  { label: "Plug-in", value: "Plug-in" },
 ];
 
 const existingCaseStyles = [
-  { label: 'Case A', value: 'Case A' },
-  { label: 'Case B', value: 'Case B' },
-  { label: 'Case C', value: 'Case C' },
-  { label: 'Case D', value: 'Case D' }
+  { label: "Case A", value: "Case A" },
+  { label: "Case B", value: "Case B" },
+  { label: "Case C", value: "Case C" },
+  { label: "Case D", value: "Case D" },
 ];
 
 const coverTypeOptions = [
-  { label: 'Open', value: 'Open' },
-  { label: 'Closed', value: 'Closed' }
+  { label: "Open", value: "Open" },
+  { label: "Closed", value: "Closed" },
 ];
 
 const bottomSolderMaskOptions = [
-  { label: 'Full solder mask', value: 'Full solder mask' },
-  { label: 'Strip solder mask', value: 'Strip solder mask' },
-  { label: 'No solder mask', value: 'No solder mask' }
+  { label: "Full solder mask", value: "Full solder mask" },
+  { label: "Strip solder mask", value: "Strip solder mask" },
+  { label: "No solder mask", value: "No solder mask" },
 ];
 
 const yesNoOptions = [
-  { label: 'Yes', value: 'Yes' },
-  { label: 'No', value: 'No' }
+  { label: "Yes", value: "Yes" },
+  { label: "No", value: "No" },
 ];
 
 const signalPassingOptions = [
-  { label: 'PCB', value: 'PCB' },
-  { label: 'Lead', value: 'Lead' },
-  { label: 'Pin', value: 'Pin' }
+  { label: "PCB", value: "PCB" },
+  { label: "Lead", value: "Lead" },
+  { label: "Pin", value: "Pin" },
 ];
 
 const pcbNameOptions = [
-  { label: 'Base PCB', value: 'Base PCB' },
-  { label: 'Coupling PCB', value: 'Coupling PCB' },
-  { label: 'Other PCB', value: 'Other PCB' }
+  { label: "Base PCB", value: "Base PCB" },
+  { label: "Coupling PCB", value: "Coupling PCB" },
+  { label: "Other PCB", value: "Other PCB" },
 ];
 
 const mountingOrientationOptions = [
-  { label: 'Horizontal', value: 'Horizontal' },
-  { label: 'Vertical', value: 'Vertical' }
+  { label: "Horizontal", value: "Horizontal" },
+  { label: "Vertical", value: "Vertical" },
 ];
 
 const canMaterialOptions = [
-  { label: 'Metal', value: 'Metal' },
-  { label: 'Plastic', value: 'Plastic' },
-  { label: 'Ceramic', value: 'Ceramic' },
-  { label: 'Others', value: 'Others' }
+  { label: "Metal", value: "Metal" },
+  { label: "Plastic", value: "Plastic" },
+  { label: "Ceramic", value: "Ceramic" },
+  { label: "Others", value: "Others" },
 ];
 
 const canMakingProcessOptions = [
-  { label: 'Etched', value: 'Etched' },
-  { label: 'Stamped', value: 'Stamped' }
+  { label: "Etched", value: "Etched" },
+  { label: "Stamped", value: "Stamped" },
 ];
 
 const qualificationOptions = [
-  { label: 'Qualification', value: 'Qualification' },
-  { label: 'Approval', value: 'Approval' }
+  { label: "Qualification", value: "Qualification" },
+  { label: "Approval", value: "Approval" },
 ];
-
+const connectorGenderOptions = [
+  { label: "Male", value: "Male" },
+  { label: "Female", value: "Female" },
+];
 
 const ProjectForm = () => {
   const { state, dispatch } = usePage21Context();
@@ -123,10 +123,23 @@ const ProjectForm = () => {
     }
   };
 
-  const yesNoOptions = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
-  ];
+  const handleNumberOfPortsChange = (field, value) => {
+    if (field === "numberOfPorts") {
+      dispatch({ type: "SET_NUMBER_OF_PORTS", value });
+    } else {
+      dispatch({ type: "SET_FIELD", payload: { field, value } });
+    }
+  };
+
+  const handlePortChange = (index, field, value) => {
+    dispatch({
+      type: "UPDATE_PORT",
+      index,
+      field,
+      value,
+    });
+  };
+
   console.log("state.schematicFile.previewUrl", state.schematicFile);
   return (
     <div className="border p-4 rounded-md shadow-sm mb-6">
@@ -192,8 +205,57 @@ const ProjectForm = () => {
           onChange={(value) => handleChange("package", value)}
           required
         />
+        {state.package === "Connectorized" && (
+          <>
+            <Input
+              label="Number of Ports"
+              type="number"
+              value={state.ports.numberOfPorts || ""}
+              onChange={(value) =>
+                handleNumberOfPortsChange("numberOfPorts", value)
+              }
+              max={6}
+            />
 
-<div className="space-y-2 col-span-2">
+            {/* Render Ports */}
+            {Array.isArray(state.ports.portDetails) &&
+              state.ports.portDetails.map((port, index) => {
+                const portLabel =
+                  state.ports.numberOfPorts === 2
+                    ? index === 0
+                      ? "Input Port"
+                      : "Output Port"
+                    : index === 0
+                    ? "Input Port"
+                    : `Channel ${index}`;
+
+                return (
+                  <div key={index}>
+                    <h3>{portLabel}</h3>
+
+                    <Input
+                      label="Connector Type"
+                      value={port.connectorType}
+                      onChange={(value) =>
+                        handlePortChange(index, "connectorType", value)
+                      }
+                    />
+
+                    <Select
+                      label="Connector Gender"
+                      options={connectorGenderOptions}
+                      value={port.connectorGender}
+                      onChange={(value) =>
+                        handlePortChange(index, "connectorGender", value)
+                      }
+                    />
+                  </div>
+                );
+              })}
+          </>
+        )}
+
+        <div className="space-y-2 col-span-2">
           <label className="block font-medium mb-1">Case Style</label>
           <div className="flex gap-4">
             <label className="flex items-center gap-2">
@@ -228,41 +290,49 @@ const ProjectForm = () => {
             </label>
           </div>
           <Select
-          label="Selected Case Style"
-          value={state.selectedCaseStyle}
-          options={existingCaseStyles}
-          onChange={(value) => handleChange("selectedCaseStyle", value)}
-          required
-        />
-{state?.selectedCaseStyle &&
-          <div className="flex flex-col md:flex-row gap-6">      
-            <Input
-            label="length"
-            type="number"
-            value={state.caseDimensions?.length || ""}
-            onChange={(value) => handleChange("customImpedance", value)}
+            label="Selected Case Style"
+            value={state.selectedCaseStyle}
+            options={existingCaseStyles}
+            onChange={(value) => handleChange("selectedCaseStyle", value)}
             required
-            disabled={state.caseStyle ==="Existing"}
           />
+          {state?.selectedCaseStyle && (
+            <div className="flex flex-col md:flex-row gap-6">
+              <Input
+                label="length"
+                type="number"
+                value={state.caseDimensions?.length || ""}
+                onChange={(value) => handleChange("customImpedance", value)}
+                required
+                disabled={state.caseStyle === "Existing"}
+              />
 
-<Input
-            label="width"
-            type="number"
-            value={state.caseDimensions.width || ""}
-            onChange={(value) => handleChange("customImpedance", value)}
-            required
-            disabled={state.caseStyle ==="Existing"}
-          />
-           <Input
-            label="height"
-            type="number"
-            value={state.caseDimensions.height || ""}
-            onChange={(value) => handleChange("customImpedance", value)}
-            required
-            disabled={state.caseStyle ==="Existing"}
-          />
-          </div>
-}
+              <Input
+                label="width"
+                type="number"
+                value={state.caseDimensions.width || ""}
+                onChange={(value) => handleChange("customImpedance", value)}
+                required
+                disabled={state.caseStyle === "Existing"}
+              />
+              <Input
+                label="height"
+                type="number"
+                value={state.caseDimensions.height || ""}
+                onChange={(value) => handleChange("customImpedance", value)}
+                required
+                disabled={state.caseStyle === "Existing"}
+              />
+              <Input
+                label="PinOuts"
+                type="number"
+                value={state.caseDimensions.pinOuts || ""}
+                onChange={(value) => handleChange("pinOuts", value)}
+                required
+                disabled={state.caseStyle === "Existing"}
+              />
+            </div>
+          )}
         </div>
 
         <Select

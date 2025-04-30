@@ -14,12 +14,17 @@ const initialState = {
   impedance: "",
   customImpedance: "",
   package: "",
+  ports: {
+    numberOfPorts: "",
+    portDetails: [], // array of { connectorType, connectorGender }
+  },
   caseStyle: "Existing",
   selectedCaseStyle: "",
   caseDimensions: {
     length: "20",
     width: "10",
     height: "5",
+    pinOuts: "",
   },
   bottomSolderMask: "",
   halfMoonRequirement: "",
@@ -184,6 +189,56 @@ const reducer = (state, action) => {
         ltcc: {
           ...state.ltcc,
           [action.field]: action.value,
+        },
+      };
+    case "SET_NUMBER_OF_PORTS":
+      const numberOfPorts = parseInt(action.value, 10) || 0;
+      return {
+        ...state,
+        ports: {
+          numberOfPorts,
+          portDetails: Array.from({ length: numberOfPorts }, (_, i) => ({
+            connectorType: "",
+            connectorGender: "",
+          })),
+        },
+      };
+
+    case "UPDATE_PORT":
+      return {
+        ...state,
+        ports: {
+          ...state.ports,
+          portDetails: state.ports.portDetails.map((port, i) =>
+            i === action.index
+              ? { ...port, [action.field]: action.value }
+              : port
+          ),
+        },
+      };
+
+    case "ADD_PORT":
+      return {
+        ...state,
+        ports: {
+          ...state.ports,
+          numberOfPorts: state.ports.numberOfPorts + 1,
+          portDetails: [
+            ...state.ports.portDetails,
+            { connectorType: "", connectorGender: "" },
+          ],
+        },
+      };
+
+    case "REMOVE_PORT":
+      return {
+        ...state,
+        ports: {
+          ...state.ports,
+          numberOfPorts: state.ports.numberOfPorts - 1,
+          portDetails: state.ports.portDetails.filter(
+            (_, i) => i !== action.index
+          ),
         },
       };
 
