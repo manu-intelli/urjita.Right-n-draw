@@ -1,9 +1,6 @@
 import React from "react";
 import { usePage21Context } from "../../../context/Page21Context";
-import {
-  FormSection,
-  FormSectionUpadated,
-} from "../../../components/common/ReusableComponents";
+import { FormSection } from "../../../components/common/ReusableComponents";
 import PartDetails from "./Parts";
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
@@ -62,16 +59,20 @@ const CreationInterface = () => {
     const stepKey = STEP_ORDER[currentStep];
     if (stepKey === STEPS.GENERAL_DETAILS) {
       return (
-        <div className="h-screen overflow-hidden flex flex-col">
-          <main className="flex-1 overflow-y-auto p-4 ">
-            <FormSection title="Capacitor Details">
-              {/* Include Capacitor-related content here */}
-              <div className="md:col-span-2">
+        <FormSection title="Capacitor Details">
+          <div className="md:col-span-2">
+            <div className="relative h-[400px]">
+              {" "}
+              {/* Adjust height as needed */}
+              <div className="sticky top-0 z-10 bg-white pb-2">
+                <h2 className="text-lg font-semibold">Capacitor Details</h2>
+              </div>
+              <div className="overflow-y-auto h-full">
                 <CapacitorTables />
               </div>
-            </FormSection>
-          </main>
-        </div>
+            </div>
+          </div>
+        </FormSection>
       );
     }
 
