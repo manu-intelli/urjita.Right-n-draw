@@ -61,15 +61,8 @@ const CreationInterface = () => {
       return (
         <FormSection title="Capacitor Details">
           <div className="md:col-span-2">
-            <div className="relative h-[400px]">
-              {" "}
-              {/* Adjust height as needed */}
-              <div className="sticky top-0 z-10 bg-white pb-2">
-                <h2 className="text-lg font-semibold">Capacitor Details</h2>
-              </div>
-              <div className="overflow-y-auto h-full">
-                <CapacitorTables />
-              </div>
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <CapacitorTables />
             </div>
           </div>
         </FormSection>
