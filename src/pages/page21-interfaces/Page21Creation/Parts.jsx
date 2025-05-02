@@ -1,271 +1,247 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { usePage21Context } from "../../../context/Page21Context";
-import { Input, Select } from "../../../components/common/ReusableComponents";
+import {
+  Input,
+  Select,
+  TextArea,
+} from "../../../components/common/ReusableComponents";
 import { Trash2 } from "lucide-react";
 
-const PartDetails = ({ item, index, partType }) => {
-  const { dispatch } = usePage21Context();
+const PartDetails = ({ partType, title }) => {
+  const { state, dispatch } = usePage21Context();
 
-  useEffect(() => {
-    if (partType === "Transformer") {
-      if (!item.coreType) {
-        handleChange("coreType", "single");
-      }
-      if (!item.wireType) {
-        handleChange("wireType", "single");
-      }
-    }
-  }, []);
+  const partState = state[partType];
 
-  const handleChange = (field, value) => {
-    dispatch({
-      type: "UPDATE_PART",
-      partType,
-      index,
-      field,
-      value,
-    });
-
-    if (field === "hasBp") {
-      handleBulkChange(
-        value === "Yes"
-          ? {
-              hasSupplier: "",
-              supplierName: "",
-              supplierNumber: "",
-              qualification: "",
-            }
-          : { bpNumber: "" }
-      );
-    }
-
-    if (field === "hasSupplier") {
-      handleBulkChange(
-        value === "Yes"
-          ? { qualification: "" }
-          : { supplierName: "", supplierNumber: "" }
-      );
-    }
-
-    if (partType === "Transformer") {
-      if (field === "coreType") {
-        handleBulkChange({ coreBPN: value === "single" ? [""] : ["", ""] });
-      }
-      if (field === "wireType") {
-        handleBulkChange({ wireGauge: value === "single" ? [""] : ["", ""] });
-      }
-    }
-  };
-
-  const handleBulkChange = (fields) => {
-    dispatch({
-      type: "UPDATE_PART_FIELDS",
-      partType,
-      index,
-      fields,
-    });
-  };
-
-  const handleArrayChange = (field, i, value) => {
-    const updated = [...(item[field] || [])];
-    updated[i] = value;
-    dispatch({
-      type: "UPDATE_PART",
-      partType,
-      index,
-      field,
-      value: updated,
-    });
-  };
-
-  const handleRemovePart = () => {
-    dispatch({
-      type: "REMOVE_PART",
-      partType,
-      index,
-    });
-  };
-
-  const yesNoOptions = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" },
-  ];
+  const {
+    numWithBpn,
+    numWithoutBp,
+    withBpn: partsWithBpn,
+    withoutBpn: partsWithoutBpn,
+  } = partState;
 
   const qualificationOptions = [
     { label: "Qualification", value: "Qualification" },
     { label: "Approval", value: "Approval" },
   ];
 
+  const handleCountChange = (value, isWithBpn) => {
+    const field = isWithBpn ? "numWithBpn" : "numWithoutBpn";
+    const count = parseInt(value, 10) || 0;
+
+    // Create empty array with count number of objects
+    const listKey = isWithBpn ? "withBpn" : "withoutBpn";
+    const defaultItem = isWithBpn
+      ? { name: "", bpn: "" }
+      : {
+          name: "",
+          supplierName: "",
+          supplierNumber: "",
+          qualificationStaus: "",
+          airCoilDetailsComment: "", // Include airCoilDetailsComment for consistency
+        };
+
+    const newList = Array.from({ length: count }, () => ({ ...defaultItem }));
+
+    dispatch({ type: "SET_COUNT", partType, field, value: count });
+    dispatch({ type: "SET_ITEMS", partType, field: listKey, value: newList });
+  };
+
+  const handleChange = (index, key, value, isWithBpn) => {
+    const listKey = isWithBpn ? "withBpn" : "withoutBpn";
+
+    dispatch({
+      type: "UPDATE_ITEM",
+      partType,
+      listKey,
+      index,
+      key,
+      value,
+    });
+  };
+
+  const handleRemoveRow = (index, isWithBpn) => {
+    const listKey = isWithBpn ? "withBpn" : "withoutBpn";
+
+    dispatch({
+      type: "REMOVE_ITEM",
+      partType,
+      listKey,
+      index,
+    });
+
+    const newCount = (isWithBpn ? partsWithBpn : partsWithoutBpn).length - 1;
+    const countField = isWithBpn ? "numWithBpn" : "numWithoutBp";
+    dispatch({
+      type: "SET_COUNT",
+      partType,
+      field: countField,
+      value: newCount,
+    });
+  };
+
   return (
-    <div className="border p-4 rounded-md shadow-sm mb-6">
-      {/* Header */}
-      <h3 className="text-lg font-semibold capitalize">
-        Number of {partType} :
-      </h3>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold capitalize">
-          {partType} {index + 1}
-        </h3>
-        <button
-          className="text-red-500 hover:text-red-700"
-          onClick={handleRemovePart}
-        >
-          <Trash2 size={18} />
-        </button>
+    <>
+      {/* Ask for Number of Parts */}
+      <div className="sticky top-0 bg-white z-10 p-6 w-full shadow-md rounded-lg">
+        <div className="flex gap-6">
+          <div className="flex-1">
+            <Input
+              label={`Number of ${title} with BP/N`}
+              type="number"
+              value={numWithBpn}
+              onChange={(val) => handleCountChange(val, true)}
+              className="w-full"
+            />
+          </div>
+          <div className="flex-1">
+            <Input
+              label={`Number of ${title} without BP/N`}
+              type="number"
+              value={numWithoutBp}
+              onChange={(val) => handleCountChange(val, false)}
+              className="w-full"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* Transformer-specific UI */}
-      {partType === "Transformer" ? (
-        <div className="grid grid-cols-1 gap-6">
-          {/* Core Type and Core BP/N - Side by Side */}
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="md:w-1/2">
-              <label className="block font-medium mb-1">Core Type</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name={`coreType-${index}`}
-                    value="single"
-                    checked={item.coreType === "single"}
-                    onChange={() => handleChange("coreType", "single")}
-                  />
-                  Single Core
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name={`coreType-${index}`}
-                    value="double"
-                    checked={item.coreType === "double"}
-                    onChange={() => handleChange("coreType", "double")}
-                  />
-                  Double Core
-                </label>
-              </div>
-            </div>
-
-            <div className="md:w-1/2">
-              {(item.coreBPN || []).map((val, i) => (
-                <Input
-                  key={i}
-                  label={`Core BP/N ${item.coreBPN.length > 1 ? i + 1 : ""}`}
-                  value={val}
-                  onChange={(value) => handleArrayChange("coreBPN", i, value)}
-                  required
-                />
-              ))}
-            </div>
+      {/* Parts with BPN */}
+      {partsWithBpn.length > 0 && (
+        <div>
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+            <h3 className="text-md font-semibold text-gray-800">
+              {title} with BP/N
+            </h3>
           </div>
-
-          {/* Wire Type and Wire Gauge - Side by Side */}
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="md:w-1/2">
-              <label className="block font-medium mb-1">Wire Type</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name={`wireType-${index}`}
-                    value="single"
-                    checked={item.wireType === "single"}
-                    onChange={() => handleChange("wireType", "single")}
-                  />
-                  Single Wire
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name={`wireType-${index}`}
-                    value="double"
-                    checked={item.wireType === "double"}
-                    onChange={() => handleChange("wireType", "double")}
-                  />
-                  Double Wire
-                </label>
-              </div>
-            </div>
-
-            <div className="md:w-1/2">
-              {(item.wireGauge || []).map((val, i) => (
-                <Input
-                  key={i}
-                  label={`Wire Gauge ${item.wireGauge.length > 1 ? i + 1 : ""}`}
-                  value={val}
-                  onChange={(value) => handleArrayChange("wireGauge", i, value)}
-                  required
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Number of Turns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Number of Turns"
-              value={item.numberOfTurns || ""}
-              onChange={(value) => handleChange("numberOfTurns", value)}
-              required
-            />
-          </div>
-        </div>
-      ) : (
-        // Generic UI
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Select
-            label="Has BP/N?"
-            value={item.hasBp || ""}
-            options={yesNoOptions}
-            onChange={(value) => handleChange("hasBp", value)}
-            required
-          />
-          {item.hasBp === "Yes" && (
-            <Input
-              label="BP Number"
-              value={item.bpNumber || ""}
-              onChange={(value) => handleChange("bpNumber", value)}
-              required
-            />
-          )}
-          {item.hasBp === "No" && (
-            <>
-              <Select
-                label="Supplier Available?"
-                value={item.hasSupplier || ""}
-                options={yesNoOptions}
-                onChange={(value) => handleChange("hasSupplier", value)}
-                required
-              />
-              {item.hasSupplier === "Yes" && (
-                <>
+          <div className="space-y-4">
+            {partsWithBpn.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-wrap bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all hover:bg-gray-50"
+              >
+                <div className="flex-1 mx-2 min-w-[200px]">
                   <Input
-                    label="Supplier Name"
-                    value={item.supplierName || ""}
-                    onChange={(value) => handleChange("supplierName", value)}
-                    required
+                    label={`${title} ${index + 1} Name`}
+                    value={item.name}
+                    onChange={(value) =>
+                      handleChange(index, "name", value, true)
+                    }
+                    placeholder="Enter Name"
                   />
+                </div>
+                <div className="flex-1 mx-2 min-w-[200px]">
                   <Input
-                    label="Supplier P/N"
-                    value={item.supplierNumber || ""}
-                    onChange={(value) => handleChange("supplierNumber", value)}
-                    required
+                    label="BPN"
+                    value={item.bpn}
+                    onChange={(value) =>
+                      handleChange(index, "bpn", value, true)
+                    }
+                    placeholder="Enter BPN"
                   />
-                </>
-              )}
-              {item.hasSupplier === "No" && (
-                <Select
-                  label="Qualification Status"
-                  value={item.qualification || ""}
-                  options={qualificationOptions}
-                  onChange={(value) => handleChange("qualification", value)}
-                  required
-                />
-              )}
-            </>
-          )}
+                </div>
+                <div className="flex items-center justify-center mx-2 mt-7">
+                  <button
+                    onClick={() => handleRemoveRow(index, true)}
+                    className="text-red-600 hover:text-red-700 transition"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-    </div>
+
+      {/* Parts without BPN */}
+      {partsWithoutBpn.length > 0 && (
+        <div>
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+            <h3 className="text-md font-semibold text-gray-800">
+              {title} without BP/N
+            </h3>
+          </div>
+          <div className="space-y-4">
+            {partsWithoutBpn.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-wrap bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all hover:bg-gray-50"
+              >
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label={`${title} ${index + 1} Name`}
+                    value={item.name}
+                    onChange={(value) =>
+                      handleChange(index, "name", value, false)
+                    }
+                    placeholder="Enter Name"
+                  />
+                </div>
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label="Supplier Name"
+                    value={item.supplierName}
+                    onChange={(value) =>
+                      handleChange(index, "supplierName", value, false)
+                    }
+                    placeholder="Enter Supplier Name"
+                  />
+                </div>
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label="Supplier P/N"
+                    value={item.supplierNumber}
+                    onChange={(value) =>
+                      handleChange(index, "supplierNumber", value, false)
+                    }
+                    placeholder="Enter Supplier P/N"
+                  />
+                </div>
+                {title !== "Air Coil" ? (
+                  <div className="flex-1 mx-2 min-w-[200px]">
+                    <Select
+                      label="Qualification Status"
+                      value={item.qualificationStaus}
+                      options={qualificationOptions}
+                      onChange={(value) =>
+                        handleChange(index, "qualificationStaus", value, false)
+                      }
+                      required
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 mx-2 min-w-[400px]">
+                    <TextArea
+                      label="Aircoil Details Comment"
+                      value={item.airCoilDetailsComment} // Use this for storing the approval comment
+                      onChange={(value) =>
+                        handleChange(
+                          index,
+                          "airCoilDetailsComment",
+                          value,
+                          false
+                        )
+                      }
+                      multiline
+                      required
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center justify-center mx-2 mt-7">
+                  <button
+                    onClick={() => handleRemoveRow(index, false)}
+                    className="text-red-600 hover:text-red-700 transition"
+                  >
+                    <Trash2 size={20} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

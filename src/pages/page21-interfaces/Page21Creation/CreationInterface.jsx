@@ -1,16 +1,20 @@
 import React from "react";
 import { usePage21Context } from "../../../context/Page21Context";
 import { FormSection } from "../../../components/common/ReusableComponents";
-import PartDetails from "./Parts";
+
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
-import ProjectForm from "./GeneralDetails";
+
 import ShieldDetails from "./ShieldDetails";
 import FingerDetails from "./FingerDetails";
 import CooperFlapDetails from "./CooperFlapDetails";
 import ResonatorDetails from "./ResonatorDetails";
 import LtccDetails from "./LTCC";
-import CapacitorTables from "../StudentEditableTable";
+
+import PartTable from "./Parts";
+import GeneralDetails from "./GeneralDetails";
+
+import TransformersPage from "./Transformer";
 
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
@@ -59,10 +63,21 @@ const CreationInterface = () => {
     const stepKey = STEP_ORDER[currentStep];
     if (stepKey === STEPS.GENERAL_DETAILS) {
       return (
-        <FormSection title="Capacitor Details">
+        <FormSection title="General Details">
           <div className="md:col-span-2">
             <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-              <CapacitorTables />
+              <GeneralDetails />
+            </div>
+          </div>
+        </FormSection>
+      );
+    }
+    if (stepKey === STEPS.TRANSFORMER_WOUND_INDUCTORS) {
+      return (
+        <FormSection title="Transformer Details">
+          <div className="md:col-span-2">
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <TransformersPage />
             </div>
           </div>
         </FormSection>
@@ -74,7 +89,9 @@ const CreationInterface = () => {
       return (
         <FormSection title={`${STEPS.COMPONENTS} Details`}>
           <div className="md:col-span-2">
+          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
             <ComponentsDetails />
+            </div>
           </div>
         </FormSection>
       );
@@ -83,7 +100,9 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Shield Details`}>
           <div className="md:col-span-2">
+          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
             <ShieldDetails />
+            </div>
           </div>
         </FormSection>
       );
@@ -93,7 +112,9 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Fingers Details`}>
           <div className="md:col-span-2">
+          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
             <FingerDetails />
+            </div>
           </div>
         </FormSection>
       );
@@ -103,7 +124,9 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Copper Flaps Details`}>
           <div className="md:col-span-2">
+          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
             <CooperFlapDetails />
+            </div>
           </div>
         </FormSection>
       );
@@ -113,7 +136,9 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Resonator Details`}>
           <div className="md:col-span-2">
+          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
             <ResonatorDetails />
+            </div>
           </div>
         </FormSection>
       );
@@ -122,7 +147,9 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Ltcc Details`}>
           <div className="md:col-span-2">
+          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
             <LtccDetails />
+            </div>
           </div>
         </FormSection>
       );
@@ -130,96 +157,45 @@ const CreationInterface = () => {
 
     // Handle all other part-based steps
     let partType = null;
+    let title = "";
+
     switch (stepKey) {
       case STEPS.CHIP_CAPACITORS:
-        partType = "Capacitor";
+        partType = "capacitor";
+        title = "Capacitor";
         break;
       case STEPS.CHIP_RESISTORS:
-        partType = "Resistor";
+        partType = "resistor";
+        title = "Resistor";
         break;
       case STEPS.CHIP_AIRCOILS:
-        partType = "AirCoil";
+        partType = "airCoil";
+        title = "Air Coil";
         break;
       case STEPS.CHIP_INDUCTORS:
-        partType = "Inductor";
+        partType = "inductor";
+        title = "Inductor";
         break;
-      case STEPS.TRANSFORMER_WOUND_INDUCTORS:
-        partType = "Transformer";
-        break;
+      // case STEPS.TRANSFORMER_WOUND_INDUCTORS:
+      //   partType = "transformer";
+      //   title = "Transformer";
+      //   break;
       default:
         return <p className="text-gray-500 p-4">No content for this step.</p>;
     }
 
     return (
       <>
-        <FormSection title={`${partType} Details`}>
-          {state[partType]?.map((item, index) => (
-            <div key={index} className="md:col-span-2">
-              <PartDetails item={item} index={index} partType={partType} />
+        <FormSection title={`${title} Details`}>
+          <div className="md:col-span-2">
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <PartTable partType={partType} title={title} />
             </div>
-          ))}
+          </div>
         </FormSection>
-
-        <Button
-          variant="primary"
-          onClick={() => dispatch({ type: "ADD_PART", partType })}
-        >
-          + Add {partType}
-        </Button>
       </>
     );
   };
-
-  // const renderStepIndicator = () => (
-  //   <div className="flex justify-between items-center mb-4 px-4">
-  //     {STEP_ORDER.map((stepKey, index) => (
-  //       <div key={stepKey} className="flex items-center flex-1 last:flex-none">
-  //         <div
-  //           className={`
-  //             w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm
-  //             ${
-  //               currentStep === index
-  //                 ? "bg-blue-600 text-white ring-4 ring-blue-100"
-  //                 : currentStep > index
-  //                 ? "bg-green-400 text-white"
-  //                 : "bg-white border-2 border-gray-200 text-gray-400"
-  //             }
-  //             transition-all duration-200 relative z-10
-  //           `}
-  //         >
-  //           {currentStep > index ? (
-  //             <svg
-  //               className="w-5 h-5"
-  //               fill="none"
-  //               viewBox="0 0 24 24"
-  //               stroke="currentColor"
-  //             >
-  //               <path
-  //                 strokeLinecap="round"
-  //                 strokeLinejoin="round"
-  //                 strokeWidth={2}
-  //                 d="M5 13l4 4L19 7"
-  //               />
-  //             </svg>
-  //           ) : (
-  //             index + 1
-  //           )}
-  //         </div>
-  //         {index < STEP_ORDER.length - 1 && (
-  //           <div className="flex-1 relative">
-  //             <div
-  //               className={`
-  //                 absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1
-  //                 ${currentStep > index ? "bg-green-400" : "bg-gray-200"}
-  //                 transition-colors duration-300
-  //               `}
-  //             />
-  //           </div>
-  //         )}
-  //       </div>
-  //     ))}
-  //   </div>
-  // );
 
   const renderStepIndicator = () => (
     <div className="flex justify-between items-center mb-4 px-4">

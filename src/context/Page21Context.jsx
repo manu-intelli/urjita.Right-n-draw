@@ -2,6 +2,12 @@ import React, { createContext, useReducer, useContext } from "react";
 
 const Page21Context = createContext();
 
+const initialPartState = {
+  numWithBpn: "",
+  numWithoutBp: "",
+  withBpn: [],
+  withoutBpn: [],
+};
 const initialState = {
   currentStep: 0,
   submitted: false,
@@ -44,10 +50,42 @@ const initialState = {
   schematicFile: null,
   similarModel: "",
   components: [],
-  Inductor: [],
-  Capacitor: [],
-  AirCoil: [],
-  Transformer: [],
+  capacitor: {
+    numWithBpn: "",
+    numWithoutBpn: "",
+    withBpn: [],
+    withoutBpn: [],
+  },
+  inductor: {
+    numWithBpn: "",
+    numWithoutBpn: "",
+    withBpn: [],
+    withoutBpn: [],
+  },
+  airCoil: {
+    numWithBpn: "",
+    numWithoutBpn: "",
+    withBpn: [],
+    withoutBpn: [],
+  },
+  resistor: {
+    numWithBpn: "",
+    numWithoutBpn: "",
+    withBpn: [],
+    withoutBpn: [],
+  },
+  transformers: {
+    transformersList: [
+      {
+        coreType: "single",
+        wireType: "single",
+        coreBPN: [""],
+        wireGauge: [""],
+        numberOfTurns: "",
+      },
+    ],
+    numberOfTransformers: 1,
+  },
   isExistingCanAvailable: "No",
   canMaterial: "",
   canProcess: "",
@@ -131,32 +169,39 @@ const reducer = (state, action) => {
         ...state,
         components: action.payload, // payload should be an array
       };
-    case "ADD_PART":
+    case "UPDATE_PART": {
+      const { partType, index, field, value } = action;
+      const updatedParts = [...state[partType]];
+      const currentPart = updatedParts[index] || {};
+      updatedParts[index] = { ...currentPart, [field]: value };
+
       return {
         ...state,
-        [action.partType]: [...(state[action.partType] || []), {}],
+        [partType]: updatedParts,
       };
-    case "REMOVE_PART":
+    }
+
+    case "UPDATE_PART_FIELDS": {
+      const { partType, index, fields } = action;
+      const updatedParts = [...state[partType]];
+      const currentPart = updatedParts[index] || {};
+      updatedParts[index] = { ...currentPart, ...fields };
+
       return {
         ...state,
-        [action.partType]: state[action.partType].filter(
-          (_, i) => i !== action.index
-        ),
+        [partType]: updatedParts,
       };
-    case "UPDATE_PART":
+    }
+
+    case "REMOVE_PART": {
+      const { partType, index } = action;
+      const updatedParts = [...state[partType]];
+      updatedParts.splice(index, 1);
       return {
         ...state,
-        [action.partType]: state[action.partType].map((part, i) =>
-          i === action.index ? { ...part, [action.field]: action.value } : part
-        ),
+        [partType]: updatedParts,
       };
-    case "UPDATE_PART_FIELDS":
-      return {
-        ...state,
-        [action.partType]: state[action.partType].map((part, i) =>
-          i === action.index ? { ...part, ...action.fields } : part
-        ),
-      };
+    }
     case "UPDATE_SHIELDS":
       console.log("Updated others field", action.payload);
 
@@ -268,6 +313,124 @@ const reducer = (state, action) => {
           [action.field]: action.value,
         },
       };
+
+    case "SET_COUNT": {
+      const { partType, field, value } = action;
+      return {
+        ...state,
+        [partType]: {
+          ...state[partType],
+          [field]: value,
+        },
+      };
+    }
+
+    case "SET_ITEMS": {
+      const { partType, field, value } = action;
+      return {
+        ...state,
+        [partType]: {
+          ...state[partType],
+          [field]: value,
+        },
+      };
+    }
+
+    case "UPDATE_ITEM": {
+      const { partType, listKey, index, key, value } = action;
+      const updatedList = [...state[partType][listKey]];
+      updatedList[index] = {
+        ...updatedList[index],
+        [key]: value,
+      };
+      return {
+        ...state,
+        [partType]: {
+          ...state[partType],
+          [listKey]: updatedList,
+        },
+      };
+    }
+
+    case "REMOVE_ITEM": {
+      const { partType, listKey, index } = action;
+      const filteredList = state[partType][listKey].filter(
+        (_, i) => i !== index
+      );
+      return {
+        ...state,
+        [partType]: {
+          ...state[partType],
+          [listKey]: filteredList,
+        },
+      };
+    }
+
+    case "transformer_transformer_add_multiple":
+      return {
+        ...state,
+        transformers: {
+          ...state.transformers,
+          transformersList: [
+            ...(state.transformers?.transformersList || []),
+            ...action.items,
+          ],
+        },
+      };
+
+    case "transformer_transformer_set_length":
+      return {
+        ...state,
+        transformers: {
+          ...state.transformers,
+          transformersList: (state.transformers?.transformersList || []).slice(
+            0,
+            action.length
+          ),
+        },
+      };
+
+    case "transformer_transformer_update":
+      return {
+        ...state,
+        transformers: {
+          ...state.transformers,
+          transformersList: state.transformers?.transformersList.map(
+            (item, idx) =>
+              idx === action.index
+                ? { ...item, [action.field]: action.value }
+                : item
+          ),
+        },
+      };
+
+    case "transformer_transformer_update_fields":
+      return {
+        ...state,
+        transformers: {
+          ...state.transformers,
+          transformersList: state.transformers?.transformersList.map(
+            (item, idx) =>
+              idx === action.index ? { ...item, ...action.fields } : item
+          ),
+        },
+      };
+
+    case "transformer_transformer_replace_all":
+      return {
+        ...state,
+        transformers: {
+          ...state.transformers,
+          transformersList: action.items,
+        },
+      };
+
+
+
+
+
+
+
 
     default:
       return state;

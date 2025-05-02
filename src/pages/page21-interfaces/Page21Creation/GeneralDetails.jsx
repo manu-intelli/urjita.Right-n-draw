@@ -76,7 +76,7 @@ const connectorGenderOptions = [
   { label: "Female", value: "Female" },
 ];
 
-const ProjectForm = () => {
+const GeneralDetails = () => {
   const { state, dispatch } = usePage21Context();
   const [previewUrl, setPreviewUrl] = useState("");
   const fileInputRef = useRef(null);
@@ -569,4 +569,4 @@ const ProjectForm = () => {
   );
 };
 
-export default ProjectForm;
+export default GeneralDetails;

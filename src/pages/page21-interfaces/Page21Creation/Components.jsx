@@ -298,6 +298,13 @@ const ComponentsDetails = () => {
                 />
               )}
 
+              <Input
+                label="Substrate Thickness"
+                value={pcb.substrateThickness}
+                onChange={(val) => onChange(index, "substrateThickness", val)}
+                placeholder="Enter Substrate Thickness"
+              />
+
               {/* Mounting & Comments for non-base */}
               <Select
                 label="Mounting Orientation"
