@@ -10,11 +10,16 @@ import { Trash2 } from "lucide-react";
 const PartDetails = ({ partType, title }) => {
   const { state, dispatch } = usePage21Context();
 
-  const partState = state[partType];
+  const partState = state[partType] || {
+    numWithBpn: 0,
+    numWithoutBpn: 0,
+    withBpn: [],
+    withoutBpn: [],
+  };
 
   const {
     numWithBpn,
-    numWithoutBp,
+    numWithoutBpn,
     withBpn: partsWithBpn,
     withoutBpn: partsWithoutBpn,
   } = partState;
@@ -25,11 +30,10 @@ const PartDetails = ({ partType, title }) => {
   ];
 
   const handleCountChange = (value, isWithBpn) => {
-    const field = isWithBpn ? "numWithBpn" : "numWithoutBpn";
     const count = parseInt(value, 10) || 0;
-
-    // Create empty array with count number of objects
+    const field = isWithBpn ? "numWithBpn" : "numWithoutBpn";
     const listKey = isWithBpn ? "withBpn" : "withoutBpn";
+
     const defaultItem = isWithBpn
       ? { name: "", bpn: "" }
       : {
@@ -37,7 +41,7 @@ const PartDetails = ({ partType, title }) => {
           supplierName: "",
           supplierNumber: "",
           qualificationStaus: "",
-          airCoilDetailsComment: "", // Include airCoilDetailsComment for consistency
+          airCoilDetailsComment: "",
         };
 
     const newList = Array.from({ length: count }, () => ({ ...defaultItem }));
@@ -48,7 +52,6 @@ const PartDetails = ({ partType, title }) => {
 
   const handleChange = (index, key, value, isWithBpn) => {
     const listKey = isWithBpn ? "withBpn" : "withoutBpn";
-
     dispatch({
       type: "UPDATE_ITEM",
       partType,
@@ -61,6 +64,8 @@ const PartDetails = ({ partType, title }) => {
 
   const handleRemoveRow = (index, isWithBpn) => {
     const listKey = isWithBpn ? "withBpn" : "withoutBpn";
+    const updatedList = [...(isWithBpn ? partsWithBpn : partsWithoutBpn)];
+    updatedList.splice(index, 1);
 
     dispatch({
       type: "REMOVE_ITEM",
@@ -69,8 +74,8 @@ const PartDetails = ({ partType, title }) => {
       index,
     });
 
-    const newCount = (isWithBpn ? partsWithBpn : partsWithoutBpn).length - 1;
-    const countField = isWithBpn ? "numWithBpn" : "numWithoutBp";
+    const newCount = updatedList.length;
+    const countField = isWithBpn ? "numWithBpn" : "numWithoutBpn";
     dispatch({
       type: "SET_COUNT",
       partType,
@@ -81,7 +86,7 @@ const PartDetails = ({ partType, title }) => {
 
   return (
     <>
-      {/* Ask for Number of Parts */}
+      {/* Number of Parts Inputs */}
       <div className="sticky top-0 bg-white z-10 p-6 w-full shadow-md rounded-lg">
         <div className="flex gap-6">
           <div className="flex-1">
@@ -97,7 +102,7 @@ const PartDetails = ({ partType, title }) => {
             <Input
               label={`Number of ${title} without BP/N`}
               type="number"
-              value={numWithoutBp}
+              value={numWithoutBpn}
               onChange={(val) => handleCountChange(val, false)}
               className="w-full"
             />
@@ -105,7 +110,7 @@ const PartDetails = ({ partType, title }) => {
         </div>
       </div>
 
-      {/* Parts with BPN */}
+      {/* Parts WITH BPN */}
       {partsWithBpn.length > 0 && (
         <div>
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
@@ -153,7 +158,7 @@ const PartDetails = ({ partType, title }) => {
         </div>
       )}
 
-      {/* Parts without BPN */}
+      {/* Parts WITHOUT BPN */}
       {partsWithoutBpn.length > 0 && (
         <div>
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
@@ -213,7 +218,7 @@ const PartDetails = ({ partType, title }) => {
                   <div className="flex-1 mx-2 min-w-[400px]">
                     <TextArea
                       label="Aircoil Details Comment"
-                      value={item.airCoilDetailsComment} // Use this for storing the approval comment
+                      value={item.airCoilDetailsComment}
                       onChange={(value) =>
                         handleChange(
                           index,
@@ -227,7 +232,6 @@ const PartDetails = ({ partType, title }) => {
                     />
                   </div>
                 )}
-
                 <div className="flex items-center justify-center mx-2 mt-7">
                   <button
                     onClick={() => handleRemoveRow(index, false)}
