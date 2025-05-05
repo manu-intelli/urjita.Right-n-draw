@@ -17,6 +17,7 @@ const initialState = {
   eduNumber: "",
   modelFamily: "",
   modelName: "",
+  technology: "",
   impedance: "",
   customImpedance: "",
   package: "",
@@ -424,13 +425,6 @@ const reducer = (state, action) => {
           transformersList: action.items,
         },
       };
-
-
-
-
-
-
-
 
     default:
       return state;

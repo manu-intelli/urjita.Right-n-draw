@@ -7,6 +7,11 @@ const impedanceOptions = [
   { label: "75 ohms", value: "75 ohms" },
   { label: "Others", value: "Others" },
 ];
+const modelFamilyOptions = [
+  { label: "Family A", value: "FamilyA" },
+  { label: "FamilyB", value: "FamilyB" },
+  { label: "Family C", value: "FamilyC" },
+];
 
 const packageOptions = [
   { label: "SMT", value: "SMT" },
@@ -97,6 +102,22 @@ const GeneralDetails = () => {
   };
 
   // Handle file changes (for schematic file)
+  // const handleFileChange = (e) => {
+  //   const file = e.target.files[0];
+  //   if (file) {
+  //     dispatch({
+  //       type: "SET_FILE",
+  //       payload: { file },
+  //     });
+  //     if (file.type === "application/pdf") {
+  //       const url = URL.createObjectURL(file);
+  //       setPreviewUrl(url);
+  //     } else {
+  //       setPreviewUrl(null);
+  //     }
+  //   }
+  // };
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -104,7 +125,11 @@ const GeneralDetails = () => {
         type: "SET_FILE",
         payload: { file },
       });
-      if (file.type === "application/pdf") {
+
+      const isPreviewable =
+        file.type === "application/pdf" || file.type.startsWith("image/");
+
+      if (isPreviewable) {
         const url = URL.createObjectURL(file);
         setPreviewUrl(url);
       } else {
@@ -162,40 +187,6 @@ const GeneralDetails = () => {
       {/* <h2 className="text-lg font-semibold mb-4">Shield Details</h2> */}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <Input
-          label="OP Number"
-          value={state.opNumber || ""}
-          onChange={(value) => handleChange("opNumber", value)}
-          required
-        />
-        <Input
-          label="OPU Number"
-          value={state.opuNumber || ""}
-          onChange={(value) => handleChange("opuNumber", value)}
-          required
-        />
-        <Input
-          label="EDU Number"
-          value={state.eduNumber || ""}
-          onChange={(value) => handleChange("eduNumber", value)}
-          required
-        />
-
-        <Select
-          label="Model Family"
-          value={state.modelFamily}
-          options={yesNoOptions}
-          onChange={(value) => handleChange("modelFamily", value)}
-          required
-        />
-
-        <Input
-          label="Model Name"
-          value={state.modelName || ""}
-          onChange={(value) => handleChange("modelName", value)}
-          required
-        />
-
         <Select
           label="Impedance"
           value={state.impedance}
@@ -519,7 +510,7 @@ const GeneralDetails = () => {
                 name="schematic"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                accept=".pdf,.dwg,.dxf"
+                accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png"
                 className="w-full text-sm text-gray-500
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-full file:border-0
@@ -528,7 +519,7 @@ const GeneralDetails = () => {
                   hover:file:bg-blue-100"
               />
               <p className="mt-2 text-sm text-gray-500">
-                Accepted formats: PDF, DWG, DXF
+                Accepted formats: PDF, DWG, DXF,IMG
               </p>
               {state.schematicFile && (
                 <div className="mt-4 w-full">

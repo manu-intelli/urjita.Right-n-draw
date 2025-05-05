@@ -1,0 +1,9 @@
+.scrollbar-hide {
+  overflow-x: none; /* or auto */
+  scrollbar-width: none; /* Firefox */
+}
+
+/* In global CSS file (e.g., index.css or App.css) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

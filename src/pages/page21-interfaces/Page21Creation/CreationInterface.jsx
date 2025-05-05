@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { usePage21Context } from "../../../context/Page21Context";
 import { FormSection } from "../../../components/common/ReusableComponents";
 
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
-
+import { ChevronLeft, ChevronRight } from "lucide-react"; // Or any icon set
 import ShieldDetails from "./ShieldDetails";
 import FingerDetails from "./FingerDetails";
 import CooperFlapDetails from "./CooperFlapDetails";
@@ -15,7 +15,7 @@ import PartTable from "./Parts";
 import GeneralDetails from "./GeneralDetails";
 
 import TransformersPage from "./Transformer";
-
+import "./page21.css";
 export const STEPS = {
   GENERAL_DETAILS: "general_details",
   COMPONENTS: "components",
@@ -49,7 +49,7 @@ export const STEP_ORDER = [
 
 const CreationInterface = () => {
   const { state, dispatch } = usePage21Context();
-  const { currentStep, submitted } = state;
+  const { currentStep, submitted, technology } = state;
 
   const handleSubmit = () => {
     dispatch({ type: "SET_SUBMITTED", payload: true });
@@ -59,8 +59,22 @@ const CreationInterface = () => {
     dispatch({ type: "SET_CURRENT_STEP", payload: step });
   };
 
+  const TECHNOLOGY_STEP_MAP = {
+    lumped: STEP_ORDER,
+    ceramic_resonators: STEP_ORDER.filter((step) => step !== STEPS.RESONATORS), // All except resonators
+    siw: [STEPS.GENERAL_DETAILS, STEPS.COMPONENTS], // Only two steps for SIW
+    thin_film: [STEPS.GENERAL_DETAILS, STEPS.COMPONENTS], // Only two steps for Thin Film
+    docs_diplexer: [STEPS.GENERAL_DETAILS, STEPS.COMPONENTS], // Only two steps for DOCSIS Diplexer
+  };
+
+  // Get steps based on the selected technology
+
+  const stepsForSelectedTechnology = TECHNOLOGY_STEP_MAP[technology] || [];
+
   const renderStepContent = () => {
-    const stepKey = STEP_ORDER[currentStep];
+    // const stepKey = STEP_ORDER[currentStep];
+    const stepKey = stepsForSelectedTechnology[currentStep];
+
     if (stepKey === STEPS.GENERAL_DETAILS) {
       return (
         <FormSection title="General Details">
@@ -89,8 +103,8 @@ const CreationInterface = () => {
       return (
         <FormSection title={`${STEPS.COMPONENTS} Details`}>
           <div className="md:col-span-2">
-          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-            <ComponentsDetails />
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <ComponentsDetails />
             </div>
           </div>
         </FormSection>
@@ -100,8 +114,8 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Shield Details`}>
           <div className="md:col-span-2">
-          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-            <ShieldDetails />
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <ShieldDetails />
             </div>
           </div>
         </FormSection>
@@ -112,8 +126,8 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Fingers Details`}>
           <div className="md:col-span-2">
-          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-            <FingerDetails />
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <FingerDetails />
             </div>
           </div>
         </FormSection>
@@ -124,8 +138,8 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Copper Flaps Details`}>
           <div className="md:col-span-2">
-          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-            <CooperFlapDetails />
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <CooperFlapDetails />
             </div>
           </div>
         </FormSection>
@@ -136,8 +150,8 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Resonator Details`}>
           <div className="md:col-span-2">
-          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-            <ResonatorDetails />
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <ResonatorDetails />
             </div>
           </div>
         </FormSection>
@@ -147,8 +161,8 @@ const CreationInterface = () => {
       return (
         <FormSection title={`Ltcc Details`}>
           <div className="md:col-span-2">
-          <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-            <LtccDetails />
+            <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
+              <LtccDetails />
             </div>
           </div>
         </FormSection>
@@ -199,7 +213,7 @@ const CreationInterface = () => {
 
   const renderStepIndicator = () => (
     <div className="flex justify-between items-center mb-4 px-4">
-      {STEP_ORDER.map((stepKey, index) => (
+      {stepsForSelectedTechnology.map((stepKey, index) => (
         <div key={stepKey} className="flex items-center flex-1 last:flex-none">
           <div
             className={`
@@ -232,10 +246,8 @@ const CreationInterface = () => {
               index + 1
             )}
           </div>
-          <div className="mt-2 text-center text-sm text-gray-500">
-            {STEPS[stepKey]} {/* Assuming STEPS is an object with step names */}
-          </div>
-          {index < STEP_ORDER.length - 1 && (
+          <div className="mt-2 text-center text-sm text-gray-500"></div>
+          {index < stepsForSelectedTechnology.length - 1 && (
             <div className="flex-1 relative">
               <div
                 className={`
@@ -251,6 +263,172 @@ const CreationInterface = () => {
     </div>
   );
 
+  // const renderStepIndicator = () => (
+  //   <div className="overflow-x-auto px-4 mb-4">
+  //     <div className="flex items-start min-w-fit">
+  //       {STEP_ORDER.map((stepKey, index) => (
+  //         <div
+  //           key={stepKey}
+  //           className="flex flex-col items-center min-w-[120px] mx-2"
+  //         >
+  //           <div className="flex items-center relative">
+  //             <div
+  //               className={`w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm
+  //                 ${
+  //                   currentStep === index
+  //                     ? "bg-blue-600 text-white ring-4 ring-blue-100"
+  //                     : currentStep > index
+  //                     ? "bg-green-400 text-white"
+  //                     : "bg-white border-2 border-gray-200 text-gray-400"
+  //                 }
+  //                 transition-all duration-200 relative z-10
+  //               `}
+  //             >
+  //               {currentStep > index ? (
+  //                 <svg
+  //                   className="w-5 h-5"
+  //                   fill="none"
+  //                   viewBox="0 0 24 24"
+  //                   stroke="currentColor"
+  //                 >
+  //                   <path
+  //                     strokeLinecap="round"
+  //                     strokeLinejoin="round"
+  //                     strokeWidth={2}
+  //                     d="M5 13l4 4L19 7"
+  //                   />
+  //                 </svg>
+  //               ) : (
+  //                 index + 1
+  //               )}
+  //             </div>
+
+  //             {index < STEP_ORDER.length - 1 && (
+  //               <div className="flex-1 relative w-full">
+  //                 <div
+  //                   className={`absolute top-1/2 -translate-y-1/2 left-full w-[40px] h-1
+  //                     ${currentStep > index ? "bg-green-400" : "bg-gray-200"}
+  //                     transition-colors duration-300
+  //                   `}
+  //                 />
+  //               </div>
+  //             )}
+  //           </div>
+
+  //           <div className="mt-2 w-full text-sm text-center text-gray-600 break-words">
+  //             {stepKey.replace(/_/g, ' ')}
+  //           </div>
+  //         </div>
+  //       ))}
+  //     </div>
+  //   </div>
+  // );
+  // const renderStepIndicator = () => {
+  //   const containerRef = useRef(null);
+  //   const totalSteps = stepsForSelectedTechnology?.length || 0;
+  //   const shouldScroll = totalSteps > 6;
+
+  //   const scroll = (direction) => {
+  //     if (!shouldScroll) return;
+  //     const scrollAmount = direction === "left" ? -200 : 200;
+  //     containerRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
+  //   };
+
+  //   return (
+  //     <div className="relative w-full mb-6">
+  //       {/* Navigation arrows - only when scrollable */}
+  //       {shouldScroll && (
+  //         <>
+  //           <button
+  //             onClick={() => scroll("left")}
+  //             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
+  //           >
+  //             <ChevronLeft size={20} />
+  //           </button>
+  //           <button
+  //             onClick={() => scroll("right")}
+  //             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
+  //           >
+  //             <ChevronRight size={20} />
+  //           </button>
+  //         </>
+  //       )}
+
+  //       {/* Steps container */}
+  //       <div
+  //         ref={shouldScroll ? containerRef : null}
+  //         className={`w-full ${
+  //           shouldScroll ? "overflow-x-auto scrollbar-hide px-10" : "px-4"
+  //         }`}
+  //       >
+  //         <div
+  //           className={`flex ${shouldScroll ? "" : "justify-between w-full"}`}
+  //         >
+  //           {stepsForSelectedTechnology?.map((stepKey, index) => (
+  //             <div
+  //               key={stepKey}
+  //               className={`flex flex-col items-center ${
+  //                 shouldScroll ? "min-w-[140px]" : "flex-1, bg-"
+  //               }`}
+  //             >
+  //               {/* Circle + Line - now with perfect vertical alignment */}
+  //               <div className="flex flex-col items-center w-full">
+  //                 <div className="flex items-center w-full">
+  //                   {/* Circle */}
+  //                   <div className="flex flex-col items-center flex-shrink-0">
+  //                     <div
+  //                       className={`w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm
+  //                                               ${
+  //                                                 currentStep === index
+  //                                                   ? "bg-blue-600 text-white ring-4 ring-blue-100"
+  //                                                   : currentStep > index
+  //                                                   ? "bg-green-500 text-white"
+  //                                                   : "bg-white border-2 border-gray-300 text-gray-500"
+  //                                               }
+  //                                           `}
+  //                     >
+  //                       {currentStep > index ? (
+  //                         <svg
+  //                           className="w-5 h-5"
+  //                           viewBox="0 0 24 24"
+  //                           fill="none"
+  //                         >
+  //                           <path
+  //                             d="M5 13l4 4L19 7"
+  //                             stroke="currentColor"
+  //                             strokeWidth="2"
+  //                           />
+  //                         </svg>
+  //                       ) : (
+  //                         index + 1
+  //                       )}
+  //                     </div>
+  //                   </div>
+
+  //                   {/* Connector line (except last step) */}
+  //                   {index < totalSteps - 1 && (
+  //                     <div
+  //                       className={`flex-1 h-1 mx-1 ${
+  //                         currentStep > index ? "bg-green-500" : "bg-gray-200"
+  //                       }`}
+  //                     />
+  //                   )}
+  //                 </div>
+
+  //                 {/* Step label - perfectly centered below circle */}
+  //                 <div className="mt-2 text-sm font-medium text-gray-600 text-center w-full px-1">
+  //                   {stepKey
+  //                     .replace(/_/g, " ")
+  //                     .replace(/\b\w/g, (char) => char.toUpperCase())}
+  //                 </div>
+  //               </div>
+  //             </div>
+  //           ))}
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
   return (
     <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
       <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">
