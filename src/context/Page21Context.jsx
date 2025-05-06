@@ -45,7 +45,7 @@ const initialState = {
   bottomSolderMask: "",
   halfMoonRequirement: "",
   viaHolesRequirement: "",
-  signalPassing: "",
+  signalLaunchType: "",
   coverType: "",
   designRuleViolation: "",
   schematicFile: null,
@@ -91,16 +91,47 @@ const initialState = {
   canMaterial: "",
   canProcess: "",
   customCanMaterial: "",
+
+  can: {
+    material: "",
+    makingProcess: "",
+  },
+  pcbs: [
+    {
+      id: 1,
+      name: "Base PCB",
+      material: "",
+      thickness: "",
+      layers: "",
+      mountingOrientation: "Horizontal",
+      comments: "",
+      isExistingCanAvailable: "",
+      bpNumber: "",
+      customMaterial: "",
+      substrateThickness: "",
+      rfLayerThickness: "",
+      overallThickness: "",
+      copperThickness: "",
+    },
+  ],
   pcbList: [
     {
       name: "Base PCB",
       material: "",
       thickness: "",
       layers: "",
-      mountingOrientation: "",
+      mountingOrientation: "Horizontal",
       comments: "",
+      isExistingCanAvailable: "",
+      bpNumber: "",
+      customMaterial: "",
+      substrateThickness: "",
+      rfLayerThickness: "",
+      overallThickness: "",
+      copperThickness: "",
     },
   ],
+
   shieldsList: {
     shieldRequired: "Yes",
     numberOfShields: "",
@@ -163,7 +194,10 @@ const reducer = (state, action) => {
       return { ...state, canProcess: action.payload };
 
     case "SET_PCB_LIST":
-      return { ...state, pcbList: action.payload };
+      return {
+        ...state,
+        pcbList: action.payload,
+      };
 
     case "SET_COMPONENTS":
       return {
@@ -426,6 +460,44 @@ const reducer = (state, action) => {
         },
       };
 
+    case "UPDATE_CAN":
+      return {
+        ...state,
+        can: {
+          ...state.can,
+          [action.field]: action.value,
+        },
+      };
+    case "ADD_PCB":
+      return {
+        ...state,
+        pcbs: [
+          ...state.pcbs,
+          {
+            id: state.pcbs.length + 1,
+            name: "",
+            basePCB: "",
+            material: "",
+            thickness: "",
+            layers: "",
+            mountingOrientation: "",
+          },
+        ],
+      };
+    case "UPDATE_PCB":
+      return {
+        ...state,
+        pcbs: state.pcbs.map((pcb) =>
+          pcb.id === action.id ? { ...pcb, [action.field]: action.value } : pcb
+        ),
+      };
+    case "REMOVE_PCB":
+      return {
+        ...state,
+        pcbs: state.pcbs.filter((pcb) => pcb.id !== action.id),
+      };
+    case "RESET_FORM":
+      return { ...initialState };
     default:
       return state;
   }

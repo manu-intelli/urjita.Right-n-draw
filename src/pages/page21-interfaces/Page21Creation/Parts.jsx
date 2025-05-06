@@ -172,48 +172,55 @@ const PartDetails = ({ partType, title }) => {
                 key={index}
                 className="flex flex-wrap bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all hover:bg-gray-50"
               >
-                <div className="flex-1 mx-2 min-w-[200px]">
-                  <Input
-                    label={`${title} ${index + 1} Name`}
-                    value={item.name}
-                    onChange={(value) =>
-                      handleChange(index, "name", value, false)
-                    }
-                    placeholder="Enter Name"
-                  />
-                </div>
-                <div className="flex-1 mx-2 min-w-[200px]">
-                  <Input
-                    label="Supplier Name"
-                    value={item.supplierName}
-                    onChange={(value) =>
-                      handleChange(index, "supplierName", value, false)
-                    }
-                    placeholder="Enter Supplier Name"
-                  />
-                </div>
-                <div className="flex-1 mx-2 min-w-[200px]">
-                  <Input
-                    label="Supplier P/N"
-                    value={item.supplierNumber}
-                    onChange={(value) =>
-                      handleChange(index, "supplierNumber", value, false)
-                    }
-                    placeholder="Enter Supplier P/N"
-                  />
-                </div>
                 {title !== "Air Coil" ? (
-                  <div className="flex-1 mx-2 min-w-[200px]">
-                    <Select
-                      label="Qualification Status"
-                      value={item.qualificationStaus}
-                      options={qualificationOptions}
-                      onChange={(value) =>
-                        handleChange(index, "qualificationStaus", value, false)
-                      }
-                      required
-                    />
-                  </div>
+                  <>
+                    <div className="flex-1 mx-2 min-w-[200px]">
+                      <Input
+                        label={`${title} ${index + 1} Name`}
+                        value={item.name}
+                        onChange={(value) =>
+                          handleChange(index, "name", value, false)
+                        }
+                        placeholder="Enter Name"
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[200px]">
+                      <Input
+                        label="Supplier Name"
+                        value={item.supplierName}
+                        onChange={(value) =>
+                          handleChange(index, "supplierName", value, false)
+                        }
+                        placeholder="Enter Supplier Name"
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[200px]">
+                      <Input
+                        label="Supplier P/N"
+                        value={item.supplierNumber}
+                        onChange={(value) =>
+                          handleChange(index, "supplierNumber", value, false)
+                        }
+                        placeholder="Enter Supplier P/N"
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[200px]">
+                      <Select
+                        label="Qualification Status"
+                        value={item.qualificationStaus}
+                        options={qualificationOptions}
+                        onChange={(value) =>
+                          handleChange(
+                            index,
+                            "qualificationStaus",
+                            value,
+                            false
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                  </>
                 ) : (
                   <div className="flex-1 mx-2 min-w-[400px]">
                     <TextArea

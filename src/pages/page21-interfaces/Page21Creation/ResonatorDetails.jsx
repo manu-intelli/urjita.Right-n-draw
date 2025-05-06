@@ -119,7 +119,7 @@ const ResonatorDetails = () => {
                   handleResonatorChange(index, "bpType", "Existing")
                 }
               />
-              Existing
+              B-P/N  to be used/modified
             </label>
             <label className="flex items-center gap-2">
               <input

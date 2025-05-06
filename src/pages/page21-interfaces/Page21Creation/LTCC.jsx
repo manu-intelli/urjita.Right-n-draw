@@ -63,9 +63,9 @@ const LtccDetails = () => {
 
       {/* Comments */}
       <div className="md:col-span-2 mt-4">
-        <h3 className="font-semibold text-lg mb-2">Others</h3>
+        <h3 className="font-semibold text-lg mb-2">Any Special Requirements</h3>
         <TextArea
-          label="Comments"
+          label="Any Special Requirements"
           value={state.Comments}
           onChange={(val) =>
             dispatch({
@@ -74,7 +74,7 @@ const LtccDetails = () => {
               value: val,
             })
           }
-          placeholder="Add any other Components or Parts that are not covered above"
+          placeholder="Add any Special Requirements are not covered above"
           multiline
         />
       </div>

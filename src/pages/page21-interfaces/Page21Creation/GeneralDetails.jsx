@@ -451,35 +451,38 @@ const GeneralDetails = () => {
             </div>
           )}
         </div>
-
-        <Select
-          label="Bottom Solder Mask"
-          value={state.bottomSolderMask}
-          options={bottomSolderMaskOptions}
-          onChange={(value) => handleChange("bottomSolderMask", value)}
-          required
-        />
-        <Select
-          label="Half Moon Requirement"
-          value={state.halfMoonRequirement}
-          options={yesNoOptions}
-          onChange={(value) => handleChange("halfMoonRequirement", value)}
-          required
-        />
-        <Select
-          label="Via Holes Requirement"
-          value={state.viaHolesRequirement}
-          options={yesNoOptions}
-          onChange={(value) => handleChange("viaHolesRequirement", value)}
-          required
-        />
-        <Select
-          label="Signal Passing"
-          value={state.signalPassing}
-          options={signalPassingOptions}
-          onChange={(value) => handleChange("signalPassing", value)}
-          required
-        />
+        {state?.technology !== "docs_diplexer" && (
+          <>
+            <Select
+              label="Bottom Solder Mask"
+              value={state.bottomSolderMask}
+              options={bottomSolderMaskOptions}
+              onChange={(value) => handleChange("bottomSolderMask", value)}
+              required
+            />
+            <Select
+              label="Half Moon Requirement"
+              value={state.halfMoonRequirement}
+              options={yesNoOptions}
+              onChange={(value) => handleChange("halfMoonRequirement", value)}
+              required
+            />
+            <Select
+              label="Via Holes Requirement"
+              value={state.viaHolesRequirement}
+              options={yesNoOptions}
+              onChange={(value) => handleChange("viaHolesRequirement", value)}
+              required
+            />
+            <Select
+              label="Signal Launch Type"
+              value={state.signalLaunchType}
+              options={signalPassingOptions}
+              onChange={(value) => handleChange("signalLaunchType", value)}
+              required
+            />
+          </>
+        )}
         <Select
           label="Cover Type"
           value={state.coverType}
@@ -487,74 +490,79 @@ const GeneralDetails = () => {
           onChange={(value) => handleChange("coverType", value)}
           required
         />
-        <Select
-          label="Design Rule Violation"
-          value={state.designRuleViolation}
-          options={yesNoOptions}
-          onChange={(value) => handleChange("designRuleViolation", value)}
-          required
-        />
 
-        <div className="space-y-2 col-span-2">
-          <label
-            htmlFor="schematic"
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Schematic
-          </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
-            <div className="flex flex-col items-center">
-              <input
-                type="file"
-                id="schematic"
-                name="schematic"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png"
-                className="w-full text-sm text-gray-500
+        {state?.technology !== "docs_diplexer" && (
+          <>
+            <Select
+              label="Design Rule Violation"
+              value={state.designRuleViolation}
+              options={yesNoOptions}
+              onChange={(value) => handleChange("designRuleViolation", value)}
+              required
+            />
+
+            <div className="space-y-2 col-span-2">
+              <label
+                htmlFor="schematic"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Schematic
+              </label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
+                <div className="flex flex-col items-center">
+                  <input
+                    type="file"
+                    id="schematic"
+                    name="schematic"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png"
+                    className="w-full text-sm text-gray-500
                   file:mr-4 file:py-2 file:px-4
                   file:rounded-full file:border-0
                   file:text-sm file:font-semibold
                   file:bg-blue-50 file:text-blue-700
                   hover:file:bg-blue-100"
-              />
-              <p className="mt-2 text-sm text-gray-500">
-                Accepted formats: PDF, DWG, DXF,IMG
-              </p>
-              {state.schematicFile && (
-                <div className="mt-4 w-full">
-                  <div className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm">
-                    <span className="text-sm text-gray-600">
-                      {state.schematicFile.name}
-                    </span>
-                    <button
-                      onClick={clearSchematic}
-                      className="text-red-500 hover:text-red-700 text-sm font-medium"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                  {previewUrl && (
-                    <div className="mt-4">
-                      <iframe
-                        src={previewUrl}
-                        className="w-full h-96 border border-gray-200 rounded-md"
-                        title="Schematic Preview"
-                      />
+                  />
+                  <p className="mt-2 text-sm text-gray-500">
+                    Accepted formats: PDF, DWG, DXF,IMG
+                  </p>
+                  {state.schematicFile && (
+                    <div className="mt-4 w-full">
+                      <div className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm">
+                        <span className="text-sm text-gray-600">
+                          {state.schematicFile.name}
+                        </span>
+                        <button
+                          onClick={clearSchematic}
+                          className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      {previewUrl && (
+                        <div className="mt-4">
+                          <iframe
+                            src={previewUrl}
+                            className="w-full h-96 border border-gray-200 rounded-md"
+                            title="Schematic Preview"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
-              )}
+              </div>
             </div>
-          </div>
-        </div>
 
-        <Input
-          label="Similar Model"
-          value={state.similarModel || ""}
-          onChange={(value) => handleChange("similarModel", value)}
-          required
-        />
+            <Input
+              label="Similar Model"
+              value={state.similarModel || ""}
+              onChange={(value) => handleChange("similarModel", value)}
+              required
+            />
+          </>
+        )}
       </div>
     </div>
   );
