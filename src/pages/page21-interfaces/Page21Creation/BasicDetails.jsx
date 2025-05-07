@@ -30,7 +30,7 @@ const BasicDetails = () => {
   };
 
   return (
-    <>
+    <div className="p-6 bg-white shadow rounded-md">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <Input
           label="OP Number"
@@ -74,7 +74,7 @@ const BasicDetails = () => {
           required
         />
       </div>
-    </>
+    </div>
   );
 };
 
