@@ -5,6 +5,7 @@ import {
   TextArea,
 } from "../../../components/common/ReusableComponents";
 import { usePage21Context } from "../../../context/Page21Context";
+import { Tooltip } from "@mui/material";
 
 const ComponentsDetails = () => {
   const { state, dispatch } = usePage21Context();
@@ -41,6 +42,7 @@ const ComponentsDetails = () => {
         substrateThickness: "",
         rfLayerThickness: "",
         overallThickness: "",
+        copperThickness:"",
       },
     ];
     dispatch({ type: "SET_PCB_LIST", payload: updated });
@@ -61,6 +63,7 @@ const ComponentsDetails = () => {
   const canMakingProcessOptions = [
     { label: "Etched", value: "Etched" },
     { label: "Stamped", value: "Stamped" },
+    { label: "Any of the above", value: "Any of the above" },
   ];
 
   const yesNoOptions = [
@@ -129,10 +132,12 @@ const ComponentsDetails = () => {
 
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-semibold">PCB Details</h3>
+        <Tooltip title={pcbList.length >=MAX_PCBS?"Maximum of 5 PCBs allowed":""}
+          disableHoverListener={pcbList.length< MAX_PCBS}>
         <button
           className={`bg-blue-600 text-white font-medium px-4 py-2 rounded flex items-center gap-2 ${
             pcbList.length >= MAX_PCBS
-              ? "opacity-50 cursor-not-allowed"
+              ? "bg-gray-500 cursor-not-allowed"
               : "hover:bg-blue-700"
           }`}
           onClick={addPCB}
@@ -140,6 +145,7 @@ const ComponentsDetails = () => {
         >
           <span className="text-lg font-bold">+</span> Add PCB
         </button>
+        </Tooltip>
       </div>
 
       {pcbList.map((pcb, index) => {
@@ -262,6 +268,14 @@ const ComponentsDetails = () => {
                           />
                         </>
                       )}
+                          <Input
+                            label="Copper Thickness"
+                            value={pcb.copperThickness}
+                            onChange={(val) =>
+                              handlePcbChange(index, "copperThickness", val)
+                            }
+                            
+                          />
 
                       <Select
                         label="Mounting Orientation"
@@ -296,14 +310,14 @@ const ComponentsDetails = () => {
                     onChange={(val) => handlePcbChange(index, "name", val)}
                   />
 
-                  {pcb.name === "Coupling PCB" && (
+                  
                     <Select
                       label="Layers"
                       value="Single"
                       options={[{ label: "Single Layer", value: "Single" }]}
                       disabled
                     />
-                  )}
+                  
 
                   <Input
                     label="Substrate Thickness"
@@ -313,7 +327,14 @@ const ComponentsDetails = () => {
                     }
                     placeholder="Enter Substrate Thickness"
                   />
-
+ <Input
+                            label="Copper Thickness"
+                            value={pcb.copperThickness}
+                            onChange={(val) =>
+                              handlePcbChange(index, "copperThickness", val)
+                            }
+                            
+                          />
                   <Select
                     label="Mounting Orientation"
                     value={pcb.mountingOrientation}
