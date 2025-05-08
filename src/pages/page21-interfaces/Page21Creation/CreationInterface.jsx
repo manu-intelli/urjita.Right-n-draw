@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePage21Context } from "../../../context/Page21Context";
 import { FormSection } from "../../../components/common/ReusableComponents";
 
@@ -57,12 +57,12 @@ const CreationInterface = () => {
   const handleSubmit = () => {
     // Here you would typically send the data to your backend
     console.log("Form submitted", state);
-    
+
     // Reset form and go back to step one
     dispatch({ type: "RESET_FORM" });
     dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
     dispatch({ type: "SET_SUBMITTED", payload: true });
-    
+
     // Optionally show a success message
     alert("Form submitted successfully! The form has been reset.");
   };
@@ -333,224 +333,151 @@ const CreationInterface = () => {
     return <p className="text-gray-500 p-4">No content for this step.</p>;
   };
 
-  const renderStepIndicator = () => (
-    <div className="flex justify-between items-center mb-4 px-4">
-      {stepsWithBasic?.map((stepKey, index) => (
-        <div key={stepKey} className="flex items-center flex-1 last:flex-none">
-          <div
-            className={`
-              w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm
-              ${
-                currentStep === index
-                  ? "bg-blue-600 text-white ring-4 ring-blue-100"
-                  : currentStep > index
-                  ? "bg-green-400 text-white"
-                  : "bg-white border-2 border-gray-200 text-gray-400"
-              }
-              transition-all duration-200 relative z-10
-            `}
-          >
-            {currentStep > index ? (
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            ) : (
-              index + 1
-            )}
+  const renderStepIndicator = () => {
+    const containerRef = useRef(null);
+    const currentStepRef = useRef(null);
+    const [visibleStart, setVisibleStart] = useState(0);
+    const [maxVisibleSteps, setMaxVisibleSteps] = useState(6);
+
+    useEffect(() => {
+      const handleResize = () => {
+        const screenWidth = window.innerWidth;
+        const stepWidth = 200;
+        setMaxVisibleSteps(Math.max(3, Math.floor(screenWidth / stepWidth)));
+      };
+
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    useEffect(() => {
+      if (currentStepRef.current && containerRef.current) {
+        currentStepRef.current.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }
+
+      if (currentStep < visibleStart) {
+        setVisibleStart(currentStep);
+      } else if (currentStep >= visibleStart + maxVisibleSteps) {
+        setVisibleStart(currentStep - maxVisibleSteps + 1);
+      }
+    }, [currentStep, maxVisibleSteps]);
+
+    const handlePrev = () => {
+      setVisibleStart((prev) => Math.max(0, prev - maxVisibleSteps));
+    };
+
+    const handleNext = () => {
+      setVisibleStart((prev) =>
+        Math.min(
+          stepsWithBasic.length - maxVisibleSteps,
+          prev + maxVisibleSteps
+        )
+      );
+    };
+
+    const visibleSteps = stepsWithBasic.slice(
+      visibleStart,
+      visibleStart + maxVisibleSteps
+    );
+
+    return (
+      <div className="flex items-center w-full px-4 mb-4">
+        {visibleStart > 0 && (
+          <button onClick={handlePrev} className="mr-2 p-2">
+            ◀
+          </button>
+        )}
+
+        <div ref={containerRef} className="flex-1 overflow-hidden relative">
+          <div className="flex items-center w-full">
+            {visibleSteps.map((stepKey, index) => {
+              const actualIndex = visibleStart + index;
+              const isCompleted = currentStep > actualIndex;
+              const isCurrent = currentStep === actualIndex;
+
+              return (
+                <div
+                  key={stepKey}
+                  className="flex-1 flex flex-col items-center relative"
+                >
+                  {/* Line to the left */}
+                  {index > 0 && (
+                    <div className="absolute left-0 top-5 w-1/2 h-1 bg-gray-200 z-0">
+                      <div
+                        className={`h-full ${
+                          currentStep > actualIndex - 1 ? "bg-green-400" : ""
+                        }`}
+                      />
+                    </div>
+                  )}
+
+                  {/* Step circle */}
+                  <div
+                    ref={isCurrent ? currentStepRef : null}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm z-10
+                      ${
+                        isCurrent
+                          ? "bg-blue-600 text-white ring-4 ring-blue-100"
+                          : isCompleted
+                          ? "bg-green-400 text-white"
+                          : "bg-white border-2 border-gray-200 text-gray-400"
+                      }
+                      transition-all duration-200`}
+                  >
+                    {isCompleted ? (
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    ) : (
+                      actualIndex + 1
+                    )}
+                  </div>
+
+                  {/* Step label */}
+                  <div className="mt-2 text-xs text-center text-gray-700 px-1 min-w-[70px] break-words">
+                    {stepKey}
+                  </div>
+
+                  {/* Line to the right */}
+                  {index < visibleSteps.length - 1 && (
+                    <div className="absolute right-0 top-5 w-1/2 h-1 bg-gray-200 z-0">
+                      <div
+                        className={`h-full ${
+                          currentStep > actualIndex ? "bg-green-400" : ""
+                        }`}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <div className="mt-2 text-center text-sm text-gray-500"></div>
-          {index < stepsWithBasic?.length - 1 && (
-            <div className="flex-1 relative">
-              <div
-                className={`
-                  absolute top-1/2 -translate-y-1/2 left-0 right-0 h-1
-                  ${currentStep > index ? "bg-green-400" : "bg-gray-200"}
-                  transition-colors duration-300
-                `}
-              />
-            </div>
-          )}
         </div>
-      ))}
-    </div>
-  );
 
-  // const renderStepIndicator = () => (
-  //   <div className="overflow-x-auto px-4 mb-4">
-  //     <div className="flex items-start min-w-fit">
-  //       {STEP_ORDER.map((stepKey, index) => (
-  //         <div
-  //           key={stepKey}
-  //           className="flex flex-col items-center min-w-[120px] mx-2"
-  //         >
-  //           <div className="flex items-center relative">
-  //             <div
-  //               className={`w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm
-  //                 ${
-  //                   currentStep === index
-  //                     ? "bg-blue-600 text-white ring-4 ring-blue-100"
-  //                     : currentStep > index
-  //                     ? "bg-green-400 text-white"
-  //                     : "bg-white border-2 border-gray-200 text-gray-400"
-  //                 }
-  //                 transition-all duration-200 relative z-10
-  //               `}
-  //             >
-  //               {currentStep > index ? (
-  //                 <svg
-  //                   className="w-5 h-5"
-  //                   fill="none"
-  //                   viewBox="0 0 24 24"
-  //                   stroke="currentColor"
-  //                 >
-  //                   <path
-  //                     strokeLinecap="round"
-  //                     strokeLinejoin="round"
-  //                     strokeWidth={2}
-  //                     d="M5 13l4 4L19 7"
-  //                   />
-  //                 </svg>
-  //               ) : (
-  //                 index + 1
-  //               )}
-  //             </div>
+        {visibleStart + maxVisibleSteps < stepsWithBasic.length && (
+          <button onClick={handleNext} className="ml-2 p-2">
+            ▶
+          </button>
+        )}
+      </div>
+    );
+  };
 
-  //             {index < STEP_ORDER.length - 1 && (
-  //               <div className="flex-1 relative w-full">
-  //                 <div
-  //                   className={`absolute top-1/2 -translate-y-1/2 left-full w-[40px] h-1
-  //                     ${currentStep > index ? "bg-green-400" : "bg-gray-200"}
-  //                     transition-colors duration-300
-  //                   `}
-  //                 />
-  //               </div>
-  //             )}
-  //           </div>
-
-  //           <div className="mt-2 w-full text-sm text-center text-gray-600 break-words">
-  //             {stepKey.replace(/_/g, ' ')}
-  //           </div>
-  //         </div>
-  //       ))}
-  //     </div>
-  //   </div>
-  // );
-  // const renderStepIndicator = () => {
-  //   const containerRef = useRef(null);
-  //   const totalSteps = stepsForSelectedTechnology?.length || 0;
-  //   const shouldScroll = totalSteps > 6;
-
-  //   const scroll = (direction) => {
-  //     if (!shouldScroll) return;
-  //     const scrollAmount = direction === "left" ? -200 : 200;
-  //     containerRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-  //   };
-
-  //   return (
-  //     <div className="relative w-full mb-6">
-  //       {/* Navigation arrows - only when scrollable */}
-  //       {shouldScroll && (
-  //         <>
-  //           <button
-  //             onClick={() => scroll("left")}
-  //             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
-  //           >
-  //             <ChevronLeft size={20} />
-  //           </button>
-  //           <button
-  //             onClick={() => scroll("right")}
-  //             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
-  //           >
-  //             <ChevronRight size={20} />
-  //           </button>
-  //         </>
-  //       )}
-
-  //       {/* Steps container */}
-  //       <div
-  //         ref={shouldScroll ? containerRef : null}
-  //         className={`w-full ${
-  //           shouldScroll ? "overflow-x-auto scrollbar-hide px-10" : "px-4"
-  //         }`}
-  //       >
-  //         <div
-  //           className={`flex ${shouldScroll ? "" : "justify-between w-full"}`}
-  //         >
-  //           {stepsForSelectedTechnology?.map((stepKey, index) => (
-  //             <div
-  //               key={stepKey}
-  //               className={`flex flex-col items-center ${
-  //                 shouldScroll ? "min-w-[140px]" : "flex-1, bg-"
-  //               }`}
-  //             >
-  //               {/* Circle + Line - now with perfect vertical alignment */}
-  //               <div className="flex flex-col items-center w-full">
-  //                 <div className="flex items-center w-full">
-  //                   {/* Circle */}
-  //                   <div className="flex flex-col items-center flex-shrink-0">
-  //                     <div
-  //                       className={`w-10 h-10 rounded-full flex items-center justify-center font-medium shadow-sm
-  //                                               ${
-  //                                                 currentStep === index
-  //                                                   ? "bg-blue-600 text-white ring-4 ring-blue-100"
-  //                                                   : currentStep > index
-  //                                                   ? "bg-green-500 text-white"
-  //                                                   : "bg-white border-2 border-gray-300 text-gray-500"
-  //                                               }
-  //                                           `}
-  //                     >
-  //                       {currentStep > index ? (
-  //                         <svg
-  //                           className="w-5 h-5"
-  //                           viewBox="0 0 24 24"
-  //                           fill="none"
-  //                         >
-  //                           <path
-  //                             d="M5 13l4 4L19 7"
-  //                             stroke="currentColor"
-  //                             strokeWidth="2"
-  //                           />
-  //                         </svg>
-  //                       ) : (
-  //                         index + 1
-  //                       )}
-  //                     </div>
-  //                   </div>
-
-  //                   {/* Connector line (except last step) */}
-  //                   {index < totalSteps - 1 && (
-  //                     <div
-  //                       className={`flex-1 h-1 mx-1 ${
-  //                         currentStep > index ? "bg-green-500" : "bg-gray-200"
-  //                       }`}
-  //                     />
-  //                   )}
-  //                 </div>
-
-  //                 {/* Step label - perfectly centered below circle */}
-  //                 <div className="mt-2 text-sm font-medium text-gray-600 text-center w-full px-1">
-  //                   {stepKey
-  //                     .replace(/_/g, " ")
-  //                     .replace(/\b\w/g, (char) => char.toUpperCase())}
-  //                 </div>
-  //               </div>
-  //             </div>
-  //           ))}
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
   return (
     <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
       <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">

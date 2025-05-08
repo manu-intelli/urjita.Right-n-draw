@@ -29,6 +29,20 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+    const code = error?.response?.data?.code;
+    if (status === 401 && code === "token_not_valid") {
+      // Clear user from localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("components");
+    }
+
+    return Promise.reject(error);
+  }
+);
 // Auth API
 export const authAPI = {
   login: async (credentials) => {
