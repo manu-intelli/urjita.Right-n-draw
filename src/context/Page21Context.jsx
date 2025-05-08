@@ -18,6 +18,7 @@ const initialState = {
   modelFamily: "",
   modelName: "",
   technology: "",
+  revisionNumber:"",
   impedance: "",
   customImpedance: "",
   package: "",

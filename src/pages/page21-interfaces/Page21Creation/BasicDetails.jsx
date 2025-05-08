@@ -65,6 +65,12 @@ const BasicDetails = () => {
           onChange={(value) => handleChange("modelName", value)}
           required
         />
+          <Input
+          label="Revision Number"
+          value={state.revisionNumber}
+          onChange={(value) => handleChange("revisionNumber", value)}
+          required
+        />
 
         <Select
           label="Technology"
@@ -73,6 +79,7 @@ const BasicDetails = () => {
           onChange={(value) => handleChange("technology", value)}
           required
         />
+
       </div>
     </div>
   );
