@@ -313,8 +313,9 @@ const AddUserForm = ({ onClose }) => {
           Roles (Select multiple)
         </label>
         <div className="space-y-2">
-          {["CADesigner", "Verifier", "Approver"].map((rol) => (
+          {["CADesigner", "Verifier", "Approver", "Page21User"].map((rol) => (
             <label key={rol} className="flex items-center space-x-2">
+              {console.log(rol, "ooooooooo")}
               <input
                 type="checkbox"
                 checked={formData.role.includes(rol)}

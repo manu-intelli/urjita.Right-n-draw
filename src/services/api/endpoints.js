@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // Configuration
-const BASE_URL = "http://172.17.71.55:96";
+const BASE_URL = "http://173.248.136.190:80";
 
 // Create axios instance
 const axiosInstance = axios.create({

@@ -66,12 +66,11 @@ const LtccDetails = () => {
         <h3 className="font-semibold text-lg mb-2">Any Special Requirements</h3>
         <TextArea
           label="Any Special Requirements"
-          value={state.Comments}
-          onChange={(val) =>
+          value={state?.specialRequirements}
+          onChange={(value) =>
             dispatch({
               type: "SET_FIELD",
-              field: "Comments",
-              value: val,
+              payload: { field: "specialRequirements", value },
             })
           }
           placeholder="Add any Special Requirements are not covered above"

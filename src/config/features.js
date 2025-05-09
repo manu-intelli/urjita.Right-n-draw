@@ -28,12 +28,20 @@ export const getRoleFeatures = (user) => {
           description: "Review and verify PCB designs",
         };
         break;
+      // case "Approver":
+      //   feature = {
+      //     ...feature,
+      //     role: "Approver",
+      //     title: "Approve PCB",
+      //     description: "Approve PCB designs for production",
+      //   };
+      //   break;
       case "Approver":
         feature = {
           ...feature,
-          role: "Approver",
-          title: "Approve PCB",
-          description: "Approve PCB designs for production",
+          role: "PricingAnalyst",
+          title: "Pricing Analyst",
+          description: "Analyse Pricing  for production",
         };
         break;
       default:
@@ -60,4 +68,10 @@ export const getFeatures = (user) => [
   //   icon: FileText,
   //   subFeatures: getAutoDrawFeatures(user),
   // },
+  {
+    title: "Pricing",
+    description: "Pricing Management Tools",
+    icon: FileText,
+    subFeatures: getRoleFeatures(user),
+  },
 ];

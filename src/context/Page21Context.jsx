@@ -18,7 +18,7 @@ const initialState = {
   modelFamily: "",
   modelName: "",
   technology: "",
-  revisionNumber:"",
+  revisionNumber: "",
   impedance: "",
   customImpedance: "",
   package: "",
@@ -38,9 +38,9 @@ const initialState = {
   caseStyle: "Existing",
   selectedCaseStyle: "",
   caseDimensions: {
-    length: "20",
-    width: "10",
-    height: "5",
+    length: "",
+    width: "",
+    height: "",
     pinOuts: "",
   },
   bottomSolderMask: "",
@@ -155,7 +155,7 @@ const initialState = {
     numberOfLtcc: 0,
     ltccItems: [],
   },
-  comments: "",
+  specialRequirements: "",
 };
 
 const reducer = (state, action) => {

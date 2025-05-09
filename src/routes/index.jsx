@@ -47,10 +47,12 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "page21",
+        path: "page21/:role",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
-            <CreationInterface />
+            <ProtectedRoute>
+              <CreationInterface />
+            </ProtectedRoute>
           </Suspense>
         ),
       },

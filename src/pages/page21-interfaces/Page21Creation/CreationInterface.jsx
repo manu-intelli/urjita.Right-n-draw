@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { usePage21Context } from "../../../context/Page21Context";
 import { FormSection } from "../../../components/common/ReusableComponents";
+import rightArrow from "../../../assets/rightArrow.svg";
+import logo from "../../../assets/logo.svg";
 
 import { Button } from "../../../components/common/ReusableComponents"; // Assuming you have a Button component
 import ComponentsDetails from "./Components";
@@ -17,6 +19,9 @@ import GeneralDetails from "./GeneralDetails";
 import TransformersPage from "./Transformer";
 import "./page21.css";
 import BasicDetails from "./BasicDetails";
+import Page21PDFDocument, {
+  generatePDF,
+} from "../../pdf-creators/Page21/PDFDocumentCreationInterface";
 export const STEPS = {
   BASIC_DETAILS: "basicDetails",
   GENERAL_DETAILS: "general_details",
@@ -58,8 +63,332 @@ const CreationInterface = () => {
     // Here you would typically send the data to your backend
     console.log("Form submitted", state);
 
+    const formData = {
+      currentStep: 11,
+      submitted: false,
+      opNumber: "Parthi0233-T",
+      opuNumber: "Parthi0233-T",
+      eduNumber: "Parthi0233-T",
+      modelFamily: "FamilyA",
+      modelName: "Parthi0233-T",
+      technology: "lumped",
+      revisionNumber: "1",
+      impedance: "50 ohms",
+      customImpedance: "1",
+      package: "Connectorized",
+      ports: {
+        numberOfPorts: 3,
+        portDetails: [
+          {
+            connectorType: "TestConnector1",
+            connectorGender: "Male",
+          },
+          {
+            connectorType: "TestConnector1",
+            connectorGender: "Male",
+          },
+          {
+            connectorType: "TestConnector3",
+            connectorGender: "Female",
+          },
+        ],
+      },
+      enclosureDetails: {
+        partType: "Existing",
+        partNumber: "0146576877-T",
+      },
+      topcoverDetails: {
+        partType: "New",
+        partNumber: "4678798-5",
+      },
+      caseStyle: "ModifyExisting",
+      selectedCaseStyle: "Case A",
+      caseDimensions: {
+        length: "20",
+        width: "10",
+        height: "5",
+        pinOuts: "5",
+      },
+      bottomSolderMask: "Full solder mask",
+      halfMoonRequirement: "Yes",
+      viaHolesRequirement: "Yes",
+      signalLaunchType: "PCB",
+      coverType: "Open",
+      designRuleViolation: "No",
+      schematicFile: {},
+      similarModel: "SimilarModelDeaign",
+      capacitor: {
+        numWithBpn: 2,
+        numWithoutBpn: 2,
+        withBpn: [
+          {
+            name: "c1",
+            bpn: "0146576666877-T",
+          },
+          {
+            name: "c2",
+            bpn: "014657687777-T",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "c3",
+            supplierName: "parthi",
+            supplierNumber: "577899",
+            qualificationStaus: "Qualification",
+            airCoilDetailsComment: "",
+          },
+          {
+            name: "c4",
+            supplierName: "april_12_test2",
+            supplierNumber: "577899ghghgjhhj",
+            qualificationStaus: "Approval",
+            airCoilDetailsComment: "",
+          },
+        ],
+      },
+      inductor: {
+        numWithBpn: 1,
+        numWithoutBpn: 2,
+        withBpn: [
+          {
+            name: "L1",
+            bpn: "456578798890-U",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "L3",
+            supplierName: "April_04_testdev",
+            supplierNumber: "april_16_64",
+            qualificationStaus: "Qualification",
+            airCoilDetailsComment: "",
+          },
+          {
+            name: "L4",
+            supplierName: "april_16_64",
+            supplierNumber: "ap_15_t3",
+            qualificationStaus: "Approval",
+            airCoilDetailsComment: "",
+          },
+        ],
+      },
+      airCoil: {
+        numWithBpn: 2,
+        numWithoutBpn: 2,
+        withBpn: [
+          {
+            name: "AC!",
+            bpn: "546767-Y",
+          },
+          {
+            name: "AC2",
+            bpn: "546767-Y65",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "",
+            supplierName: "",
+            supplierNumber: "",
+            qualificationStaus: "",
+            airCoilDetailsComment: "gffhgjhktestin without bp number",
+          },
+          {
+            name: "",
+            supplierName: "",
+            supplierNumber: "",
+            qualificationStaus: "",
+            airCoilDetailsComment: "gffhgjhktestin without bp number",
+          },
+        ],
+      },
+      resistor: {
+        numWithBpn: 2,
+        numWithoutBpn: 2,
+        withBpn: [
+          {
+            name: "R1",
+            bpn: "665676-t",
+          },
+          {
+            name: "R2",
+            bpn: "66575676-tu",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "R4",
+            supplierName: "67899",
+            supplierNumber: "456667879",
+            qualificationStaus: "Qualification",
+            airCoilDetailsComment: "",
+          },
+          {
+            name: "R3",
+            supplierName: "parthi",
+            supplierNumber: "8867678890",
+            qualificationStaus: "Approval",
+            airCoilDetailsComment: "",
+          },
+        ],
+      },
+      transformers: {
+        transformersList: [
+          {
+            coreType: "double",
+            wireType: "single",
+            coreBPN: ["6768789-ct", "5776789-ct"],
+            wireGauge: ["65677676"],
+            numberOfTurns: "3",
+          },
+        ],
+        numberOfTransformers: 1,
+      },
+      isExistingCanAvailable: "No",
+      canMaterial: "Metal",
+      canProcess: "Etched",
+      customCanMaterial: "",
+      can: {
+        material: "metal",
+        makingProcess: "etched",
+      },
+      pcbs: [
+        {
+          id: 1,
+          name: "Base PCB",
+          material: "",
+          thickness: "",
+          layers: "",
+          mountingOrientation: "Horizontal",
+          comments: "",
+          isExistingCanAvailable: "",
+          bpNumber: "",
+          customMaterial: "",
+          substrateThickness: "",
+          rfLayerThickness: "",
+          overallThickness: "",
+          copperThickness: "",
+        },
+      ],
+      pcbList: [
+        {
+          name: "Base PCB",
+          material: "",
+          thickness: "",
+          layers: "",
+          mountingOrientation: "Horizontal",
+          comments: "",
+          isExistingCanAvailable: "Yes",
+          bpNumber: "0146576877-T",
+          customMaterial: "",
+          substrateThickness: "",
+          rfLayerThickness: "",
+          overallThickness: "",
+          copperThickness: "",
+        },
+        {
+          name: "",
+          material: "",
+          thickness: "",
+          layers: "",
+          mountingOrientation: "Vertical",
+          comments: "Testing Comments",
+          isExistingCanAvailable: "No",
+          bpNumber: "",
+          customMaterial: "",
+          substrateThickness: "4",
+          rfLayerThickness: "",
+          overallThickness: "",
+          copperThickness: "5",
+        },
+        {
+          name: "Other PCB",
+          material: "",
+          thickness: "",
+          layers: "",
+          mountingOrientation: "Horizontal",
+          comments: "Testing comment3",
+          isExistingCanAvailable: "No",
+          bpNumber: "",
+          customMaterial: "",
+          substrateThickness: "5",
+          rfLayerThickness: "",
+          overallThickness: "",
+          copperThickness: "8",
+        },
+      ],
+      shieldsList: {
+        shieldRequired: "Yes",
+        numberOfShields: "2",
+        shields: [
+          {
+            partType: "New",
+            partNumber: "TBD",
+          },
+          {
+            partType: "Existing",
+            partNumber: "dgdhgfjgkhljjj-3346",
+          },
+        ],
+      },
+      fingersList: {
+        fingerRequired: "Yes",
+        numberOfFingers: "2",
+        fingers: [
+          {
+            partType: "New",
+            partNumber: "TBD",
+          },
+          {
+            partType: "Existing",
+            partNumber: "4675897",
+          },
+        ],
+      },
+      cooperFlapDetails: {
+        numberOfFlaps: "2",
+        flaps: [
+          {
+            bpType: "New",
+            bpNumber: "TBD",
+            length: "5",
+            width: "3",
+            thickness: "3",
+          },
+          {
+            bpType: "Existing",
+            bpNumber: "TBD",
+            length: "",
+            width: "",
+            thickness: "",
+          },
+        ],
+      },
+      resonatorList: {
+        numberOfResonators: "",
+        resonators: [],
+      },
+      ltcc: {
+        numberOfLtcc: 3,
+        ltccItems: [
+          {
+            modelName: "6786970980",
+          },
+          {
+            modelName: "6786908",
+          },
+          {
+            modelName: "567869709",
+          },
+        ],
+      },
+      comments: "Testing Additional RequireMent Comments",
+    };
+    generatePDF(formData);
+
     // Reset form and go back to step one
-    dispatch({ type: "RESET_FORM" });
+    // dispatch({ type: "RESET_FORM" });
     dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
     dispatch({ type: "SET_SUBMITTED", payload: true });
 
@@ -103,159 +432,13 @@ const CreationInterface = () => {
     ),
   };
 
-  // Get steps based on the selected technology
+  const actionType = "Creation"; // or "rejected"
+  const userEmail = "parthiban@example.com";
+  const selectedComponent = "Sample";
 
-  // const renderStepContent = () => {
-  //   // const stepKey = STEP_ORDER[currentStep];
-  //   const stepKey = stepsForSelectedTechnology[currentStep];
-
-  //   if (stepKey === STEPS.BASIC_DETAILS) {
-  //     return (
-  //       <FormSection title="General Details">
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <BasicDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-
-  //   if (stepKey === STEPS.GENERAL_DETAILS) {
-  //     return (
-  //       <FormSection title="General Details">
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <GeneralDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-  //   if (stepKey === STEPS.TRANSFORMER_WOUND_INDUCTORS) {
-  //     return (
-  //       <FormSection title="Transformer or Wound Inductors Details">
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <TransformersPage />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-
-  //   // Handle COMPONENTS step separately
-  //   if (stepKey === STEPS.COMPONENTS) {
-  //     return (
-  //       <FormSection title={`${STEPS.COMPONENTS} Details`}>
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <ComponentsDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-  //   if (stepKey === STEPS.SHEIDS) {
-  //     return (
-  //       <FormSection title={`Shield Details`}>
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <ShieldDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-
-  //   if (stepKey === STEPS.FINGERS) {
-  //     return (
-  //       <FormSection title={`Fingers Details`}>
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <FingerDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-
-  //   if (stepKey === STEPS.COPPER_FLAPS) {
-  //     return (
-  //       <FormSection title={`Copper Flaps Details`}>
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <CooperFlapDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-
-  //   if (stepKey === STEPS.RESONATORS) {
-  //     return (
-  //       <FormSection title={`Resonator Details`}>
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <ResonatorDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-  //   if (stepKey === STEPS.LTCC) {
-  //     return (
-  //       <FormSection title={`Ltcc Details`}>
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <LtccDetails />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     );
-  //   }
-
-  //   // Handle all other part-based steps
-  //   let partType = null;
-  //   let title = "";
-
-  //   switch (stepKey) {
-  //     case STEPS.CHIP_CAPACITORS:
-  //       partType = "capacitor";
-  //       title = "Capacitor";
-  //       break;
-  //     case STEPS.CHIP_RESISTORS:
-  //       partType = "resistor";
-  //       title = "Resistor";
-  //       break;
-  //     case STEPS.CHIP_AIRCOILS:
-  //       partType = "airCoil";
-  //       title = "Air Coil";
-  //       break;
-  //     case STEPS.CHIP_INDUCTORS:
-  //       partType = "inductor";
-  //       title = "Inductor";
-  //       break;
-  //     // case STEPS.TRANSFORMER_WOUND_INDUCTORS:
-  //     //   partType = "transformer";
-  //     //   title = "Transformer";
-  //     //   break;
-  //     default:
-  //       return <p className="text-gray-500 p-4">No content for this step.</p>;
-  //   }
-
-  //   return (
-  //     <>
-  //       <FormSection title={`${title} Details`}>
-  //         <div className="md:col-span-2">
-  //           <div className="overflow-y-auto mt-4 space-y-6 pr-1 h-[50vh]">
-  //             <PartTable partType={partType} title={title} />
-  //           </div>
-  //         </div>
-  //       </FormSection>
-  //     </>
-  //   );
-  // };
+  const generateSamplePDF = () => {
+    Page21PDFDocument(state);
+  };
   const stepsForSelectedTechnology =
     TECHNOLOGY_STEP_MAP[state.technology] || [];
   console.log("stepsForSelectedTechnology", stepsForSelectedTechnology);
@@ -342,7 +525,7 @@ const CreationInterface = () => {
     useEffect(() => {
       const handleResize = () => {
         const screenWidth = window.innerWidth;
-        const stepWidth = 200;
+        const stepWidth = 240;
         setMaxVisibleSteps(Math.max(3, Math.floor(screenWidth / stepWidth)));
       };
 
@@ -388,8 +571,8 @@ const CreationInterface = () => {
     return (
       <div className="flex items-center w-full px-4 mb-4">
         {visibleStart > 0 && (
-          <button onClick={handlePrev} className="mr-2 p-2">
-            ◀
+          <button onClick={handlePrev} className="w-10 h-10 mb-5">
+            <img src={rightArrow} alt="leftArrow" className="-scale-x-100" />
           </button>
         )}
 
@@ -470,8 +653,8 @@ const CreationInterface = () => {
         </div>
 
         {visibleStart + maxVisibleSteps < stepsWithBasic.length && (
-          <button onClick={handleNext} className="ml-2 p-2">
-            ▶
+          <button onClick={handleNext} className="w-10 h-10 mb-5">
+            <img src={rightArrow} alt="rightArrow" />
           </button>
         )}
       </div>

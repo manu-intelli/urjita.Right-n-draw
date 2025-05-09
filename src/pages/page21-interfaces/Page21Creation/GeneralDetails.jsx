@@ -419,7 +419,7 @@ const GeneralDetails = () => {
                 label="length"
                 type="number"
                 value={state.caseDimensions?.length || ""}
-                onChange={(value) => handleChange("customImpedance", value)}
+                onChange={(value) => handleCaseDimensionsChange("length", Number(value))}
                 required
                 disabled={state.caseStyle === "Existing"}
               />
@@ -428,7 +428,7 @@ const GeneralDetails = () => {
                 label="width"
                 type="number"
                 value={state.caseDimensions.width || ""}
-                onChange={(value) => handleChange("customImpedance", value)}
+                onChange={(value) => handleCaseDimensionsChange("width", Number(value))}
                 required
                 disabled={state.caseStyle === "Existing"}
               />
@@ -436,15 +436,15 @@ const GeneralDetails = () => {
                 label="height"
                 type="number"
                 value={state.caseDimensions.height || ""}
-                onChange={(value) => handleChange("customImpedance", value)}
+                onChange={(value) => handleCaseDimensionsChange("height", Number(value))}
                 required
                 disabled={state.caseStyle === "Existing"}
               />
               <Input
                 label="PinOuts"
                 type="number"
-                value={state.caseDimensions.pinOuts || ""}
-                onChange={(value) => handleChange("pinOuts", value)}
+                value={state?.caseDimensions?.pinOuts || ""}
+                onChange={(value) => handleCaseDimensionsChange("pinOuts", Number(value))}
                 required
                 disabled={state.caseStyle === "Existing"}
               />
