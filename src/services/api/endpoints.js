@@ -28,7 +28,21 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status;
+   // const code = error?.response?.data?.code;
+    if (status === 401 ) {
+      // Clear user from localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("components");
+      window.location.href ="/";
+    }
 
+    return Promise.reject(error);
+  }
+);
 // Auth API
 export const authAPI = {
   login: async (credentials) => {
