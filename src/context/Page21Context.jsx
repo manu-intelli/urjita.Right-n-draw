@@ -78,13 +78,14 @@ const initialState = {
   },
   transformers: {
     transformersList: [
-      {
-        coreType: "single",
-        wireType: "single",
-        coreBPN: [""],
-        wireGauge: [""],
-        numberOfTurns: "",
-      },
+      // {
+      //   name: "",
+      //   coreType: "single",
+      //   wireType: "single",
+      //   coreBPN: [""],
+      //   wireGauge: [""],
+      //   numberOfTurns: "",
+      // },
     ],
     numberOfTransformers: 1,
   },

@@ -52,6 +52,7 @@ const CooperFlapDetails = () => {
 
   useEffect(() => {
     const count = parseInt(numberOfFlaps || "0", 10);
+    if (count < 0) count = 0; // Prevent negative values
     const updated = [...(flaps || [])];
 
     while (updated.length < count) {

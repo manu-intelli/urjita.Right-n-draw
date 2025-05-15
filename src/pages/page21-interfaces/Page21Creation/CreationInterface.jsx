@@ -405,7 +405,7 @@ const CreationInterface = () => {
 
     ceramic_resonators: STEP_ORDER, // Includes all steps
 
-    thin_film: STEP_ORDER.filter(
+    docs_diplexer: STEP_ORDER.filter(
       (step) =>
         ![
           STEPS.RESONATORS,
@@ -415,7 +415,7 @@ const CreationInterface = () => {
         ].includes(step)
     ),
 
-    docs_diplexer: STEP_ORDER.filter(
+    thin_film: STEP_ORDER.filter(
       (step) =>
         ![
           STEPS.RESONATORS,

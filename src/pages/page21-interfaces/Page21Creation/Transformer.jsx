@@ -15,6 +15,7 @@ const TransformersPage = () => {
       const newTransformers = Array.from(
         { length: number - currentLength },
         () => ({
+          name: "",
           coreType: "single",
           wireType: "single",
           coreBPN: [""],
@@ -106,6 +107,14 @@ const TransformersPage = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-6">
+            <div className="md:w-1/2">
+              <Input
+                label={`Transformer ${index + 1} Name`}
+                value={item.name || ""}
+                onChange={(value) => handleChange(index, "name", value)}
+                placeholder="Enter Name"
+              />
+            </div>
             <div className="flex flex-col md:flex-row gap-6">
               <div className="md:w-1/2">
                 <label className="block font-medium mb-1">Core Type</label>
@@ -129,7 +138,7 @@ const TransformersPage = () => {
                 {(item.coreBPN || []).map((val, i) => (
                   <Input
                     key={i}
-                    label={`Core BP/N ${item.coreBPN.length > 1 ? i + 1 : ""}`}
+                    label={`Core B-P/N ${item.coreBPN.length > 1 ? i + 1 : ""}`}
                     value={val}
                     onChange={(value) =>
                       handleArrayChange(index, "coreBPN", i, value)

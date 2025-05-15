@@ -31,6 +31,7 @@ const PartDetails = ({ partType, title }) => {
 
   const handleCountChange = (value, isWithBpn) => {
     const count = parseInt(value, 10) || 0;
+    if (count < 0) count = 0; // Prevent negative values
     const field = isWithBpn ? "numWithBpn" : "numWithoutBpn";
     const listKey = isWithBpn ? "withBpn" : "withoutBpn";
 
@@ -41,7 +42,7 @@ const PartDetails = ({ partType, title }) => {
           supplierName: "",
           supplierNumber: "",
           qualificationStaus: "",
-          airCoilDetailsComment: "",
+          ...(title === "Air Coil" && { airCoilDetailsComment: "" }),
         };
 
     const newList = Array.from({ length: count }, () => ({ ...defaultItem }));
@@ -91,7 +92,7 @@ const PartDetails = ({ partType, title }) => {
         <div className="flex gap-6">
           <div className="flex-1">
             <Input
-              label={`Number of ${title} with BP/N`}
+              label={`Number of ${title} with B-P/N`}
               type="number"
               value={numWithBpn}
               onChange={(val) => handleCountChange(val, true)}
@@ -100,7 +101,7 @@ const PartDetails = ({ partType, title }) => {
           </div>
           <div className="flex-1">
             <Input
-              label={`Number of ${title} without BP/N`}
+              label={`Number of ${title} without B-P/N`}
               type="number"
               value={numWithoutBpn}
               onChange={(val) => handleCountChange(val, false)}
@@ -115,7 +116,7 @@ const PartDetails = ({ partType, title }) => {
         <div>
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
             <h3 className="text-md font-semibold text-gray-800">
-              {title} with BP/N
+              {title} with B-P/N
             </h3>
           </div>
           <div className="space-y-4">
@@ -163,7 +164,7 @@ const PartDetails = ({ partType, title }) => {
         <div>
           <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
             <h3 className="text-md font-semibold text-gray-800">
-              {title} without BP/N
+              {title} without B-P/N
             </h3>
           </div>
           <div className="space-y-4">
@@ -172,18 +173,18 @@ const PartDetails = ({ partType, title }) => {
                 key={index}
                 className="flex flex-wrap bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-all hover:bg-gray-50"
               >
+                <div className="flex-1 mx-2 min-w-[200px]">
+                  <Input
+                    label={`${title} ${index + 1} Name`}
+                    value={item.name}
+                    onChange={(value) =>
+                      handleChange(index, "name", value, false)
+                    }
+                    placeholder="Enter Name"
+                  />
+                </div>
                 {title !== "Air Coil" ? (
                   <>
-                    <div className="flex-1 mx-2 min-w-[200px]">
-                      <Input
-                        label={`${title} ${index + 1} Name`}
-                        value={item.name}
-                        onChange={(value) =>
-                          handleChange(index, "name", value, false)
-                        }
-                        placeholder="Enter Name"
-                      />
-                    </div>
                     <div className="flex-1 mx-2 min-w-[200px]">
                       <Input
                         label="Supplier Name"

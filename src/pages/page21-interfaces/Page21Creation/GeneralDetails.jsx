@@ -302,11 +302,11 @@ const GeneralDetails = () => {
                   value={
                     state.enclosureDetails.partType === "New"
                       ? "TBD"
-                      : state.enclosureDetails.partNumber
+                      : state.enclosureDetails.B - P / N
                   }
                   onChange={(value) =>
                     handleEnclosureChange(
-                      "partNumber",
+                      "B-P/N",
                       state.enclosureDetails.partType === "New" ? "TBD" : value
                     )
                   }
@@ -356,11 +356,11 @@ const GeneralDetails = () => {
                   value={
                     state.topcoverDetails.partType === "New"
                       ? "TBD"
-                      : state.topcoverDetails.partNumber
+                      : state.topcoverDetails.B - P / N
                   }
                   onChange={(value) =>
                     handleTopcoverChange(
-                      "partNumber",
+                      "B-P/N",
                       state.topcoverDetails.partType === "New" ? "TBD" : value
                     )
                   }
@@ -419,7 +419,9 @@ const GeneralDetails = () => {
                 label="length"
                 type="number"
                 value={state.caseDimensions?.length || ""}
-                onChange={(value) => handleCaseDimensionsChange("length", Number(value))}
+                onChange={(value) =>
+                  handleCaseDimensionsChange("length", Number(value))
+                }
                 required
                 disabled={state.caseStyle === "Existing"}
               />
@@ -428,7 +430,9 @@ const GeneralDetails = () => {
                 label="width"
                 type="number"
                 value={state.caseDimensions.width || ""}
-                onChange={(value) => handleCaseDimensionsChange("width", Number(value))}
+                onChange={(value) =>
+                  handleCaseDimensionsChange("width", Number(value))
+                }
                 required
                 disabled={state.caseStyle === "Existing"}
               />
@@ -436,18 +440,25 @@ const GeneralDetails = () => {
                 label="height"
                 type="number"
                 value={state.caseDimensions.height || ""}
-                onChange={(value) => handleCaseDimensionsChange("height", Number(value))}
+                onChange={(value) =>
+                  handleCaseDimensionsChange("height", Number(value))
+                }
                 required
                 disabled={state.caseStyle === "Existing"}
               />
-              <Input
-                label="PinOuts"
-                type="number"
-                value={state?.caseDimensions?.pinOuts || ""}
-                onChange={(value) => handleCaseDimensionsChange("pinOuts", Number(value))}
-                required
-                disabled={state.caseStyle === "Existing"}
-              />
+
+              <div className="md:col-span-2">
+                <TextArea
+                  label="PinOuts"
+                  value={state?.caseDimensions?.pinOuts || ""}
+                  onChange={(value) =>
+                    handleCaseDimensionsChange("pinOuts", Number(value))
+                  }
+                  required
+                  disabled={state.caseStyle === "Existing"}
+                  multiline
+                />
+              </div>
             </div>
           )}
         </div>

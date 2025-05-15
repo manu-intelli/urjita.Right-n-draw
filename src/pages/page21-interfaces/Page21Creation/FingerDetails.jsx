@@ -143,7 +143,7 @@ const FingerDetails = () => {
             </div>
 
             <Input
-              label="Part Number"
+              label="B-P/N"
               value={finger.partNumber || ""}
               onChange={(value) =>
                 handleFingerChange(index, "partNumber", value)

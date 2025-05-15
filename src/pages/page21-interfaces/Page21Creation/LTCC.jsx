@@ -73,7 +73,7 @@ const LtccDetails = () => {
               payload: { field: "specialRequirements", value },
             })
           }
-          placeholder="Add any Special Requirements are not covered above"
+          placeholder="Add any Special Requirements that are not covered above"
           multiline
         />
       </div>

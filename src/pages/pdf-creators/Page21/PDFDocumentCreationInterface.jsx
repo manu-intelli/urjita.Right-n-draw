@@ -287,7 +287,7 @@ const Page21PDFDocument = ({ formData }) => {
 
             <ConditionalField condition={formData.enclosureDetails?.partNumber}>
               <View style={styles.row}>
-                <Text style={styles.label}>Enclosure Part Number:</Text>
+                <Text style={styles.label}>Enclosure B-P/N:</Text>
                 <Text style={styles.value}>
                   {formData.enclosureDetails?.partNumber}
                 </Text>
@@ -305,7 +305,7 @@ const Page21PDFDocument = ({ formData }) => {
 
             <ConditionalField condition={formData.topcoverDetails?.partNumber}>
               <View style={styles.row}>
-                <Text style={styles.label}>Top Cover Part Number:</Text>
+                <Text style={styles.label}>Top Cover B-P/N:</Text>
                 <Text style={styles.value}>
                   {formData.topcoverDetails?.partNumber}
                 </Text>

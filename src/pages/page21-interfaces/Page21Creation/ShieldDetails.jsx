@@ -71,6 +71,7 @@ const ShieldDetails = () => {
     }
 
     const count = parseInt(numberOfShields || "0", 10);
+    if (count < 0) count = 0; // Prevent negative values
     const updated = [...(shields || [])];
 
     while (updated.length < count) {
@@ -147,7 +148,7 @@ const ShieldDetails = () => {
             </div>
 
             <Input
-              label="Part Number"
+              label="B-P/N"
               value={shield.partNumber || ""}
               onChange={(value) =>
                 handleShieldChange(index, "partNumber", value)

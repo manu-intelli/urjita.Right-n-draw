@@ -26,11 +26,12 @@ const ResonatorDetails = () => {
       if (i !== index) return resonator;
 
       if (field === "bpType") {
+        const isNew = value === "New";
         return {
           ...resonator,
           bpType: value,
-          partNumber: value === "New" ? "TBD" : "",
-          bpNumber: value === "New" ? "" : resonator.bpNumber || "",
+
+          bpNumber: isNew ? "TBD" : "",
         };
       }
 
@@ -119,7 +120,7 @@ const ResonatorDetails = () => {
                   handleResonatorChange(index, "bpType", "Existing")
                 }
               />
-              B-P/N  to be used/modified
+              B-P/N to be used/modified
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -136,7 +137,7 @@ const ResonatorDetails = () => {
           {/* Resonator Input Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="BP/N"
+              label="B-P/N"
               value={resonator.bpNumber || ""}
               onChange={(value) =>
                 handleResonatorChange(index, "bpNumber", value)
