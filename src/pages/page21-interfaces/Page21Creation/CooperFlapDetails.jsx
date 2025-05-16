@@ -27,8 +27,13 @@ const CooperFlapDetails = () => {
         return {
           ...flap,
           bpType: value,
+          bpNumber: value === "New" ? "TBD" : "",
           ...(value === "Existing"
-            ? { length: "", width: "", thickness: "" }
+            ? {
+                length: "",
+                width: "",
+                thickness: "",
+              }
             : {}),
         };
       }
@@ -51,7 +56,7 @@ const CooperFlapDetails = () => {
   };
 
   useEffect(() => {
-    const count = parseInt(numberOfFlaps || "0", 10);
+    var count = parseInt(numberOfFlaps || "0", 10);
     if (count < 0) count = 0; // Prevent negative values
     const updated = [...(flaps || [])];
 

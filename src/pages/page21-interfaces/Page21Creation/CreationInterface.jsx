@@ -385,12 +385,12 @@ const CreationInterface = () => {
       },
       comments: "Testing Additional RequireMent Comments",
     };
-    generatePDF(formData);
+    // generatePDF(formData);
 
     // Reset form and go back to step one
     // dispatch({ type: "RESET_FORM" });
     dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
-    dispatch({ type: "SET_SUBMITTED", payload: true });
+    dispatch({ type: "SET_SUBMITTED", payload: false });
 
     // Optionally show a success message
     alert("Form submitted successfully! The form has been reset.");

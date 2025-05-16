@@ -30,7 +30,7 @@ const PartDetails = ({ partType, title }) => {
   ];
 
   const handleCountChange = (value, isWithBpn) => {
-    const count = parseInt(value, 10) || 0;
+    var count = parseInt(value, 10) || 0;
     if (count < 0) count = 0; // Prevent negative values
     const field = isWithBpn ? "numWithBpn" : "numWithoutBpn";
     const listKey = isWithBpn ? "withBpn" : "withoutBpn";

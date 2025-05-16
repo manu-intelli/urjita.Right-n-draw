@@ -1,6 +1,10 @@
 import React, { useState, useRef } from "react";
 import { usePage21Context } from "../../../context/Page21Context";
-import { Input, Select } from "../../../components/common/ReusableComponents";
+import {
+  Input,
+  Select,
+  TextArea,
+} from "../../../components/common/ReusableComponents";
 
 const impedanceOptions = [
   { label: "50 ohms", value: "50 ohms" },
@@ -302,11 +306,11 @@ const GeneralDetails = () => {
                   value={
                     state.enclosureDetails.partType === "New"
                       ? "TBD"
-                      : state.enclosureDetails.B - P / N
+                      : state.enclosureDetails.partNumber
                   }
                   onChange={(value) =>
                     handleEnclosureChange(
-                      "B-P/N",
+                      "partNumber",
                       state.enclosureDetails.partType === "New" ? "TBD" : value
                     )
                   }
@@ -356,11 +360,11 @@ const GeneralDetails = () => {
                   value={
                     state.topcoverDetails.partType === "New"
                       ? "TBD"
-                      : state.topcoverDetails.B - P / N
+                      : state.topcoverDetails?.partNumber
                   }
                   onChange={(value) =>
                     handleTopcoverChange(
-                      "B-P/N",
+                      "partNumber",
                       state.topcoverDetails.partType === "New" ? "TBD" : value
                     )
                   }
@@ -406,14 +410,31 @@ const GeneralDetails = () => {
               New
             </label>
           </div>
-          <Select
-            label="Selected Case Style"
-            value={state.selectedCaseStyle}
-            options={existingCaseStyles}
-            onChange={(value) => handleChange("selectedCaseStyle", value)}
-            required
-          />
-          {state?.selectedCaseStyle && (
+          {state?.caseStyle !== "New" && (
+            <>
+              <Select
+                label="Selected Case Style"
+                value={state.selectedCaseStyle}
+                options={existingCaseStyles}
+                onChange={(value) => handleChange("selectedCaseStyle", value)}
+                required
+              />
+
+              <div className="md:col-span-2">
+                <TextArea
+                  label="PinOuts"
+                  value={state?.caseDimensions?.pinOuts || ""}
+                  onChange={(value) =>
+                    handleCaseDimensionsChange("pinOuts", Number(value))
+                  }
+                  required
+                  disabled={state.caseStyle === "Existing"}
+                  multiline
+                />
+              </div>
+            </>
+          )}
+          {state?.caseStyle === "New" && (
             <div className="flex flex-col md:flex-row gap-6">
               <Input
                 label="length"
@@ -446,19 +467,6 @@ const GeneralDetails = () => {
                 required
                 disabled={state.caseStyle === "Existing"}
               />
-
-              <div className="md:col-span-2">
-                <TextArea
-                  label="PinOuts"
-                  value={state?.caseDimensions?.pinOuts || ""}
-                  onChange={(value) =>
-                    handleCaseDimensionsChange("pinOuts", Number(value))
-                  }
-                  required
-                  disabled={state.caseStyle === "Existing"}
-                  multiline
-                />
-              </div>
             </div>
           )}
         </div>
