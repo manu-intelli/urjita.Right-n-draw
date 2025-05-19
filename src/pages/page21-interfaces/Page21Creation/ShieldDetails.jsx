@@ -70,7 +70,7 @@ const ShieldDetails = () => {
       return;
     }
 
-    const count = parseInt(numberOfShields || "0", 10);
+    var count = parseInt(numberOfShields || "0", 10);
     if (count < 0) count = 0; // Prevent negative values
     const updated = [...(shields || [])];
 
