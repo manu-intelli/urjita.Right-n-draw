@@ -36,14 +36,16 @@ const LtccDetails = () => {
     <div className="border p-4 rounded-md shadow-sm mb-6">
       {/* Number of LTCCs */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <Input
-          label="Number of LTCCs"
-          type="number"
-          min={0}
-          value={numberOfLtcc}
-          onChange={handleNumberChange}
-          required
-        />
+        <div className="w-full md:w-1/2">
+          <Input
+            label="Number of LTCCs"
+            type="number"
+            min={0}
+            value={numberOfLtcc}
+            onChange={handleNumberChange}
+            required
+          />
+        </div>
       </div>
 
       {/* LTCC Inputs */}
@@ -52,11 +54,15 @@ const LtccDetails = () => {
           <h3 className="font-semibold mb-2">LTCC {index + 1}</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Model Name"
-              value={ltcc.modelName || ""}
-              onChange={(value) => handleModelChange(index, "modelName", value)}
-            />
+            <div className="w-full md:w-1/2">
+              <Input
+                label="Model Name"
+                value={ltcc.modelName || ""}
+                onChange={(value) =>
+                  handleModelChange(index, "modelName", value)
+                }
+              />
+            </div>
           </div>
         </div>
       ))}

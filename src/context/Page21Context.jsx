@@ -21,7 +21,7 @@ const initialState = {
   revisionNumber: "",
   impedance: "",
   customImpedance: "",
-  package: "",
+  interfaces: "",
   ports: {
     numberOfPorts: "",
     portDetails: [], // array of { connectorType, connectorGender }

@@ -223,22 +223,81 @@ const PartDetails = ({ partType, title }) => {
                     </div>
                   </>
                 ) : (
-                  <div className="flex-1 mx-2 min-w-[400px]">
-                    <TextArea
-                      label="Aircoil Details Comment"
-                      value={item.airCoilDetailsComment}
-                      onChange={(value) =>
-                        handleChange(
-                          index,
-                          "airCoilDetailsComment",
-                          value,
-                          false
-                        )
-                      }
-                      multiline
-                      required
-                    />
-                  </div>
+                  <>
+                    <div className="flex-1 mx-2 min-w-[150px]">
+                      <Input
+                        label="wire gauge"
+                        value={item.wiregauge}
+                        onChange={(value) =>
+                          handleChange(index, "wiregauge", value, false)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[150px]">
+                      <Input
+                        label="Innner Diameter"
+                        value={item.innnerDiameter}
+                        onChange={(value) =>
+                          handleChange(index, "innnerDiameter", value, false)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[150px]">
+                      <Input
+                        label="Number of Truns"
+                        value={item.numberOfTurns}
+                        onChange={(value) =>
+                          handleChange(index, "numberOfTurns", value, false)
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div className="flex-1 mx-2 min-w-[150px]">
+                      <Input
+                        label="Length Of Aircoil"
+                        value={item.lengthOfAircoil}
+                        onChange={(value) =>
+                          handleChange(index, "lengthOfAircoil", value, false)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[150px]">
+                      <Input
+                        label="width Of Aircoil"
+                        value={item.widthOfAircoil}
+                        onChange={(value) =>
+                          handleChange(index, "widthOfAircoil", value, false)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[120px]">
+                      <Select
+                        label="LBend Aircoil"
+                        value={item.lBendAircoil}
+                        options={qualificationOptions}
+                        onChange={(value) =>
+                          handleChange(index, "lBendAircoil", value, false)
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 mx-2 min-w-[120px]">
+                      <Select
+                        label="Shorter leg aircoil"
+                        value={item.ShorterLegAircoil}
+                        options={qualificationOptions}
+                        onChange={(value) =>
+                          handleChange(index, "ShorterLegAircoil", value, false)
+                        }
+                        required
+                      />
+                    </div>
+                  </>
                 )}
                 <div className="flex items-center justify-center mx-2 mt-7">
                   <button

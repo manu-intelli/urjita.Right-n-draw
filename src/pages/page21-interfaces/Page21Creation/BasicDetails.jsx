@@ -1,16 +1,13 @@
-import React, { useState, useRef } from "react";
+import React from "react";
 import { usePage21Context } from "../../../context/Page21Context";
-import {
-  FormSection,
-  Input,
-  Select,
-} from "../../../components/common/ReusableComponents";
+import { Input, Select } from "../../../components/common/ReusableComponents";
 
 const modelFamilyOptions = [
   { label: "Family A", value: "FamilyA" },
   { label: "FamilyB", value: "FamilyB" },
   { label: "Family C", value: "FamilyC" },
 ];
+
 export const technologyOptions = [
   { label: "Lumped Technology", value: "lumped" },
   { label: "Ceramic Resonator Technology", value: "ceramic_resonators" },
@@ -21,7 +18,6 @@ export const technologyOptions = [
 const BasicDetails = () => {
   const { state, dispatch } = usePage21Context();
 
-  // Handle input changes
   const handleChange = (field, value) => {
     dispatch({
       type: "SET_FIELD",
@@ -30,8 +26,8 @@ const BasicDetails = () => {
   };
 
   return (
-    <div className="p-6 bg-white shadow rounded-md">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div className="container mx-auto max-w-screen-lg p-4 bg-white shadow rounded-md">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Input
           label="OP Number"
           value={state.opNumber || ""}
@@ -50,7 +46,6 @@ const BasicDetails = () => {
           onChange={(value) => handleChange("eduNumber", value)}
           required
         />
-
         <Select
           label="Model Family"
           value={state.modelFamily}
@@ -58,17 +53,10 @@ const BasicDetails = () => {
           onChange={(value) => handleChange("modelFamily", value)}
           required
         />
-
         <Input
           label="Model Name"
           value={state.modelName || ""}
           onChange={(value) => handleChange("modelName", value)}
-          required
-        />
-          <Input
-          label="Revision Number"
-          value={state.revisionNumber}
-          onChange={(value) => handleChange("revisionNumber", value)}
           required
         />
 
@@ -79,7 +67,6 @@ const BasicDetails = () => {
           onChange={(value) => handleChange("technology", value)}
           required
         />
-
       </div>
     </div>
   );
