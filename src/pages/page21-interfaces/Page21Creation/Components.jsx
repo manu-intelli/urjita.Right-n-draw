@@ -73,66 +73,72 @@ const ComponentsDetails = () => {
 
   return (
     <div className="p-6 bg-white shadow rounded-md">
-      <h3 className="text-xl font-semibold mb-4">CAN</h3>
       {state.coverType === "Open" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <Select
-            label="Existing Can Available"
-            value={isExistingCanAvailable}
-            options={yesNoOptions}
-            onChange={(value) =>
-              dispatch({
-                type: "SET_FIELD",
-                payload: { field: "isExistingCanAvailable", value },
-              })
-            }
-          />
+        <>
+          <h3 className="text-md font-semibold mb-4">CAN</h3>
 
-          {isExistingCanAvailable === "Yes" && (
-            <Input
-              label="B-P/N"
-              value={bpNumber || ""}
-              onChange={(val) =>
-                dispatch({ type: "SET_BP_NUMBER", payload: val })
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <Select
+              label="Existing Can Available"
+              value={isExistingCanAvailable}
+              options={yesNoOptions}
+              onChange={(value) =>
+                dispatch({
+                  type: "SET_FIELD",
+                  payload: { field: "isExistingCanAvailable", value },
+                })
               }
             />
-          )}
 
-          {isExistingCanAvailable !== "Yes" && (
-            <>
-              <Select
-                label="Can Material"
-                value={canMaterial}
-                options={canMaterialOptions}
-                onChange={(value) =>
-                  dispatch({ type: "SET_CAN_MATERIAL", payload: value })
+            {isExistingCanAvailable === "Yes" && (
+              <Input
+                label="B-P/N"
+                value={bpNumber || ""}
+                onChange={(val) =>
+                  dispatch({ type: "SET_BP_NUMBER", payload: val })
                 }
               />
-              <Select
-                label="Can Making Process"
-                value={canProcess}
-                options={canMakingProcessOptions}
-                onChange={(value) =>
-                  dispatch({ type: "SET_CAN_PROCESS", payload: value })
-                }
-              />
-              {canMaterial === "Others" && (
-                <Input
-                  label="Custom Can Material"
-                  value={customCanMaterial || ""}
-                  onChange={(val) =>
-                    dispatch({ type: "SET_CUSTOM_CAN_MATERIAL", payload: val })
+            )}
+
+            {isExistingCanAvailable !== "Yes" && (
+              <>
+                <Select
+                  label="Can Material"
+                  value={canMaterial}
+                  options={canMaterialOptions}
+                  onChange={(value) =>
+                    dispatch({ type: "SET_CAN_MATERIAL", payload: value })
                   }
-                  placeholder="Enter custom material"
                 />
-              )}
-            </>
-          )}
-        </div>
+                <Select
+                  label="Can Making Process"
+                  value={canProcess}
+                  options={canMakingProcessOptions}
+                  onChange={(value) =>
+                    dispatch({ type: "SET_CAN_PROCESS", payload: value })
+                  }
+                />
+                {canMaterial === "Others" && (
+                  <Input
+                    label="Custom Can Material"
+                    value={customCanMaterial || ""}
+                    onChange={(val) =>
+                      dispatch({
+                        type: "SET_CUSTOM_CAN_MATERIAL",
+                        payload: val,
+                      })
+                    }
+                    placeholder="Enter custom material"
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </>
       )}
 
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-semibold">PCB Details</h3>
+        <h3 className="text-lg font-semibold">PCB Details</h3>
         <Tooltip
           title={pcbList.length >= MAX_PCBS ? "Maximum of 5 PCBs allowed" : ""}
           disableHoverListener={pcbList.length < MAX_PCBS}
@@ -162,7 +168,7 @@ const ComponentsDetails = () => {
             className="border rounded-md p-4 mb-4 bg-white shadow"
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-lg">PCB {index + 1}</h3>
+              <h3 className="font-semibold text-md">PCB {index + 1}</h3>
               {!isBase && (
                 <button
                   onClick={() => deletePCB(index)}
@@ -174,7 +180,7 @@ const ComponentsDetails = () => {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {isBase ? (
                 <>
                   <Select
@@ -288,7 +294,7 @@ const ComponentsDetails = () => {
                         disabled
                       />
 
-                      <div className="md:col-span-2">
+                      <div className="md:col-span-3">
                         <TextArea
                           label="Comments"
                           value={pcb.comments}

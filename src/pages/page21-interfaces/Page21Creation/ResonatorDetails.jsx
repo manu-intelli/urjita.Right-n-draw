@@ -86,7 +86,7 @@ const ResonatorDetails = () => {
   return (
     <div className="border p-4 rounded-md shadow-sm mb-6">
       {/* Input for Number of Resonators */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <Input
           label="Number of Resonators"
           type="number"

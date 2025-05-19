@@ -679,6 +679,7 @@ const GeneralDetails = () => {
   const clearSchematic = () => {
     dispatch({ type: "REMOVE_FILE" });
     if (fileInputRef.current) fileInputRef.current.value = "";
+    setPreviewUrl(null);
   };
 
   const handleNumberOfPortsChange = (field, value) => {
@@ -1159,6 +1160,16 @@ const GeneralDetails = () => {
               </div>
             )}
           </div>
+          {previewUrl && (
+            <div className="mt-4">
+              {" "}
+              <iframe
+                src={previewUrl}
+                className="w-full h-96 border border-gray-200 rounded-md"
+                title="Schematic Preview"
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
