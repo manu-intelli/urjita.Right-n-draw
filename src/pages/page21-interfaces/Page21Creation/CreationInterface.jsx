@@ -446,7 +446,7 @@ const CreationInterface = () => {
   const STEP_COMPONENT_MAP = {
     [STEPS.BASIC_DETAILS]: {
       component: BasicDetails,
-      title: "General Details",
+      title: "Basic Details",
     },
     [STEPS.GENERAL_DETAILS]: {
       component: GeneralDetails,
