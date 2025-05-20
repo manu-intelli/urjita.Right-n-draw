@@ -58,7 +58,18 @@ export const basicInfoFields = [
   },
 ];
 
-
-
-
-
+export const COMPONENT_TYPES = Object.freeze({
+  PCB: "pcb",
+  CAN: "can",
+  CHIP_CAPACITOR: "chip-capacitor",
+  CHIP_INDUCTOR: "chip-inductor",
+  CHIP_RESISTOR: "chip-resistor",
+  TRANSFORMER: "transformer",
+  CHIP_RESONATOR: "chip-resonator",
+  AIR_COIL: "air-coil",
+  SHIELD: "shield",
+  FINGER: "finger",
+  COPPER_FLAP: "copper-flap",
+  LTCC: "ltcc",
+  OTHER: "other",
+});

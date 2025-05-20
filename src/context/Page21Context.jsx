@@ -11,7 +11,7 @@ const initialPartState = {
 const initialState = {
   currentStep: 0,
   submitted: false,
-
+  selectedComponents: [], // Store as array
   opNumber: "",
   opuNumber: "",
   eduNumber: "",
@@ -165,6 +165,21 @@ const reducer = (state, action) => {
       return {
         ...state,
         [action.payload.field]: action.payload.value,
+      };
+
+    case "SET_SELECTED_COMPONENTS":
+      return {
+        ...state,
+        selectedComponents: new Set(action.payload),
+      };
+
+    case "TOGGLE_COMPONENT":
+      const componentId = action.payload;
+      return {
+        ...state,
+        selectedComponents: state.selectedComponents.includes(componentId)
+          ? state.selectedComponents.filter((id) => id !== componentId)
+          : [...state.selectedComponents, componentId],
       };
     case "SET_CASE_DIMENSIONS":
       return {

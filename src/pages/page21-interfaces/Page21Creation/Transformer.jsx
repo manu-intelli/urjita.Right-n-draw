@@ -344,9 +344,7 @@ const TransformersPage = () => {
               {/* Core Type Section */}
               <div className="space-y-4 p-3 border rounded-md bg-gray-50">
                 <div>
-                  <label className="block font-medium mb-2">
-                    Core Configuration
-                  </label>
+                  <label className="block font-medium mb-2">Core Config</label>
                   <div className="flex flex-wrap gap-4 mb-3">
                     {["single", "double"].map((type) => (
                       <label key={type} className="flex items-center gap-2">
@@ -385,7 +383,7 @@ const TransformersPage = () => {
               <div className="space-y-4 p-3 border rounded-md bg-gray-50">
                 <div>
                   <label className="block font-medium mb-2">
-                    Wire Configuration
+                    Wire gauge Config
                   </label>
                   <div className="flex flex-wrap gap-4 mb-3">
                     {["single", "double"].map((type) => (
