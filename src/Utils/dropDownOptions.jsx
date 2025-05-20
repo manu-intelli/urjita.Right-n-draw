@@ -46,20 +46,20 @@ export const CONNECTOR_GENDER_OPTIONS = [
   { label: "Female", value: "Female" },
 ];
 
-const CAN_MATERIAL_OPTIONS = [
+export const CAN_MATERIAL_OPTIONS = [
   { label: "Metal", value: "Metal" },
   { label: "Plastic", value: "Plastic" },
   { label: "Ceramic", value: "Ceramic" },
   { label: "Others", value: "Others" },
 ];
 
-const CAN_MAKING_PROCESS_OPTIONS = [
+export const CAN_MAKING_PROCESS_OPTIONS = [
   { label: "Etched", value: "Etched" },
   { label: "Stamped", value: "Stamped" },
   { label: "Any of the above", value: "Any of the above" },
 ];
 
-const yesNoOptions = [
-  { label: "Yes", value: "Yes" },
-  { label: "No", value: "No" },
+export const QUALIFICATION_STATUS_OPTIONS = [
+  { label: "Qualification", value: "Qualification" },
+  { label: "Approval", value: "Approval" },
 ];

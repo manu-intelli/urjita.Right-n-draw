@@ -77,45 +77,13 @@ const initialState = {
     withoutBpn: [],
   },
   transformers: {
-    transformersList: [
-      // {
-      //   name: "",
-      //   coreType: "single",
-      //   wireType: "single",
-      //   coreBPN: [""],
-      //   wireGauge: [""],
-      //   numberOfTurns: "",
-      // },
-    ],
-    numberOfTransformers: 1,
+    transformersList: [],
+    numberOfTransformers: 0,
   },
   isExistingCanAvailable: "No",
   canMaterial: "",
   canProcess: "",
   customCanMaterial: "",
-
-  can: {
-    material: "",
-    makingProcess: "",
-  },
-  pcbs: [
-    {
-      id: 1,
-      name: "Base PCB",
-      material: "",
-      thickness: "",
-      layers: "",
-      mountingOrientation: "Horizontal",
-      comments: "",
-      isExistingCanAvailable: "",
-      bpNumber: "",
-      customMaterial: "",
-      substrateThickness: "",
-      rfLayerThickness: "",
-      overallThickness: "",
-      copperThickness: "",
-    },
-  ],
   pcbList: [
     {
       name: "Base PCB",

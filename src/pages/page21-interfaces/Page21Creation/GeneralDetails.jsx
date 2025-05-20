@@ -1010,7 +1010,7 @@ const GeneralDetails = () => {
           {/* Case Dimensions */}
 
           {/* Technical Options */}
-          {state?.technology !== "docs_diplexer" && (
+          {state?.technology !== "thin_film" && (
             <div className="space-y-2">
               <div className="grid grid-cols-2 gap-2">
                 <Select

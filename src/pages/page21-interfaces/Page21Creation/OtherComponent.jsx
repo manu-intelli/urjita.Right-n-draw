@@ -11,7 +11,6 @@ const OtherSpecialComponents = () => {
       <div className="md:col-span-2 mt-4">
         <h3 className="font-semibold text-lg mb-2">Any Special Requirements</h3>
         <TextArea
-          label="Any Special Requirements"
           value={state?.specialRequirements}
           onChange={(value) =>
             dispatch({

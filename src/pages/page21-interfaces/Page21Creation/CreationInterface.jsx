@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { usePage21Context } from "../../../context/Page21Context";
-import { FormSection } from "../../../components/common/ReusableComponents";
+import {
+  FormSection,
+  Button,
+} from "../../../components/common/ReusableComponents";
 import rightArrow from "../../../assets/rightArrow.svg";
-import { Button } from "../../../components/common/ReusableComponents";
 import ComponentsDetails from "./Components";
 import ShieldDetails from "./ShieldDetails";
 import FingerDetails from "./FingerDetails";
@@ -15,45 +17,25 @@ import TransformersPage from "./Transformer";
 import "./page21.css";
 import BasicDetails from "./BasicDetails";
 import Page21PDFDocument from "../../pdf-creators/Page21/PDFDocumentCreationInterface";
-import { COMPONENT_TYPES } from "../../../constants";
+import { COMPONENT_STEP_MAP, STEPS } from "../../../constants";
 import OtherSpecialComponents from "./OtherComponent";
-
-export const STEPS = {
-  BASIC_DETAILS: "basicDetails",
-  GENERAL_DETAILS: "general_details",
-  COMPONENTS: "components",
-  CHIP_AIRCOILS: "chip_aircoils",
-  CHIP_INDUCTORS: "chip_inductors",
-  CHIP_CAPACITORS: "chip_capacitors",
-  CHIP_RESISTORS: "chip_resistor",
-  TRANSFORMER_OR_WOUND_INDUCTORS: "transformer_or_wound_inductors",
-  SHIELDS: "shields",
-  FINGERS: "fingers",
-  COPPER_FLAPS: "cooper_flaps",
-  RESONATORS: "resonators",
-  LTCC: "ltcc",
-  OTHER: "other",
-};
-
-export const COMPONENT_STEP_MAP = Object.freeze({
-  [COMPONENT_TYPES.PCB]: [STEPS.COMPONENTS],
-  [COMPONENT_TYPES.CAN]: [STEPS.COMPONENTS],
-  [COMPONENT_TYPES.CHIP_CAPACITOR]: [STEPS.CHIP_CAPACITORS],
-  [COMPONENT_TYPES.CHIP_INDUCTOR]: [STEPS.CHIP_INDUCTORS],
-  [COMPONENT_TYPES.CHIP_RESISTOR]: [STEPS.CHIP_RESISTORS],
-  [COMPONENT_TYPES.TRANSFORMER]: [STEPS.TRANSFORMER_OR_WOUND_INDUCTORS],
-  [COMPONENT_TYPES.CHIP_RESONATOR]: [STEPS.RESONATORS],
-  [COMPONENT_TYPES.AIR_COIL]: [STEPS.CHIP_AIRCOILS],
-  [COMPONENT_TYPES.SHIELD]: [STEPS.SHIELDS],
-  [COMPONENT_TYPES.FINGER]: [STEPS.FINGERS],
-  [COMPONENT_TYPES.COPPER_FLAP]: [STEPS.COPPER_FLAPS],
-  [COMPONENT_TYPES.LTCC]: [STEPS.LTCC],
-  [COMPONENT_TYPES.OTHER]: [STEPS.OTHER], // Explicitly handle "other" components
-});
+import {
+  validateCooperFlaps,
+  validateFingers,
+  validateGeneralDetails,
+  validateLtcc,
+  validatePartDetails,
+  validatePcbDetails,
+  validateResonators,
+  validateShields,
+  validateTransformers,
+} from "./ValidationHelpers";
 
 const CreationInterface = () => {
   const { state, dispatch } = usePage21Context();
   const { currentStep, submitted, selectedComponents = [] } = state;
+
+  const [isNextDisabled, setIsNextDisabled] = useState(false);
 
   const getStepsForSelectedComponents = () => {
     const mandatorySteps = [STEPS.BASIC_DETAILS, STEPS.GENERAL_DETAILS];
@@ -75,17 +57,6 @@ const CreationInterface = () => {
 
   console.log("stepsForSelectedComponents", stepsForSelectedComponents);
 
-  const handleSubmit = () => {
-    console.log("Form submitted", state);
-    dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
-    dispatch({ type: "SET_SUBMITTED", payload: false });
-    alert("Form submitted successfully! The form has been reset.");
-  };
-
-  const setCurrentStep = (step) => {
-    dispatch({ type: "SET_CURRENT_STEP", payload: step });
-  };
-
   const STEP_COMPONENT_MAP = {
     [STEPS.BASIC_DETAILS]: {
       component: BasicDetails,
@@ -100,43 +71,54 @@ const CreationInterface = () => {
     [STEPS.TRANSFORMER_OR_WOUND_INDUCTORS]: {
       component: TransformersPage,
       title: "Transformer/Wound Inductors Specifications",
-      stepName: "Transformer Specs",
+      stepName: "Transformer",
     },
     [STEPS.COMPONENTS]: {
       component: ComponentsDetails,
       title: "Component Configuration",
-      stepName: "Component Config",
+      stepName: "PCB Config",
     },
     [STEPS.SHIELDS]: {
       component: ShieldDetails,
       title: "Shield Specifications",
-      stepName: "Shield Specs",
+      stepName: "Shields",
     },
     [STEPS.FINGERS]: {
       component: FingerDetails,
       title: "Finger Specifications",
-      stepName: "Finger Specs",
+      stepName: "Fingers",
     },
     [STEPS.COPPER_FLAPS]: {
       component: CooperFlapDetails,
       title: "Copper Flaps Specifications",
-      stepName: "Copper Flaps Specs",
+      stepName: "Copper Flaps ",
     },
     [STEPS.RESONATORS]: {
       component: ResonatorDetails,
       title: "Resonator Specifications",
-      stepName: "Resonator Specs",
+      stepName: "Resonators",
     },
     [STEPS.LTCC]: {
       component: LtccDetails,
-      title: "Ltcc Specifications",
-      stepName: "Ltcc Specs",
+      title: "LTCC Specifications",
+      stepName: "LTCC",
     },
     [STEPS.OTHER]: {
       component: OtherSpecialComponents,
       title: "Special Requirements",
       stepName: "Special Req",
     },
+  };
+
+  const handleSubmit = () => {
+    console.log("Form submitted", state);
+    dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
+    dispatch({ type: "SET_SUBMITTED", payload: false });
+    alert("Form submitted successfully! The form has been reset.");
+  };
+
+  const setCurrentStep = (step) => {
+    dispatch({ type: "SET_CURRENT_STEP", payload: step });
   };
 
   const PART_STEP_MAP = {
@@ -341,13 +323,148 @@ const CreationInterface = () => {
     );
   };
 
+  const handleNext = () => {
+    // Validate current step before proceeding
+    const isValid = validateCurrentStep();
+
+    console.log("isValid", isValid);
+
+    if (!isValid) {
+      return; // Don't proceed if validation fails
+    }
+
+    if (currentStep < stepsForSelectedComponents.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleSubmit();
+    }
+  };
+
+  // In your component's validation logic:
+  // const validateCurrentStep = () => {
+  //   const stepKey = stepsForSelectedComponents[currentStep];
+  //   let isValid = false;
+  //   console.log("validateCurrentStep----stepKey", stepKey);
+
+  //   if (PART_STEP_MAP[stepKey]) {
+  //     const { type } = PART_STEP_MAP[stepKey];
+  //     const partState = state[type];
+  //     isValid = validatePartDetails(type, partState);
+  //     console.log("parts isValid", isValid);
+  //     return isValid;
+  //     //const errors = getPartValidationErrors(type, partState);
+  //   } else {
+  //     setIsNextDisabled(false);
+  //     // Validate other step types
+  //     return (isValid = true);
+  //   }
+  // };
+
+  const validateCurrentStep = () => {
+    const stepKey = stepsForSelectedComponents[currentStep];
+    console.log("Validating step:", stepKey);
+
+    try {
+      if (PART_STEP_MAP[stepKey]) {
+        // Part-specific validation
+        const { type } = PART_STEP_MAP[stepKey];
+        const partState = state[type];
+
+        if (!partState) {
+          console.warn(`No state found for part type: ${type}`);
+          return false;
+        }
+
+        const isValid = validatePartDetails(type, partState);
+        console.log(`${type} validation result:`, isValid);
+        return isValid;
+      } else if (stepKey === STEPS.GENERAL_DETAILS) {
+        console.log("STEPS.GENERAL_DETAILS", STEPS.GENERAL_DETAILS);
+
+        // General details validation
+        const validationResult = validateGeneralDetails(state);
+        console.log("General details validation:", validationResult);
+
+        // Optional: Store errors in state for display
+        // dispatch({ type: 'SET_VALIDATION_ERRORS', payload: validationResult.errors });
+
+        return validationResult.isValid;
+      } else if (stepKey === STEPS.COMPONENTS) {
+        console.log("STEPS.GENERAL_DETAILS", STEPS.GENERAL_DETAILS);
+
+        // General details validation
+        const validationResult = validatePcbDetails(state);
+        console.log("Pcb details validation:", validationResult);
+
+        // Optional: Store errors in state for display
+        // dispatch({ type: 'SET_VALIDATION_ERRORS', payload: validationResult.errors });
+
+        return validationResult.isValid;
+      } else if (stepKey === STEPS.RESONATORS) {
+        console.log("STEPS.RESONATORS", STEPS.RESONATORS);
+
+        // Resonators validation
+        const validationResult = validateResonators(state.resonatorList);
+        console.log("Resonator validation", validationResult);
+
+        return validationResult.isValid;
+      } else if (stepKey === STEPS.TRANSFORMER_OR_WOUND_INDUCTORS) {
+        console.log(
+          "STEPS.TRANSFORMER_OR_WOUND_INDUCTORS",
+          STEPS.TRANSFORMER_OR_WOUND_INDUCTORS
+        );
+
+        // Transformers validation
+        const validationResult = validateTransformers(state.transformers);
+        console.log("Transformer validation:", validationResult);
+
+        return validationResult.isValid;
+      } else if (stepKey === STEPS.LTCC) {
+        console.log("Validating LTCC components");
+
+        // LTCC validation
+        const validationResult = validateLtcc(state.ltcc);
+        console.log("LTCC validation:", validationResult);
+        return validationResult.isValid;
+      } else if (stepKey === STEPS.COPPER_FLAPS) {
+        console.log("Validating copper flaps");
+
+        // Copper flaps validation
+        const validationResult = validateCooperFlaps(state.cooperFlapDetails);
+        console.log("Copper flaps validation:", validationResult);
+        return validationResult.isValid;
+      } else if (stepKey === STEPS.FINGERS) {
+        console.log("Validating fingers");
+
+        // Fingers validation
+        const validationResult = validateFingers(state.fingersList);
+        console.log("Fingers validation:", validationResult);
+        return validationResult.isValid;
+      } else if (stepKey === STEPS.SHIELDS) {
+        console.log("Validating shields");
+
+        // Shields validation
+        const validationResult = validateShields(state.shieldsList);
+        console.log("Shields validation:", validationResult);
+        return validationResult.isValid;
+      } else {
+        // Non-validated steps
+        console.log(`No validation required for step: ${stepKey}`);
+        setIsNextDisabled(false);
+        return true;
+      }
+    } catch (error) {
+      console.error("Validation error:", error);
+      return false;
+    }
+  };
   return (
     <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
       <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">
         <div className="px-4 sm:px-6 md:px-8 py-4 border-b border-neutral-200">
           <div className="w-full text-center">
             <h1 className="text-2xl font-semibold text-neutral-900 mb-6">
-              Page 21 Creation Interface
+              PiBase Creation Interface
             </h1>
 
             {stepsForSelectedComponents.length > 1 && renderStepIndicator()}
@@ -373,11 +490,8 @@ const CreationInterface = () => {
 
             <Button
               variant="primary"
-              onClick={
-                currentStep === stepsForSelectedComponents.length - 1
-                  ? handleSubmit
-                  : () => setCurrentStep(currentStep + 1)
-              }
+              onClick={handleNext}
+              disabled={isNextDisabled}
             >
               {currentStep === stepsForSelectedComponents.length - 1
                 ? "Submit"

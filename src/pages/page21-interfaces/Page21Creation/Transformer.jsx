@@ -296,7 +296,7 @@ const TransformersPage = () => {
           label="Number of Transformers"
           type="number"
           min={0}
-          value={transformersList.length}
+          value={transforms.numberOfTransformers}
           onChange={handleTransformerCountChange}
         />
       </div>
