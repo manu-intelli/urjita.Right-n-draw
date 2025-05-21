@@ -6,22 +6,88 @@ import {
 } from "../../../components/common/ReusableComponents";
 import { usePage21Context } from "../../../context/Page21Context";
 import { Tooltip } from "@mui/material";
+import { useEffect } from "react";
 
 const ComponentsDetails = () => {
   const { state, dispatch } = usePage21Context();
   const MAX_PCBS = 5;
   const {
-    canMaterial,
-    canProcess,
+    can: {
+      canMaterial,
+      canProcess,
+      isExistingCanAvailable,
+      bpNumber,
+      customCanMaterial,
+    },
     pcbList,
-    isExistingCanAvailable,
-    bpNumber,
-    customCanMaterial,
+    coverType,
+    technology,
   } = state;
 
-  const handlePcbChange = (i, field, value) => {
+  // Reset CAN-related fields when coverType is not "Open"
+  useEffect(() => {
+    if (coverType !== "Open") {
+      dispatch({
+        type: "UPDATE_CAN",
+        field: "isExistingCanAvailable",
+        value: "No",
+      });
+      dispatch({
+        type: "UPDATE_CAN",
+        field: "bpNumber",
+        value: "",
+      });
+      dispatch({
+        type: "UPDATE_CAN",
+        field: "canMaterial",
+        value: "",
+      });
+      dispatch({
+        type: "UPDATE_CAN",
+        field: "canProcess",
+        value: "",
+      });
+      dispatch({
+        type: "UPDATE_CAN",
+        field: "customCanMaterial",
+        value: "",
+      });
+    }
+  }, [coverType, dispatch]);
+
+  const handlePcbChange = (index, field, value) => {
     const updated = [...pcbList];
-    updated[i][field] = value;
+
+    // Create a new object for the PCB we're updating
+    updated[index] = {
+      ...updated[index],
+      [field]: value,
+    };
+
+    // Special handling for isExistingCanAvailable change
+    if (field === "isExistingPCBAvailable" && value === "Yes") {
+      updated[index] = {
+        ...updated[index],
+        material: "",
+        layers: "",
+        substrateThickness: "",
+        rfLayerThickness: "",
+        overallThickness: "",
+        copperThickness: "",
+        mountingOrientation: "",
+        comments: "",
+        customMaterial: "",
+      };
+    }
+
+    // Special handling for material change
+    if (field === "material" && value !== "Other") {
+      updated[index] = {
+        ...updated[index],
+        customMaterial: "",
+      };
+    }
+
     dispatch({ type: "SET_PCB_LIST", payload: updated });
   };
 
@@ -30,13 +96,13 @@ const ComponentsDetails = () => {
     const updated = [
       ...pcbList,
       {
-        name: "",
+        name: "Coupling PCB",
         material: "",
         thickness: "",
-        layers: "",
-        mountingOrientation: "",
+        layers: "Single",
+        mountingOrientation: "Horizontal",
         comments: "",
-        isExistingCanAvailable: "No",
+        isExistingPCBAvailable: "No",
         bpNumber: "",
         customMaterial: "",
         substrateThickness: "",
@@ -49,6 +115,7 @@ const ComponentsDetails = () => {
   };
 
   const deletePCB = (index) => {
+    if (index === 0) return; // Prevent deleting base PCB
     const updated = pcbList.filter((_, i) => i !== index);
     dispatch({ type: "SET_PCB_LIST", payload: updated });
   };
@@ -71,9 +138,25 @@ const ComponentsDetails = () => {
     { label: "No", value: "No" },
   ];
 
+  const pcbNameOptions = [
+    { label: "Coupling PCB", value: "Coupling PCB" },
+    { label: "Other PCB", value: "Other PCB" },
+  ];
+
+  const pcbMaterialOptions = [
+    { label: "Material 1", value: "Material 1" },
+    { label: "Material 2", value: "Material 2" },
+    { label: "Other", value: "Other" },
+  ];
+
+  const mountingOrientationOptions = [
+    { label: "Horizontal", value: "Horizontal" },
+    { label: "Vertical", value: "Vertical" },
+  ];
+
   return (
     <div className="p-6 bg-white shadow rounded-md">
-      {state.coverType === "Open" && (
+      {coverType === "Open" && (
         <>
           <h3 className="text-md font-semibold mb-4">CAN</h3>
 
@@ -82,12 +165,32 @@ const ComponentsDetails = () => {
               label="Existing Can Available"
               value={isExistingCanAvailable}
               options={yesNoOptions}
-              onChange={(value) =>
+              onChange={(value) => {
                 dispatch({
-                  type: "SET_FIELD",
-                  payload: { field: "isExistingCanAvailable", value },
-                })
-              }
+                  type: "UPDATE_CAN",
+                  field: "isExistingCanAvailable",
+                  value,
+                });
+
+                // Reset other fields when switching to existing can
+                if (value === "Yes") {
+                  dispatch({
+                    type: "UPDATE_CAN",
+                    field: "canMaterial",
+                    value: "",
+                  });
+                  dispatch({
+                    type: "UPDATE_CAN",
+                    field: "canProcess",
+                    value: "",
+                  });
+                  dispatch({
+                    type: "UPDATE_CAN",
+                    field: "customCanMaterial",
+                    value: "",
+                  });
+                }
+              }}
             />
 
             {isExistingCanAvailable === "Yes" && (
@@ -95,37 +198,64 @@ const ComponentsDetails = () => {
                 label="B-P/N"
                 value={bpNumber || ""}
                 onChange={(val) =>
-                  dispatch({ type: "SET_BP_NUMBER", payload: val })
+                  dispatch({
+                    type: "UPDATE_CAN",
+                    field: "bpNumber",
+                    value: val,
+                  })
                 }
+                placeholder="Enter BP Number"
               />
             )}
 
-            {isExistingCanAvailable !== "Yes" && (
+            {isExistingCanAvailable === "No" && (
               <>
                 <Select
                   label="Can Material"
                   value={canMaterial}
                   options={canMaterialOptions}
-                  onChange={(value) =>
-                    dispatch({ type: "SET_CAN_MATERIAL", payload: value })
-                  }
+                  onChange={(value) => {
+                    dispatch({
+                      type: "UPDATE_CAN",
+                      field: "canMaterial",
+                      value,
+                    });
+
+                    // Reset custom material if not "Others"
+                    if (value !== "Others") {
+                      dispatch({
+                        type: "UPDATE_CAN",
+                        field: "customCanMaterial",
+                        value: "",
+                      });
+                    }
+                  }}
                 />
-                <Select
-                  label="Can Making Process"
-                  value={canProcess}
-                  options={canMakingProcessOptions}
-                  onChange={(value) =>
-                    dispatch({ type: "SET_CAN_PROCESS", payload: value })
-                  }
-                />
+
+                {canMaterial && (
+                  <Select
+                    label="Can Making Process"
+                    value={canProcess}
+                    options={canMakingProcessOptions}
+                    onChange={(value) =>
+                      dispatch({
+                        type: "UPDATE_CAN",
+                        field: "canProcess",
+                        value,
+                      })
+                    }
+                  />
+                )}
+
                 {canMaterial === "Others" && (
                   <Input
                     label="Custom Can Material"
                     value={customCanMaterial || ""}
                     onChange={(val) =>
                       dispatch({
-                        type: "SET_CUSTOM_CAN_MATERIAL",
-                        payload: val,
+                        type: "UPDATE_CAN",
+                        field: "customCanMaterial",
+                        value: val,
                       })
                     }
                     placeholder="Enter custom material"
@@ -140,19 +270,22 @@ const ComponentsDetails = () => {
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">PCB Details</h3>
         <Tooltip
-          title={pcbList.length >= MAX_PCBS ? "Maximum of 5 PCBs allowed" : ""}
-          disableHoverListener={pcbList.length < MAX_PCBS}
+          title={
+            pcbList.length >= MAX_PCBS
+              ? "Maximum of 5 PCBs allowed"
+              : technology === "thin_film"
+              ? "Not applicable for thin film technology"
+              : ""
+          }
         >
           <button
             className={`bg-blue-600 text-white font-medium px-4 py-2 rounded flex items-center gap-2 ${
-              pcbList.length >= MAX_PCBS
+              pcbList.length >= MAX_PCBS || technology === "thin_film"
                 ? "bg-gray-500 cursor-not-allowed"
                 : "hover:bg-blue-700"
             }`}
             onClick={addPCB}
-            disabled={
-              pcbList.length >= MAX_PCBS || state?.technology === "thin_film"
-            }
+            disabled={pcbList.length >= MAX_PCBS || technology === "thin_film"}
           >
             <span className="text-lg font-bold">+</span> Add PCB
           </button>
@@ -168,7 +301,9 @@ const ComponentsDetails = () => {
             className="border rounded-md p-4 mb-4 bg-white shadow"
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-md">PCB {index + 1}</h3>
+              <h3 className="font-semibold text-md">
+                {isBase ? "Base PCB" : `PCB ${index}`}
+              </h3>
               {!isBase && (
                 <button
                   onClick={() => deletePCB(index)}
@@ -189,37 +324,31 @@ const ComponentsDetails = () => {
                     options={[{ label: "Base PCB", value: "Base PCB" }]}
                     disabled
                   />
-
                   <Select
                     label="Is Existing PCB Available"
-                    value={pcb.isExistingCanAvailable}
+                    value={pcb.isExistingPCBAvailable}
                     options={yesNoOptions}
                     onChange={(val) =>
-                      handlePcbChange(index, "isExistingCanAvailable", val)
+                      handlePcbChange(index, "isExistingPCBAvailable", val)
                     }
                   />
-
-                  {pcb.isExistingCanAvailable === "Yes" && (
+                  {pcb.isExistingPCBAvailable === "Yes" && (
                     <Input
-                      label="BP Number"
+                      label="B-P/N"
                       value={pcb.bpNumber || ""}
                       onChange={(val) =>
                         handlePcbChange(index, "bpNumber", val)
                       }
                       placeholder="Enter BP Number"
+                      required
                     />
-                  )}
-
-                  {pcb.isExistingCanAvailable === "No" && (
+                  )}{" "}
+                  {pcb.isExistingPCBAvailable === "No" && (
                     <>
                       <Select
                         label="Material"
                         value={pcb.material}
-                        options={[
-                          { label: "Material 1", value: "Material 1" },
-                          { label: "Material 2", value: "Material 2" },
-                          { label: "Other", value: "Other" },
-                        ]}
+                        options={pcbMaterialOptions}
                         onChange={(val) =>
                           handlePcbChange(index, "material", val)
                         }
@@ -250,48 +379,55 @@ const ComponentsDetails = () => {
 
                       {pcb.layers === "Single" && (
                         <Input
-                          label="Substrate Thickness"
+                          label="Substrate Thickness (mm)"
                           value={pcb.substrateThickness}
                           onChange={(val) =>
                             handlePcbChange(index, "substrateThickness", val)
                           }
-                          placeholder="Enter Substrate Thickness"
+                          placeholder="Enter thickness in mm"
+                          type="number"
                         />
                       )}
 
                       {pcb.layers === "Multi" && (
                         <>
                           <Input
-                            label="RF Layer Thickness"
+                            label="RF Layer Thickness (mm)"
                             value={pcb.rfLayerThickness}
                             onChange={(val) =>
                               handlePcbChange(index, "rfLayerThickness", val)
                             }
-                            placeholder="Enter RF Layer Thickness"
+                            placeholder="Enter thickness in mm"
+                            type="number"
                           />
                           <Input
-                            label="Overall Thickness"
+                            label="Overall Thickness (mm)"
                             value={pcb.overallThickness}
                             onChange={(val) =>
                               handlePcbChange(index, "overallThickness", val)
                             }
-                            placeholder="Enter Overall Thickness"
+                            placeholder="Enter thickness in mm"
+                            type="number"
                           />
                         </>
                       )}
                       <Input
-                        label="Copper Thickness"
+                        label="Copper Thickness (μm)"
                         value={pcb.copperThickness}
                         onChange={(val) =>
                           handlePcbChange(index, "copperThickness", val)
                         }
+                        placeholder="Enter thickness in μm"
+                        type="number"
                       />
 
                       <Select
                         label="Mounting Orientation"
-                        value="Horizontal"
-                        options={[{ label: "Horizontal", value: "Horizontal" }]}
-                        disabled
+                        value={pcb.mountingOrientation}
+                        options={mountingOrientationOptions}
+                        onChange={(val) =>
+                          handlePcbChange(index, "mountingOrientation", val)
+                        }
                       />
 
                       <div className="md:col-span-3">
@@ -302,7 +438,7 @@ const ComponentsDetails = () => {
                             handlePcbChange(index, "comments", val)
                           }
                           placeholder="Add any additional comments"
-                          multiline
+                          rows={3}
                         />
                       </div>
                     </>
@@ -313,45 +449,42 @@ const ComponentsDetails = () => {
                   <Select
                     label="PCB Name"
                     value={pcb.name}
-                    options={[
-                      { label: "Coupling PCB", value: "Coupling PCB" },
-                      { label: "Other PCB", value: "Other PCB" },
-                    ]}
+                    options={pcbNameOptions}
                     onChange={(val) => handlePcbChange(index, "name", val)}
                   />
 
                   <Select
                     label="Layers"
-                    value="Single"
+                    value={pcb.layers}
                     options={[{ label: "Single Layer", value: "Single" }]}
                     disabled
                   />
 
                   <Input
-                    label="Substrate Thickness"
+                    label="Substrate Thickness (mm)"
                     value={pcb.substrateThickness}
                     onChange={(val) =>
                       handlePcbChange(index, "substrateThickness", val)
                     }
-                    placeholder="Enter Substrate Thickness"
+                    placeholder="Enter thickness in mm"
+                    type="number"
                   />
+
                   <Input
-                    label="Copper Thickness"
+                    label="Copper Thickness (μm)"
                     value={pcb.copperThickness}
                     onChange={(val) =>
                       handlePcbChange(index, "copperThickness", val)
                     }
+                    placeholder="Enter thickness in μm"
+                    type="number"
                   />
+
                   <Select
                     label="Mounting Orientation"
-                    value={pcb.mountingOrientation}
-                    options={[
-                      { label: "Horizontal", value: "Horizontal" },
-                      { label: "Vertical", value: "Vertical" },
-                    ]}
-                    onChange={(val) =>
-                      handlePcbChange(index, "mountingOrientation", val)
-                    }
+                    value="Horizontal"
+                    options={[{ label: "Horizontal", value: "Horizontal" }]}
+                    disabled
                   />
 
                   <div className="md:col-span-2">
@@ -362,7 +495,7 @@ const ComponentsDetails = () => {
                         handlePcbChange(index, "comments", val)
                       }
                       placeholder="Add any additional comments"
-                      multiline
+                      rows={3}
                     />
                   </div>
                 </>

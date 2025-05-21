@@ -84,13 +84,7 @@ const validateAirCoil = (item) => {
 export const isFormValid = (state) => {
   if (!state || typeof state !== "object") return false;
 
-  const partTypes = [
-    "transformer",
-    "inductor",
-    "airCoil",
-    "capacitor",
-    "resistor",
-  ];
+  const partTypes = ["inductor", "airCoil", "capacitor", "resistor"];
 
   return partTypes.every((partType) => {
     const partState = state[partType];
@@ -357,126 +351,195 @@ export const validateGeneralDetails = (formData) => {
  * @param {object} state - The complete form state
  * @returns {object} An object with { isValid: boolean, errors: object }
  */
-export const validatePcbDetails = (state) => {
+export const validatePcbDetails = (formData) => {
   const errors = {};
-  console.log("pcb Step Errors", errors);
   let isValid = true;
 
-  // Validate CAN section when cover is open
-  if (state.coverType === "Open") {
-    if (!state.isExistingCanAvailable) {
-      errors.isExistingCanAvailable = "Existing can availability is required";
+  // CAN validation (only required if coverType is "Open")
+  if (formData.coverType === "Open") {
+    if (!formData.can.isExistingCanAvailable) {
+      errors.isExistingCanAvailable = "Existing Can Available is required";
       isValid = false;
     }
 
-    if (state.isExistingCanAvailable === "Yes") {
-      if (!state.bpNumber?.trim()) {
+    if (formData.can.isExistingCanAvailable === "Yes") {
+      if (!formData.can.bpNumber) {
         errors.bpNumber = "B-P/N is required for existing can";
         isValid = false;
       }
     } else {
-      if (!state.canMaterial) {
-        errors.canMaterial = "Can material is required";
+      if (!formData.can.canMaterial) {
+        errors.canMaterial = "Can Material is required";
         isValid = false;
       }
 
-      if (state.canMaterial === "Others" && !state.customCanMaterial?.trim()) {
-        errors.customCanMaterial = "Custom can material is required";
+      if (
+        formData.can.canMaterial === "Others" &&
+        !formData.can.customCanMaterial
+      ) {
+        errors.customCanMaterial =
+          "Custom Can Material is required when 'Others' is selected";
         isValid = false;
       }
 
-      if (!state.canProcess) {
-        errors.canProcess = "Can making process is required";
+      if (!formData.can.canProcess) {
+        errors.canProcess = "Can Making Process is required";
         isValid = false;
       }
     }
   }
 
-  // Validate PCB list
-  if (!state.pcbList || state.pcbList.length === 0) {
+  // PCB validation
+  if (formData.pcbList.length === 0) {
     errors.pcbList = "At least one PCB is required";
     isValid = false;
   } else {
-    state.pcbList.forEach((pcb, index) => {
-      const pcbErrors = {};
-      let pcbIsValid = true;
+    formData.pcbList.forEach((pcb, index) => {
+      const isBase = index === 0;
+      const pcbPrefix = isBase ? "Base PCB" : `PCB ${index}`;
 
-      // Base PCB validation
-      if (index === 0) {
-        if (!pcb.isExistingCanAvailable) {
-          pcbErrors.isExistingCanAvailable = "This field is required";
-          pcbIsValid = false;
+      if (!pcb.isExistingPCBAvailable) {
+        errors[
+          `pcb${index}_isExistingPCBAvailable`
+        ] = `${pcbPrefix}: Existing PCB Available is required`;
+        isValid = false;
+      }
+
+      if (pcb.isExistingPCBAvailable === "Yes") {
+        if (!pcb.bpNumber) {
+          errors[
+            `pcb${index}_bpNumber`
+          ] = `${pcbPrefix}: B-P/N is required for existing PCB`;
+          isValid = false;
         }
-
-        if (pcb.isExistingCanAvailable === "Yes") {
-          if (!pcb.bpNumber?.trim()) {
-            pcbErrors.bpNumber = "BP Number is required";
-            pcbIsValid = false;
-          }
-        } else {
+      } else {
+        // Validate PCB details only if not existing PCB
+        if (isBase) {
           if (!pcb.material) {
-            pcbErrors.material = "Material is required";
-            pcbIsValid = false;
+            errors[
+              `pcb${index}_material`
+            ] = `${pcbPrefix}: Material is required`;
+            isValid = false;
           }
 
-          if (pcb.material === "Other" && !pcb.customMaterial?.trim()) {
-            pcbErrors.customMaterial = "Custom material is required";
-            pcbIsValid = false;
+          if (pcb.material === "Other" && !pcb.customMaterial) {
+            errors[
+              `pcb${index}_customMaterial`
+            ] = `${pcbPrefix}: Custom Material is required when 'Other' is selected`;
+            isValid = false;
           }
 
           if (!pcb.layers) {
-            pcbErrors.layers = "Layers is required";
-            pcbIsValid = false;
+            errors[`pcb${index}_layers`] = `${pcbPrefix}: Layers is required`;
+            isValid = false;
           }
 
-          // Thickness validation
+          // Thickness validations
           if (pcb.layers === "Single") {
             if (!pcb.substrateThickness) {
-              pcbErrors.substrateThickness = "Substrate thickness is required";
-              pcbIsValid = false;
+              errors[
+                `pcb${index}_substrateThickness`
+              ] = `${pcbPrefix}: Substrate Thickness is required`;
+              isValid = false;
+            } else if (
+              isNaN(pcb.substrateThickness) ||
+              parseFloat(pcb.substrateThickness) <= 0
+            ) {
+              errors[
+                `pcb${index}_substrateThickness`
+              ] = `${pcbPrefix}: Substrate Thickness must be a positive number`;
+              isValid = false;
             }
           } else if (pcb.layers === "Multi") {
             if (!pcb.rfLayerThickness) {
-              pcbErrors.rfLayerThickness = "RF layer thickness is required";
-              pcbIsValid = false;
+              errors[
+                `pcb${index}_rfLayerThickness`
+              ] = `${pcbPrefix}: RF Layer Thickness is required`;
+              isValid = false;
+            } else if (
+              isNaN(pcb.rfLayerThickness) ||
+              parseFloat(pcb.rfLayerThickness) <= 0
+            ) {
+              errors[
+                `pcb${index}_rfLayerThickness`
+              ] = `${pcbPrefix}: RF Layer Thickness must be a positive number`;
+              isValid = false;
             }
+
             if (!pcb.overallThickness) {
-              pcbErrors.overallThickness = "Overall thickness is required";
-              pcbIsValid = false;
+              errors[
+                `pcb${index}_overallThickness`
+              ] = `${pcbPrefix}: Overall Thickness is required`;
+              isValid = false;
+            } else if (
+              isNaN(pcb.overallThickness) ||
+              parseFloat(pcb.overallThickness) <= 0
+            ) {
+              errors[
+                `pcb${index}_overallThickness`
+              ] = `${pcbPrefix}: Overall Thickness must be a positive number`;
+              isValid = false;
             }
           }
 
           if (!pcb.copperThickness) {
-            pcbErrors.copperThickness = "Copper thickness is required";
-            pcbIsValid = false;
+            errors[
+              `pcb${index}_copperThickness`
+            ] = `${pcbPrefix}: Copper Thickness is required`;
+            isValid = false;
+          } else if (
+            isNaN(pcb.copperThickness) ||
+            parseFloat(pcb.copperThickness) <= 0
+          ) {
+            errors[
+              `pcb${index}_copperThickness`
+            ] = `${pcbPrefix}: Copper Thickness must be a positive number`;
+            isValid = false;
+          }
+
+          if (!pcb.mountingOrientation) {
+            errors[
+              `pcb${index}_mountingOrientation`
+            ] = `${pcbPrefix}: Mounting Orientation is required`;
+            isValid = false;
+          }
+        } else {
+          // Additional PCBs validation
+          if (!pcb.name) {
+            errors[`pcb${index}_name`] = `${pcbPrefix}: Name is required`;
+            isValid = false;
+          }
+
+          if (!pcb.substrateThickness) {
+            errors[
+              `pcb${index}_substrateThickness`
+            ] = `${pcbPrefix}: Substrate Thickness is required`;
+            isValid = false;
+          } else if (
+            isNaN(pcb.substrateThickness) ||
+            parseFloat(pcb.substrateThickness) <= 0
+          ) {
+            errors[
+              `pcb${index}_substrateThickness`
+            ] = `${pcbPrefix}: Substrate Thickness must be a positive number`;
+            isValid = false;
+          }
+
+          if (!pcb.copperThickness) {
+            errors[
+              `pcb${index}_copperThickness`
+            ] = `${pcbPrefix}: Copper Thickness is required`;
+            isValid = false;
+          } else if (
+            isNaN(pcb.copperThickness) ||
+            parseFloat(pcb.copperThickness) <= 0
+          ) {
+            errors[
+              `pcb${index}_copperThickness`
+            ] = `${pcbPrefix}: Copper Thickness must be a positive number`;
+            isValid = false;
           }
         }
-      } else {
-        // Additional PCBs validation
-        if (!pcb.name) {
-          pcbErrors.name = "PCB name is required";
-          pcbIsValid = false;
-        }
-
-        if (!pcb.substrateThickness) {
-          pcbErrors.substrateThickness = "Substrate thickness is required";
-          pcbIsValid = false;
-        }
-
-        if (!pcb.copperThickness) {
-          pcbErrors.copperThickness = "Copper thickness is required";
-          pcbIsValid = false;
-        }
-
-        if (!pcb.mountingOrientation) {
-          pcbErrors.mountingOrientation = "Mounting orientation is required";
-          pcbIsValid = false;
-        }
-      }
-
-      if (!pcbIsValid) {
-        errors[`pcb${index}`] = pcbErrors;
-        isValid = false;
       }
     });
   }
@@ -821,6 +884,60 @@ export const validateLtcc = (ltccState = {}) => {
       errors[`ltcc${index}`] = ltccErrors;
     }
   });
+
+  return { isValid, errors };
+};
+
+export const validateBasicDetails = (formData) => {
+  const errors = {};
+  let isValid = true;
+
+  // Required fields validation
+  const requiredFields = [
+    "opNumber",
+    "opuNumber",
+    "eduNumber",
+    "modelFamily",
+    "modelName",
+    "technology",
+  ];
+
+  requiredFields.forEach((field) => {
+    if (!formData[field]) {
+      const fieldName = field
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase());
+      errors[field] = `${fieldName} is required`;
+      isValid = false;
+    }
+  });
+
+  // Alphanumeric validation for number fields
+  const alphanumericFields = ["opNumber", "opuNumber", "eduNumber"];
+  alphanumericFields.forEach((field) => {
+    if (formData[field] && !/^[A-Za-z0-9-]+$/.test(formData[field])) {
+      errors[field] = "Only alphanumeric characters and hyphens allowed";
+      isValid = false;
+    }
+  });
+
+  // Model name length validation
+  if (
+    formData.modelName &&
+    (formData.modelName.length < 2 || formData.modelName.length > 50)
+  ) {
+    errors.modelName = "Must be between 2-50 characters";
+    isValid = false;
+  }
+
+  // Component selection validation
+  if (
+    !formData.selectedComponents ||
+    formData.selectedComponents.length === 0
+  ) {
+    errors.selectedComponents = "At least one component must be selected";
+    isValid = false;
+  }
 
   return { isValid, errors };
 };

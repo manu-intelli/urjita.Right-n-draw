@@ -1,3 +1,17 @@
+import {
+  CircuitBoard,
+  Cpu,
+  Zap,
+  Coins as Coil,
+  AudioWaveform as WaveformSine,
+  Radio,
+  Shield,
+  Fingerprint,
+  Square,
+  Box,
+  Plus,
+} from "lucide-react";
+
 export const BASIC_DETAILS_LENGTH = 7;
 
 export const BASIC_KEY_LABEL = {
@@ -106,3 +120,85 @@ export const COMPONENT_STEP_MAP = Object.freeze({
   [COMPONENT_TYPES.LTCC]: [STEPS.LTCC],
   [COMPONENT_TYPES.OTHER]: [STEPS.OTHER], // Explicitly handle "other" components
 });
+
+
+ export  const COMPONENTS = [
+    {
+      id: COMPONENT_TYPES.PCB,
+      name: "PCB",
+      icon: CircuitBoard,
+      description: "Printed Circuit Board",
+    },
+    {
+      id: COMPONENT_TYPES.CAN,
+      name: "CAN",
+      icon: Box,
+      description: "Controller Area Network",
+    },
+    {
+      id: COMPONENT_TYPES.CHIP_CAPACITOR,
+      name: "Chip Capacitor",
+      icon: Zap,
+      description: "Surface Mount Capacitor",
+    },
+    {
+      id: COMPONENT_TYPES.CHIP_INDUCTOR,
+      name: "Chip Inductor",
+      icon: Coil,
+      description: "Surface Mount Inductor",
+    },
+    {
+      id: COMPONENT_TYPES.CHIP_RESISTOR,
+      name: "Chip Resistor",
+      icon: WaveformSine,
+      description: "Surface Mount Resistor",
+    },
+    {
+      id: COMPONENT_TYPES.TRANSFORMER,
+      name: "Transformer",
+      icon: Radio,
+      description: "Power Transformer",
+    },
+    {
+      id: COMPONENT_TYPES.CHIP_RESONATOR,
+      name: "Chip Resonator",
+      icon: Cpu,
+      description: "Crystal Resonator",
+    },
+    {
+      id: COMPONENT_TYPES.AIR_COIL,
+      name: "Aircoil",
+      icon: Coil,
+      description: "Air-core Inductor",
+    },
+    {
+      id: COMPONENT_TYPES.SHIELD,
+      name: "Shield",
+      icon: Shield,
+      description: "EMI Shield",
+    },
+    {
+      id: COMPONENT_TYPES.FINGER,
+      name: "Finger",
+      icon: Fingerprint,
+      description: "Contact Finger",
+    },
+    {
+      id: COMPONENT_TYPES.COPPER_FLAP,
+      name: "Copper Flap",
+      icon: Square,
+      description: "Copper Connection",
+    },
+    {
+      id: COMPONENT_TYPES.LTCC,
+      name: "LTCC",
+      icon: CircuitBoard,
+      description: "Low Temperature Co-fired Ceramic",
+    },
+    {
+      id: COMPONENT_TYPES.OTHER,
+      name: "Others",
+      icon: Plus,
+      description: "Other Components",
+    },
+  ];

@@ -16,10 +16,11 @@ import GeneralDetails from "./GeneralDetails";
 import TransformersPage from "./Transformer";
 import "./page21.css";
 import BasicDetails from "./BasicDetails";
-import Page21PDFDocument from "../../pdf-creators/Page21/PDFDocumentCreationInterface";
+import { generatePDF } from "../../pdf-creators/Page21/PDFDocumentCreationInterface";
 import { COMPONENT_STEP_MAP, STEPS } from "../../../constants";
 import OtherSpecialComponents from "./OtherComponent";
 import {
+  validateBasicDetails,
   validateCooperFlaps,
   validateFingers,
   validateGeneralDetails,
@@ -112,6 +113,354 @@ const CreationInterface = () => {
 
   const handleSubmit = () => {
     console.log("Form submitted", state);
+
+    const formData = {
+      currentStep: 13,
+      submitted: false,
+      selectedComponents: [
+        "chip-resonator",
+        "pcb",
+        "can",
+        "chip-capacitor",
+        "chip-inductor",
+        "chip-resistor",
+        "transformer",
+        "air-coil",
+        "shield",
+        "finger",
+        "copper-flap",
+        "ltcc",
+        "other",
+      ],
+      opNumber: "testPIBase1",
+      opuNumber: "testPIBase1",
+      eduNumber: "testPIBase1",
+      modelFamily: "FamilyA",
+      modelName: "testPIBase1",
+      technology: "ceramic_resonators",
+      revisionNumber: "",
+      impedance: "50 ohms",
+      customImpedance: "",
+      interfaces: "Connectorized",
+      ports: {
+        numberOfPorts: 3,
+        portDetails: [
+          {
+            connectorType: "conn1",
+            connectorGender: "Male",
+          },
+          {
+            connectorType: "conn2",
+            connectorGender: "Male",
+          },
+          {
+            connectorType: "conn3",
+            connectorGender: "Female",
+          },
+        ],
+      },
+      enclosureDetails: {
+        partType: "Existing",
+        partNumber: "test1part",
+      },
+      topcoverDetails: {
+        partType: "New",
+        partNumber: "",
+      },
+      caseStyle: "ModifyExisting",
+      selectedCaseStyle: "Case A",
+      caseDimensions: {
+        length: "",
+        width: "",
+        height: "",
+        pinOuts: "gjyghjhjhkjjjjjjjjjjjjjjjjjjjjjj",
+      },
+      bottomSolderMask: "Full solder mask",
+      halfMoonRequirement: "Yes",
+      viaHolesRequirement: "Yes",
+      signalLaunchType: "Lead",
+      coverType: "Open",
+      designRuleViolation: "Yes",
+      schematicFile: {},
+      similarModel: "trsr",
+
+      capacitor: {
+        numWithBpn: 2,
+        numWithoutBpn: 1,
+        withBpn: [
+          {
+            name: "testcap",
+            bpn: "testcap",
+          },
+          {
+            name: "testcap",
+            bpn: "testcap",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "testcap",
+            supplierName: "testcap",
+            supplierNumber: "testcap",
+            qualificationStaus: "Qualification",
+          },
+        ],
+      },
+      inductor: {
+        numWithBpn: 3,
+        numWithoutBpn: 2,
+        withBpn: [
+          {
+            name: "inctest",
+            bpn: "inctest",
+          },
+          {
+            name: "inctest",
+            bpn: "inctest",
+          },
+          {
+            name: "inctest",
+            bpn: "inctest",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "inctest",
+            supplierName: "inctest",
+            supplierNumber: "inctest",
+            qualificationStaus: "Qualification",
+          },
+          {
+            name: "inctest",
+            supplierName: "inctest",
+            supplierNumber: "inctest",
+            qualificationStaus: "Approval",
+          },
+        ],
+      },
+      airCoil: {
+        numWithBpn: 2,
+        numWithoutBpn: 2,
+        withBpn: [
+          {
+            name: "arctest",
+            bpn: "arctest",
+          },
+          {
+            name: "arctest",
+            bpn: "arctest",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "arctest",
+            supplierName: "",
+            supplierNumber: "",
+            qualificationStaus: "",
+            wiregauge: "arctest",
+            innnerDiameter: "3",
+            numberOfTurns: "2",
+            lengthOfAircoil: "3",
+            widthOfAircoil: "3",
+            lBendAircoil: "Yes",
+            shorterLegAircoil: "Yes",
+          },
+          {
+            name: "arctest",
+            supplierName: "",
+            supplierNumber: "",
+            qualificationStaus: "",
+            wiregauge: "5",
+            innnerDiameter: "6",
+            numberOfTurns: "7",
+            lengthOfAircoil: "5",
+            widthOfAircoil: "4",
+            lBendAircoil: "Yes",
+            shorterLegAircoil: "Yes",
+          },
+        ],
+      },
+      resistor: {
+        numWithBpn: 1,
+        numWithoutBpn: 2,
+        withBpn: [
+          {
+            name: "restest",
+            bpn: "restest",
+          },
+        ],
+        withoutBpn: [
+          {
+            name: "restest",
+            supplierName: "restest",
+            supplierNumber: "restest",
+            qualificationStaus: "Qualification",
+          },
+          {
+            name: "restest",
+            supplierName: "restest",
+            supplierNumber: "restest",
+            qualificationStaus: "Approval",
+          },
+        ],
+      },
+      transformers: {
+        transformersList: [
+          {
+            name: "test1",
+            coreType: "double",
+            wireType: "single",
+            coreBPN: ["test1", "test1"],
+            wireGauge: ["test1"],
+            numberOfTurns: "2",
+            orientation: "test1",
+          },
+          {
+            name: "test1",
+            coreType: "double",
+            wireType: "double",
+            coreBPN: ["test1", "test1"],
+            wireGauge: ["test1", "test1"],
+            numberOfTurns: "2",
+            orientation: "test1",
+          },
+        ],
+        numberOfTransformers: 2,
+      },
+      can: {
+        isExistingCanAvailable: "No",
+        canMaterial: "Metal",
+        canProcess: "Etched",
+        customCanMaterial: "",
+        bpNumber: "",
+      },
+      pcbList: [
+        {
+          name: "Base PCB",
+          material: "Material 1",
+          thickness: "",
+          layers: "Single",
+          mountingOrientation: "Horizontal",
+          comments: "commenttest23",
+          isExistingCanAvailable: "",
+          bpNumber: "",
+          customMaterial: "",
+          substrateThickness: "5",
+          rfLayerThickness: "",
+          overallThickness: "",
+          copperThickness: "4",
+          isExistingPCBAvailable: "No",
+        },
+        {
+          name: "Coupling PCB",
+          material: "",
+          thickness: "",
+          layers: "Single",
+          mountingOrientation: "Horizontal",
+          comments: "comment2",
+          isExistingPCBAvailable: "No",
+          bpNumber: "",
+          customMaterial: "",
+          substrateThickness: "5",
+          rfLayerThickness: "",
+          overallThickness: "",
+          copperThickness: "4",
+        },
+      ],
+      shieldsList: {
+        shieldRequired: "Yes",
+        numberOfShields: "2",
+        shields: [
+          {
+            partType: "Existing",
+            partNumber: "TestShield",
+          },
+          {
+            partType: "New",
+            partNumber: "TBD",
+          },
+        ],
+      },
+      fingersList: {
+        fingerRequired: "Yes",
+        numberOfFingers: "03",
+        fingers: [
+          {
+            partType: "Existing",
+            partNumber: "445Tesr",
+          },
+          {
+            partType: "New",
+            partNumber: "TBD",
+          },
+          {
+            partType: "Existing",
+            partNumber: "test3466",
+          },
+        ],
+      },
+      cooperFlapDetails: {
+        numberOfFlaps: "2",
+        flaps: [
+          {
+            bpType: "Existing",
+            bpNumber: "4556Test",
+            length: "",
+            width: "",
+            thickness: "",
+          },
+          {
+            bpType: "New",
+            bpNumber: "TBD",
+            length: "3",
+            width: "5",
+            thickness: "5",
+          },
+        ],
+      },
+      resonatorList: {
+        numberOfResonators: 2,
+        resonators: [
+          {
+            bpType: "New",
+            bpNumber: "TBD",
+            resonatorSize: "5",
+            dielectricConstant: "6",
+            resonatorLength: "7",
+            resonatorFrequency: "7",
+            assemblyType: "TAB",
+            comments: "fghhjhjjh",
+          },
+          {
+            bpType: "Existing",
+            bpNumber: "test1",
+            resonatorSize: "778",
+            dielectricConstant: "8",
+            resonatorLength: "7",
+            resonatorFrequency: "7",
+            assemblyType: "TAB",
+            comments: "tyuyuui",
+          },
+        ],
+      },
+      ltcc: {
+        numberOfLtcc: 3,
+        ltccItems: [
+          {
+            modelName: "LtccTest1",
+          },
+          {
+            modelName: "LtccTest1",
+          },
+          {
+            modelName: "LtccTest1",
+          },
+        ],
+      },
+      specialRequirements:
+        "testiing special requirement ttestiing special requirement testiing special requirement testiing special requirement testiing special requirement testiing special requirement estiing special requirement testiing special requirement testiing special requirement testiing special requirement ",
+    };
+    generatePDF(formData);
     dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
     dispatch({ type: "SET_SUBMITTED", payload: false });
     alert("Form submitted successfully! The form has been reset.");
@@ -325,13 +674,13 @@ const CreationInterface = () => {
 
   const handleNext = () => {
     // Validate current step before proceeding
-    const isValid = validateCurrentStep();
+    // const isValid = validateCurrentStep();
 
-    console.log("isValid", isValid);
+    // console.log("isValid", isValid);
 
-    if (!isValid) {
-      return; // Don't proceed if validation fails
-    }
+    // if (!isValid) {
+    //   return; // Don't proceed if validation fails
+    // }
 
     if (currentStep < stepsForSelectedComponents.length - 1) {
       setCurrentStep(currentStep + 1);
@@ -378,6 +727,17 @@ const CreationInterface = () => {
         const isValid = validatePartDetails(type, partState);
         console.log(`${type} validation result:`, isValid);
         return isValid;
+      } else if (stepKey === STEPS.BASIC_DETAILS) {
+        console.log("STEPS.GENERAL_DETAILS", STEPS.BASIC_DETAILS);
+
+        // General details validation
+        const validationResult = validateBasicDetails(state);
+        console.log("Basic details validation:", validationResult);
+
+        // Optional: Store errors in state for display
+        // dispatch({ type: 'SET_VALIDATION_ERRORS', payload: validationResult.errors });
+
+        return validationResult.isValid;
       } else if (stepKey === STEPS.GENERAL_DETAILS) {
         console.log("STEPS.GENERAL_DETAILS", STEPS.GENERAL_DETAILS);
 

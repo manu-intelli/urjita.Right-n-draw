@@ -4,6 +4,13 @@ export const YES_OR_NO_OPTIONS = [
   { label: "Yes", value: "Yes" },
   { label: "No", value: "No" },
 ];
+
+export const TECHNOLOGY_OPTIONS = [
+  { label: "Lumped Technology", value: "lumped" },
+  { label: "Ceramic Resonator Technology", value: "ceramic_resonators" },
+  { label: "Thin Film", value: "thin_film" },
+  { label: "DOCSIS Diplexer", value: "docs_diplexer" },
+];
 export const IMPEDANCE_OPTIONS = [
   { label: "50 ohms", value: "50 ohms" },
   { label: "75 ohms", value: "75 ohms" },

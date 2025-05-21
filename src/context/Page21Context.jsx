@@ -2,12 +2,6 @@ import React, { createContext, useReducer, useContext } from "react";
 
 const Page21Context = createContext();
 
-const initialPartState = {
-  numWithBpn: "",
-  numWithoutBp: "",
-  withBpn: [],
-  withoutBpn: [],
-};
 const initialState = {
   currentStep: 0,
   submitted: false,
@@ -78,12 +72,15 @@ const initialState = {
   },
   transformers: {
     transformersList: [],
-    numberOfTransformers: 0,
+    numberOfTransformers: "",
   },
-  isExistingCanAvailable: "No",
-  canMaterial: "",
-  canProcess: "",
-  customCanMaterial: "",
+  can: {
+    isExistingCanAvailable: "No",
+    canMaterial: "",
+    canProcess: "",
+    customCanMaterial: "",
+    bpNumber: "",
+  },
   pcbList: [
     {
       name: "Base PCB",
@@ -150,11 +147,22 @@ const reducer = (state, action) => {
           : [...state.selectedComponents, componentId],
       };
     case "SET_CASE_DIMENSIONS":
+      // If payload has 'field' property, it's a single field update
+      if (action.payload.field) {
+        return {
+          ...state,
+          caseDimensions: {
+            ...state.caseDimensions,
+            [action.payload.field]: action.payload.value,
+          },
+        };
+      }
+      // Otherwise it's a bulk update of multiple fields
       return {
         ...state,
         caseDimensions: {
           ...state.caseDimensions,
-          [action.payload.field]: action.payload.value,
+          ...action.payload,
         },
       };
     case "SET_FILE":
@@ -316,6 +324,15 @@ const reducer = (state, action) => {
         },
       };
 
+    case "RESET_PORTS":
+      return {
+        ...state,
+        ports: {
+          numberOfPorts: "",
+          portDetails: [],
+        },
+      };
+
     case "UPDATE_ENCLOSURE_DETAILS":
       return {
         ...state,
@@ -386,6 +403,15 @@ const reducer = (state, action) => {
       };
     }
 
+    case "transformer_update_number":
+      return {
+        ...state,
+        transformers: {
+          ...state.transformers,
+          numberOfTransformers: action.number,
+        },
+      };
+
     case "transformer_transformer_add_multiple":
       return {
         ...state,
@@ -445,13 +471,45 @@ const reducer = (state, action) => {
         },
       };
 
+    // case "UPDATE_CAN":
+    //   return {
+    //     ...state,
+    //     can: {
+    //       ...state.can,
+    //       [action.field]: action.value,
+    //     },
+    //   };
+
     case "UPDATE_CAN":
+      const newCanState = {
+        ...state.can,
+        [action.field]: action.value,
+      };
+
+      // Clear dependent fields when isExistingCanAvailable changes
+      if (action.field === "isExistingCanAvailable") {
+        if (action.value === "Yes") {
+          newCanState.canMaterial = "";
+          newCanState.canProcess = "";
+          newCanState.customCanMaterial = "";
+        } else {
+          newCanState.bpNumber = "";
+        }
+      }
+
+      // Clear custom material when canMaterial changes away from "Others"
+      if (action.field === "canMaterial" && action.value !== "Others") {
+        newCanState.customCanMaterial = "";
+      }
+
+      // Clear process when material is cleared
+      if (action.field === "canMaterial" && action.value === "") {
+        newCanState.canProcess = "";
+      }
+
       return {
         ...state,
-        can: {
-          ...state.can,
-          [action.field]: action.value,
-        },
+        can: newCanState,
       };
     case "ADD_PCB":
       return {

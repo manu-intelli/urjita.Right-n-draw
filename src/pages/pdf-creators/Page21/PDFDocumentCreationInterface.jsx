@@ -1,486 +1,1244 @@
-import React from "react";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  pdf,
-  Image,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
 
-// Create styles
+// Styles
 const styles = StyleSheet.create({
   page: {
     padding: 40,
-    fontSize: 10,
-    lineHeight: 1.4,
     fontFamily: "Helvetica",
-    color: "#333",
+    fontSize: 10,
+    backgroundColor: "#FFFFFF",
+    lineHeight: 1.5,
+    color: "#1a202c",
   },
   header: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottom: "2px solid #2b6cb0",
+    paddingBottom: 12,
+    marginBottom: 24,
+    paddingTop: 8,
+  },
+  headerTitle: {
+    fontSize: 14,
     fontWeight: "bold",
-    color: "#2c3e50",
-    borderBottom: "1px solid #e0e0e0",
-    paddingBottom: 10,
+    color: "#2d3748",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  headerSubtitle: {
+    fontSize: 10,
+    color: "#4a5568",
+    marginTop: 4,
+  },
+  headerRight: {
+    textAlign: "right",
+  },
+  revisionBadge: {
+    backgroundColor: "#2b6cb0",
+    color: "white",
+    padding: "4px 8px",
+    borderRadius: 4,
+    fontSize: 10,
+    fontWeight: "bold",
   },
   section: {
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
-    borderRadius: 5,
-    padding: 15,
-    border: "1px solid #e0e0e0",
+    marginBottom: 28,
+    breakInside: "avoid",
   },
-  sectionTitle: {
-    fontSize: 14,
-    marginBottom: 10,
+  heading: {
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#2c3e50",
-    borderBottom: "1px solid #e0e0e0",
-    paddingBottom: 5,
+    color: "#2d3748",
+    borderBottom: "1px solid #e2e8f0",
+    paddingBottom: 8,
+    marginBottom: 12,
+    letterSpacing: 0.5,
   },
-  subHeader: {
-    fontSize: 12,
-    marginBottom: 8,
-    fontWeight: "bold",
-    color: "#3498db",
-    marginTop: 10,
+  subHeading: {
+    fontSize: 13,
+    fontWeight: "semibold",
+    marginBottom: 12,
+    color: "#2b6cb0",
+    paddingLeft: 4,
+    borderLeft: "3px solid #2b6cb0",
   },
   row: {
     flexDirection: "row",
-    marginBottom: 5,
+    marginBottom: 8,
     alignItems: "flex-start",
+    minHeight: 20,
   },
   label: {
-    width: 160,
-    fontWeight: "bold",
-    color: "#7f8c8d",
+    width: 140,
+    fontWeight: "semibold",
+    color: "#4a5568",
+    paddingRight: 8,
   },
   value: {
     flex: 1,
-    color: "#2c3e50",
+    color: "#1a202c",
   },
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: "#3498db",
-    color: "white",
-    padding: 5,
-    marginBottom: 5,
-    borderRadius: 3,
-    fontWeight: "bold",
+  table: {
+    width: "100%",
+    border: "1px solid #e2e8f0",
+    marginTop: 8,
+    marginBottom: 16,
+    borderRadius: 4,
+    overflow: "hidden",
   },
   tableRow: {
     flexDirection: "row",
-    marginBottom: 3,
-    padding: 5,
-    backgroundColor: "#f8f9fa",
-    borderRadius: 3,
-    borderBottom: "1px solid #e0e0e0",
+    borderBottom: "1px solid #e2e8f0",
   },
-  col: {
-    flex: 1,
-    padding: 3,
+  tableRowAlternate: {
+    backgroundColor: "#edf2f7",
   },
-  pageNumber: {
-    position: "absolute",
-    bottom: 20,
-    left: 0,
-    right: 0,
+  tableColHeader: {
+    padding: 10,
+    backgroundColor: "#2b6cb0",
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 9,
     textAlign: "center",
-    fontSize: 10,
-    color: "#95a5a6",
   },
-  logo: {
-    width: 120,
-    marginBottom: 20,
-    alignSelf: "center",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#e0e0e0",
-    marginVertical: 10,
+  tableCol: {
+    padding: 8,
+    fontSize: 9,
+    color: "#1a202c",
+    textAlign: "left",
   },
   emptyText: {
-    color: "#95a5a6",
     fontStyle: "italic",
+    color: "#718096",
+    fontSize: 10,
+    padding: 8,
+    textAlign: "center",
+  },
+  commentBox: {
+    padding: 12,
+    backgroundColor: "#e6f0ff",
+    border: "1px solid #2b6cb0",
+    borderRadius: 6,
+    marginTop: 8,
+  },
+  commentText: {
+    fontSize: 10,
+    color: "#2b6cb0",
+    lineHeight: 1.4,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 30,
+    left: 40,
+    right: 40,
+    textAlign: "center",
+    fontSize: 8,
+    color: "#718096",
+    borderTop: "1px solid #e2e8f0",
+    paddingTop: 8,
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: "#e2e8f0",
+    marginVertical: 16,
+  },
+  badge: {
+    backgroundColor: "#e6f0ff",
+    color: "#2b6cb0",
+    padding: "2px 6px",
+    borderRadius: 4,
+    fontSize: 8,
+    fontWeight: "bold",
+    marginLeft: 4,
   },
 });
 
-const ConditionalField = ({ condition, children }) => {
-  if (!condition) return null;
-  return children;
+// Utility Functions
+const ConditionalField = ({ condition, children }) =>
+  condition ? <>{children}</> : null;
+
+const getSafe = (fn, defaultVal = "N/A") => {
+  try {
+    const result = fn();
+    return result !== undefined && result !== null && result !== ""
+      ? result
+      : defaultVal;
+  } catch (e) {
+    return defaultVal;
+  }
 };
 
-const Page21PDFDocument = ({ formData }) => {
-  // Helper function to render component tables
-  const renderComponentTable = (components, withBpn, withoutBpn) => {
-    if (
-      (!withBpn || withBpn.length === 0) &&
-      (!withoutBpn || withoutBpn.length === 0)
-    ) {
-      return <Text style={styles.emptyText}>No components specified</Text>;
-    }
+const hasValue = (value) => {
+  if (value === null || value === undefined) return false;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed !== "" && trimmed !== "N/A";
+  }
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === "number") return true;
+  return !!value;
+};
 
-    return (
-      <>
-        <View style={styles.tableHeader}>
-          <Text style={styles.col}>Name</Text>
-          <Text style={styles.col}>BPN/Supplier</Text>
-          <Text style={styles.col}>Status</Text>
+const truncateText = (text, maxLength = 50) => {
+  if (typeof text !== "string") return "N/A";
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+};
+
+const renderTable = (data, columns, keyPrefix, width = "auto") => {
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    return <Text style={styles.emptyText}>No data available</Text>;
+  }
+
+  return (
+    <View style={styles.table}>
+      <View style={styles.tableRow}>
+        {columns.map((col, idx) => (
+          <View
+            key={idx}
+            style={[
+              styles.tableColHeader,
+              {
+                width: col.width || width,
+                backgroundColor: col.headerBg || "#2b6cb0",
+              },
+            ]}
+          >
+            <Text>{col.label}</Text>
+          </View>
+        ))}
+      </View>
+      {data.map((item, idx) => (
+        <View
+          style={[styles.tableRow, idx % 2 ? styles.tableRowAlternate : {}]}
+          key={`${keyPrefix}-${idx}`}
+        >
+          {columns.map((col, colIdx) => (
+            <View
+              key={colIdx}
+              style={[
+                styles.tableCol,
+                {
+                  width: col.width || width,
+                  textAlign: col.align || "left",
+                },
+              ]}
+            >
+              <Text wrap>
+                {truncateText(getSafe(() => item[col.key], "N/A"))}
+              </Text>
+            </View>
+          ))}
         </View>
+      ))}
+    </View>
+  );
+};
 
-        {withBpn?.map((comp, index) => (
-          <View key={`with-bpn-${index}`} style={styles.tableRow}>
-            <Text style={styles.col}>{comp.name || "N/A"}</Text>
-            <Text style={styles.col}>{comp.bpn || "N/A"}</Text>
-            <Text style={styles.col}>BPN Available</Text>
-          </View>
-        ))}
+// PDF Component
+export const Page21PDFDocument = ({ formData = {} }) => {
+  // Extract data with safe defaults
+  const basicInfo = {
+    opNumber: getSafe(() => formData.opNumber),
+    opuNumber: getSafe(() => formData.opuNumber),
+    eduNumber: getSafe(() => formData.eduNumber),
+    modelFamily: getSafe(() => formData.modelFamily),
+    modelName: getSafe(() => formData.modelName),
+    technology: getSafe(() => formData.technology),
+    revisionNumber: getSafe(() => formData.revisionNumber),
+  };
 
-        {withoutBpn?.map((comp, index) => (
-          <View key={`without-bpn-${index}`} style={styles.tableRow}>
-            <Text style={styles.col}>{comp.name || "N/A"}</Text>
-            <Text style={styles.col}>
-              {comp.supplierName
-                ? `${comp.supplierName} (${comp.supplierNumber})`
-                : "N/A"}
-            </Text>
-            <Text style={styles.col}>
-              {comp.qualificationStaus || "Not Qualified"}
-            </Text>
-          </View>
-        ))}
-      </>
-    );
+  const generalInfo = {
+    impedance: getSafe(() => formData.impedance),
+    interfaces: getSafe(() => formData.interfaces),
+    caseStyle: getSafe(() => formData.caseStyle),
+    selectedCaseStyle: getSafe(() => formData.selectedCaseStyle),
+    bottomSolderMask: getSafe(() => formData.bottomSolderMask),
+    halfMoonRequirement: getSafe(() => formData.halfMoonRequirement),
+    viaHolesRequirement: getSafe(() => formData.viaHolesRequirement),
+    signalLaunchType: getSafe(() => formData.signalLaunchType),
+    coverType: getSafe(() => formData.coverType),
+    designRuleViolation: getSafe(() => formData.designRuleViolation),
+    similarModel: getSafe(() => formData.similarModel),
+  };
+
+  const ports = {
+    numberOfPorts: getSafe(() => formData.ports?.numberOfPorts, 0),
+    portDetails: getSafe(() => formData.ports?.portDetails || [], []),
+  };
+
+  const enclosureDetails = {
+    partType: getSafe(() => formData.enclosureDetails?.partType),
+    partNumber: getSafe(() => formData.enclosureDetails?.partNumber),
+  };
+
+  const topcoverDetails = {
+    partType: getSafe(() => formData.topcoverDetails?.partType),
+    partNumber: getSafe(() => formData.topcoverDetails?.partNumber),
+  };
+
+  const caseDimensions = {
+    length: getSafe(() => formData.caseDimensions?.length),
+    width: getSafe(() => formData.caseDimensions?.width),
+    height: getSafe(() => formData.caseDimensions?.height),
+    pinOuts: getSafe(() => formData.caseDimensions?.pinOuts),
+  };
+
+  const capacitor = {
+    numWithBpn: getSafe(() => formData.capacitor?.numWithBpn, 0),
+    numWithoutBpn: getSafe(() => formData.capacitor?.numWithoutBpn, 0),
+    withBpn: getSafe(() => formData.capacitor?.withBpn || [], []),
+    withoutBpn: getSafe(() => formData.capacitor?.withoutBpn || [], []),
+  };
+
+  const inductor = {
+    numWithBpn: getSafe(() => formData.inductor?.numWithBpn, 0),
+    numWithoutBpn: getSafe(() => formData.inductor?.numWithoutBpn, 0),
+    withBpn: getSafe(() => formData.inductor?.withBpn || [], []),
+    withoutBpn: getSafe(() => formData.inductor?.withoutBpn || [], []),
+  };
+
+  const resistor = {
+    numWithBpn: getSafe(() => formData.resistor?.numWithBpn, 0),
+    numWithoutBpn: getSafe(() => formData.resistor?.numWithoutBpn, 0),
+    withBpn: getSafe(() => formData.resistor?.withBpn || [], []),
+    withoutBpn: getSafe(() => formData.resistor?.withoutBpn || [], []),
+  };
+
+  const airCoil = {
+    numWithBpn: getSafe(() => formData.airCoil?.numWithBpn, 0),
+    numWithoutBpn: getSafe(() => formData.airCoil?.numWithoutBpn, 0),
+    withBpn: getSafe(() => formData.airCoil?.withBpn || [], []),
+    withoutBpn: getSafe(() => formData.airCoil?.withoutBpn || [], []),
+  };
+
+  const transformers = {
+    numberOfTransformers: getSafe(
+      () => formData.transformers?.numberOfTransformers,
+      0
+    ),
+    transformersList: getSafe(
+      () => formData.transformers?.transformersList || [],
+      []
+    ),
+  };
+
+  const can = {
+    isExistingCanAvailable: getSafe(() => formData.can?.isExistingCanAvailable),
+    canMaterial: getSafe(() => formData.can?.canMaterial),
+    canProcess: getSafe(() => formData.can?.canProcess),
+    bpNumber: getSafe(() => formData.can?.bpNumber),
+  };
+
+  const pcbList = getSafe(() => formData.pcbList || [], []);
+
+  const shieldsList = {
+    shieldRequired: getSafe(() => formData.shieldsList?.shieldRequired),
+    numberOfShields: getSafe(() => formData.shieldsList?.numberOfShields, 0),
+    shields: getSafe(() => formData.shieldsList?.shields || [], []),
+  };
+
+  const fingersList = {
+    fingerRequired: getSafe(() => formData.fingersList?.fingerRequired),
+    numberOfFingers: getSafe(() => formData.fingersList?.numberOfFingers, 0),
+    fingers: getSafe(() => formData.fingersList?.fingers || [], []),
+  };
+
+  const cooperFlapDetails = {
+    numberOfFlaps: getSafe(() => formData.cooperFlapDetails?.numberOfFlaps, 0),
+    flaps: getSafe(() => formData.cooperFlapDetails?.flaps || [], []),
+  };
+
+  const resonatorList = {
+    numberOfResonators: getSafe(
+      () => formData.resonatorList?.numberOfResonators,
+      0
+    ),
+    resonators: getSafe(() => formData.resonatorList?.resonators || [], []),
+  };
+
+  const ltcc = {
+    numberOfLtcc: getSafe(() => formData.ltcc?.numberOfLtcc, 0),
+    ltccItems: getSafe(() => formData.ltcc?.ltccItems || [], []),
+  };
+
+  const specialRequirements = truncateText(
+    getSafe(() => formData.specialRequirements),
+    500
+  );
+
+  const hasSectionData = (fields, arrays = []) => {
+    const hasFieldData = Object.values(fields).some(hasValue);
+    const hasArrayData = arrays.some((arr) => hasValue(arr));
+    return hasFieldData || hasArrayData;
   };
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        {/* Header with logo */}
-        <View style={{ alignItems: "center", marginBottom: 20 }}>
-          <Text style={styles.header}>Component Pricing Specification</Text>
-        </View>
-
-        {/* Basic Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Basic Information</Text>
-
-          <ConditionalField condition={formData.opNumber}>
-            <View style={styles.row}>
-              <Text style={styles.label}>OP Number:</Text>
-              <Text style={styles.value}>{formData.opNumber}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.opuNumber}>
-            <View style={styles.row}>
-              <Text style={styles.label}>OPU Number:</Text>
-              <Text style={styles.value}>{formData.opuNumber}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.eduNumber}>
-            <View style={styles.row}>
-              <Text style={styles.label}>EDU Number:</Text>
-              <Text style={styles.value}>{formData.eduNumber}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.modelFamily}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Model Family:</Text>
-              <Text style={styles.value}>{formData.modelFamily}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.modelName}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Model Name:</Text>
-              <Text style={styles.value}>{formData.modelName}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.technology}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Technology:</Text>
-              <Text style={styles.value}>{formData.technology}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.revisionNumber}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Revision Number:</Text>
-              <Text style={styles.value}>{formData.revisionNumber}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.impedance}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Impedance:</Text>
-              <Text style={styles.value}>
-                {formData.impedance}
-                {formData.customImpedance === "1" ? " (Custom)" : ""}
-              </Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.package}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Package:</Text>
-              <Text style={styles.value}>{formData.package}</Text>
-            </View>
-          </ConditionalField>
-        </View>
-
-        {/* Ports Configuration */}
-        <ConditionalField condition={formData.ports?.numberOfPorts > 0}>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Ports Configuration</Text>
-
-            <View style={styles.row}>
-              <Text style={styles.label}>Number of Ports:</Text>
-              <Text style={styles.value}>
-                {formData.ports?.numberOfPorts || 0}
-              </Text>
-            </View>
-
-            <Text style={styles.subHeader}>Port Details</Text>
-            <View style={styles.tableHeader}>
-              <Text style={styles.col}>Port #</Text>
-              <Text style={styles.col}>Connector Type</Text>
-              <Text style={styles.col}>Gender</Text>
-            </View>
-
-            {formData.ports?.portDetails?.map((port, index) => (
-              <View key={index} style={styles.tableRow}>
-                <Text style={styles.col}>{index + 1}</Text>
-                <Text style={styles.col}>{port.connectorType || "N/A"}</Text>
-                <Text style={styles.col}>{port.connectorGender || "N/A"}</Text>
+      <Page size="A4" style={styles.page} wrap>
+        {/* Header */}
+        <View style={styles.header} fixed>
+          <View>
+            <Text style={styles.headerTitle}>
+              {basicInfo.modelName || "Component"} Specification
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              PiBase Documentation Sheet
+            </Text>
+          </View>
+          <View style={styles.headerRight}>
+            <ConditionalField condition={hasValue(basicInfo.revisionNumber)}>
+              <View style={styles.revisionBadge}>
+                <Text>Rev: {basicInfo.revisionNumber}</Text>
               </View>
-            ))}
+            </ConditionalField>
+            <ConditionalField condition={hasValue(basicInfo.modelFamily)}>
+              <Text style={{ fontSize: 9, marginTop: 4, color: "#4a5568" }}>
+                {basicInfo.modelFamily}
+              </Text>
+            </ConditionalField>
+          </View>
+        </View>
+
+        {/* Basic Details */}
+        <ConditionalField
+          condition={hasSectionData({
+            opNumber: basicInfo.opNumber,
+            opuNumber: basicInfo.opuNumber,
+            eduNumber: basicInfo.eduNumber,
+            modelFamily: basicInfo.modelFamily,
+            modelName: basicInfo.modelName,
+            technology: basicInfo.technology,
+          })}
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>Component Identification</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <ConditionalField condition={hasValue(basicInfo.opNumber)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>OP Number:</Text>
+                  <Text style={styles.value} wrap>
+                    {basicInfo.opNumber}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(basicInfo.opuNumber)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>OPU Number:</Text>
+                  <Text style={styles.value} wrap>
+                    {basicInfo.opuNumber}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(basicInfo.eduNumber)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>EDU Number:</Text>
+                  <Text style={styles.value} wrap>
+                    {basicInfo.eduNumber}
+                  </Text>
+                </View>
+              </ConditionalField>
+
+              <ConditionalField condition={hasValue(basicInfo.modelName)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Model Name:</Text>
+                  <Text style={styles.value} wrap>
+                    {basicInfo.modelName}
+                  </Text>
+                </View>
+              </ConditionalField>
+
+              <ConditionalField condition={hasValue(basicInfo.modelFamily)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Model Family:</Text>
+                  <Text style={styles.value} wrap>
+                    {basicInfo.modelFamily}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(basicInfo.technology)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Technology:</Text>
+                  <Text style={styles.value} wrap>
+                    {basicInfo.technology}
+                  </Text>
+                </View>
+              </ConditionalField>
+            </View>
           </View>
         </ConditionalField>
 
-        {/* Enclosure & Cover Details */}
+        {/* General Details */}
+        <ConditionalField
+          condition={hasSectionData(
+            {
+              impedance: generalInfo.impedance,
+              interfaces: generalInfo.interfaces,
+              caseStyle: generalInfo.caseStyle,
+              selectedCaseStyle: generalInfo.selectedCaseStyle,
+              bottomSolderMask: generalInfo.bottomSolderMask,
+              halfMoonRequirement: generalInfo.halfMoonRequirement,
+              viaHolesRequirement: generalInfo.viaHolesRequirement,
+              signalLaunchType: generalInfo.signalLaunchType,
+              coverType: generalInfo.coverType,
+              designRuleViolation: generalInfo.designRuleViolation,
+              similarModel: generalInfo.similarModel,
+            },
+            [ports.portDetails]
+          )}
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>General Specifications</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <ConditionalField condition={hasValue(generalInfo.impedance)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Impedance (Ω):</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.impedance}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(generalInfo.interfaces)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Interfaces:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.interfaces}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField
+                condition={
+                  hasValue(generalInfo.caseStyle) ||
+                  hasValue(generalInfo.selectedCaseStyle)
+                }
+              >
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Case Style:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.caseStyle}{" "}
+                    {generalInfo.selectedCaseStyle && (
+                      <Text style={styles.badge}>
+                        {generalInfo.selectedCaseStyle}
+                      </Text>
+                    )}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField
+                condition={hasValue(generalInfo.bottomSolderMask)}
+              >
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Solder Mask:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.bottomSolderMask}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField
+                condition={hasValue(generalInfo.halfMoonRequirement)}
+              >
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Half Moon:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.halfMoonRequirement}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField
+                condition={hasValue(generalInfo.viaHolesRequirement)}
+              >
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Via Holes:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.viaHolesRequirement}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField
+                condition={hasValue(generalInfo.signalLaunchType)}
+              >
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Signal Launch:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.signalLaunchType}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(generalInfo.coverType)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Cover Type:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.coverType}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(generalInfo.similarModel)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Similar Model:</Text>
+                  <Text style={styles.value} wrap>
+                    {generalInfo.similarModel}
+                  </Text>
+                </View>
+              </ConditionalField>
+            </View>
+
+            <ConditionalField
+              condition={ports.numberOfPorts > 0 && hasValue(ports.portDetails)}
+            >
+              <Text style={styles.subHeading}>Ports Configuration</Text>
+              <View style={styles.row}>
+                <Text style={styles.label}>Number of Ports:</Text>
+                <Text style={styles.value}>{ports.numberOfPorts}</Text>
+              </View>
+              {renderTable(
+                ports.portDetails.map((item, idx) => ({
+                  ...item,
+                  port: `Port ${idx + 1}`,
+                })),
+                [
+                  { label: "Port", key: "port", width: "20%", align: "center" },
+                  {
+                    label: "Connector Type",
+                    key: "connectorType",
+                    width: "40%",
+                    align: "left",
+                  },
+                  {
+                    label: "Gender",
+                    key: "connectorGender",
+                    width: "40%",
+                    align: "left",
+                  },
+                ],
+                "port",
+                "33%"
+              )}
+            </ConditionalField>
+          </View>
+        </ConditionalField>
+
+        {/* Enclosure & Mechanical Details */}
+        <ConditionalField
+          condition={hasSectionData({
+            partType: enclosureDetails.partType,
+            partNumber: enclosureDetails.partNumber,
+            partType: topcoverDetails.partType,
+            partNumber: topcoverDetails.partNumber,
+            length: caseDimensions.length,
+            width: caseDimensions.width,
+            height: caseDimensions.height,
+            pinOuts: caseDimensions.pinOuts,
+          })}
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>Mechanical Details</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <ConditionalField condition={hasValue(enclosureDetails.partType)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Enclosure Type:</Text>
+                  <Text style={styles.value} wrap>
+                    {enclosureDetails.partType}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField
+                condition={hasValue(enclosureDetails.partNumber)}
+              >
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Enclosure P/N:</Text>
+                  <Text style={styles.value} wrap>
+                    {enclosureDetails.partNumber}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(topcoverDetails.partType)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Topcover Type:</Text>
+                  <Text style={styles.value} wrap>
+                    {topcoverDetails.partType}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField
+                condition={hasValue(topcoverDetails.partNumber)}
+              >
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Topcover P/N:</Text>
+                  <Text style={styles.value} wrap>
+                    {topcoverDetails.partNumber}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(caseDimensions.length)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Length (mm):</Text>
+                  <Text style={styles.value} wrap>
+                    {caseDimensions.length}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(caseDimensions.width)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Width (mm):</Text>
+                  <Text style={styles.value} wrap>
+                    {caseDimensions.width}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(caseDimensions.height)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Height (mm):</Text>
+                  <Text style={styles.value} wrap>
+                    {caseDimensions.height}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={hasValue(caseDimensions.pinOuts)}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Pin Outs:</Text>
+                  <Text style={styles.value} wrap>
+                    {truncateText(caseDimensions.pinOuts)}
+                  </Text>
+                </View>
+              </ConditionalField>
+            </View>
+          </View>
+        </ConditionalField>
+
+        {/* Components Section */}
         <ConditionalField
           condition={
-            formData.enclosureDetails?.partType ||
-            formData.topcoverDetails?.partType ||
-            formData.caseStyle
+            capacitor.numWithBpn + capacitor.numWithoutBpn > 0 ||
+            inductor.numWithBpn + inductor.numWithoutBpn > 0 ||
+            resistor.numWithBpn + resistor.numWithoutBpn > 0 ||
+            airCoil.numWithBpn + airCoil.numWithoutBpn > 0 ||
+            transformers.numberOfTransformers > 0
           }
         >
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Enclosure & Cover Details</Text>
+            <Text style={styles.heading}>Component Inventory</Text>
 
-            <ConditionalField condition={formData.enclosureDetails?.partType}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Enclosure Part Type:</Text>
-                <Text style={styles.value}>
-                  {formData.enclosureDetails?.partType}
-                </Text>
-              </View>
-            </ConditionalField>
-
-            <ConditionalField condition={formData.enclosureDetails?.partNumber}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Enclosure B-P/N:</Text>
-                <Text style={styles.value}>
-                  {formData.enclosureDetails?.partNumber}
-                </Text>
-              </View>
-            </ConditionalField>
-
-            <ConditionalField condition={formData.topcoverDetails?.partType}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Top Cover Part Type:</Text>
-                <Text style={styles.value}>
-                  {formData.topcoverDetails?.partType}
-                </Text>
-              </View>
-            </ConditionalField>
-
-            <ConditionalField condition={formData.topcoverDetails?.partNumber}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Top Cover B-P/N:</Text>
-                <Text style={styles.value}>
-                  {formData.topcoverDetails?.partNumber}
-                </Text>
-              </View>
-            </ConditionalField>
-
-            <ConditionalField condition={formData.caseStyle}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Case Style:</Text>
-                <Text style={styles.value}>{formData.caseStyle}</Text>
-              </View>
-            </ConditionalField>
-
-            <ConditionalField condition={formData.selectedCaseStyle}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Selected Case Style:</Text>
-                <Text style={styles.value}>{formData.selectedCaseStyle}</Text>
-              </View>
-            </ConditionalField>
-
+            {/* Capacitors */}
             <ConditionalField
               condition={
-                formData.caseDimensions?.length ||
-                formData.caseDimensions?.width ||
-                formData.caseDimensions?.height
+                capacitor.numWithBpn + capacitor.numWithoutBpn > 0 ||
+                hasValue(capacitor.withBpn) ||
+                hasValue(capacitor.withoutBpn)
               }
             >
-              <View style={styles.row}>
-                <Text style={styles.label}>Case Dimensions (L x W x H):</Text>
-                <Text style={styles.value}>
-                  {formData.caseDimensions?.length || "N/A"} x{" "}
-                  {formData.caseDimensions?.width || "N/A"} x{" "}
-                  {formData.caseDimensions?.height || "N/A"}
-                </Text>
+              <Text style={styles.subHeading}>Capacitors</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  marginBottom: 8,
+                }}
+              >
+                <ConditionalField
+                  condition={capacitor.numWithBpn + capacitor.numWithoutBpn > 0}
+                >
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Total Count:</Text>
+                    <Text style={styles.value}>
+                      {capacitor.numWithBpn + capacitor.numWithoutBpn}
+                    </Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={capacitor.numWithBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>With BPN:</Text>
+                    <Text style={styles.value}>{capacitor.numWithBpn}</Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={capacitor.numWithoutBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Without BPN:</Text>
+                    <Text style={styles.value}>{capacitor.numWithoutBpn}</Text>
+                  </View>
+                </ConditionalField>
               </View>
+              <ConditionalField condition={hasValue(capacitor.withBpn)}>
+                {renderTable(
+                  capacitor.withBpn,
+                  [
+                    { label: "Name", key: "name", width: "50%", align: "left" },
+                    { label: "BPN", key: "bpn", width: "50%", align: "left" },
+                  ],
+                  "cap-bpn"
+                )}
+              </ConditionalField>
+              <ConditionalField condition={hasValue(capacitor.withoutBpn)}>
+                {renderTable(
+                  capacitor.withoutBpn,
+                  [
+                    { label: "Name", key: "name", width: "25%", align: "left" },
+                    {
+                      label: "Supplier",
+                      key: "supplierName",
+                      width: "25%",
+                      align: "left",
+                    },
+                    {
+                      label: "P/N",
+                      key: "supplierNumber",
+                      width: "25%",
+                      align: "left",
+                    },
+                    {
+                      label: "Status",
+                      key: "qualificationStaus",
+                      width: "25%",
+                      align: "left",
+                    },
+                  ],
+                  "cap-nobpn"
+                )}
+              </ConditionalField>
             </ConditionalField>
 
-            <ConditionalField condition={formData.caseDimensions?.pinOuts}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Pin Outs:</Text>
-                <Text style={styles.value}>
-                  {formData.caseDimensions?.pinOuts}
-                </Text>
+            {/* Inductors */}
+            <ConditionalField
+              condition={
+                inductor.numWithBpn + inductor.numWithoutBpn > 0 ||
+                hasValue(inductor.withBpn) ||
+                hasValue(inductor.withoutBpn)
+              }
+            >
+              <Text style={styles.subHeading}>Inductors</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  marginBottom: 8,
+                }}
+              >
+                <ConditionalField
+                  condition={inductor.numWithBpn + inductor.numWithoutBpn > 0}
+                >
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Total Count:</Text>
+                    <Text style={styles.value}>
+                      {inductor.numWithBpn + inductor.numWithoutBpn}
+                    </Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={inductor.numWithBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>With BPN:</Text>
+                    <Text style={styles.value}>{inductor.numWithBpn}</Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={inductor.numWithoutBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Without BPN:</Text>
+                    <Text style={styles.value}>{inductor.numWithoutBpn}</Text>
+                  </View>
+                </ConditionalField>
               </View>
+              <ConditionalField condition={hasValue(inductor.withBpn)}>
+                {renderTable(
+                  inductor.withBpn,
+                  [
+                    { label: "Name", key: "name", width: "50%", align: "left" },
+                    { label: "BPN", key: "bpn", width: "50%", align: "left" },
+                  ],
+                  "ind-bpn"
+                )}
+              </ConditionalField>
+              <ConditionalField condition={hasValue(inductor.withoutBpn)}>
+                {renderTable(
+                  inductor.withoutBpn,
+                  [
+                    { label: "Name", key: "name", width: "25%", align: "left" },
+                    {
+                      label: "Supplier",
+                      key: "supplierName",
+                      width: "25%",
+                      align: "left",
+                    },
+                    {
+                      label: "P/N",
+                      key: "supplierNumber",
+                      width: "25%",
+                      align: "left",
+                    },
+                    {
+                      label: "Status",
+                      key: "qualificationStaus",
+                      width: "25%",
+                      align: "left",
+                    },
+                  ],
+                  "ind-nobpn"
+                )}
+              </ConditionalField>
+            </ConditionalField>
+
+            {/* Resistors */}
+            <ConditionalField
+              condition={
+                resistor.numWithBpn + resistor.numWithoutBpn > 0 ||
+                hasValue(resistor.withBpn) ||
+                hasValue(resistor.withoutBpn)
+              }
+            >
+              <Text style={styles.subHeading}>Resistors</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  marginBottom: 8,
+                }}
+              >
+                <ConditionalField
+                  condition={resistor.numWithBpn + resistor.numWithoutBpn > 0}
+                >
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Total Count:</Text>
+                    <Text style={styles.value}>
+                      {resistor.numWithBpn + resistor.numWithoutBpn}
+                    </Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={resistor.numWithBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>With BPN:</Text>
+                    <Text style={styles.value}>{resistor.numWithBpn}</Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={resistor.numWithoutBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Without BPN:</Text>
+                    <Text style={styles.value}>{resistor.numWithoutBpn}</Text>
+                  </View>
+                </ConditionalField>
+              </View>
+              <ConditionalField condition={hasValue(resistor.withBpn)}>
+                {renderTable(
+                  resistor.withBpn,
+                  [
+                    { label: "Name", key: "name", width: "50%", align: "left" },
+                    { label: "BPN", key: "bpn", width: "50%", align: "left" },
+                  ],
+                  "res-bpn"
+                )}
+              </ConditionalField>
+              <ConditionalField condition={hasValue(resistor.withoutBpn)}>
+                {renderTable(
+                  resistor.withoutBpn,
+                  [
+                    { label: "Name", key: "name", width: "25%", align: "left" },
+                    {
+                      label: "Supplier",
+                      key: "supplierName",
+                      width: "25%",
+                      align: "left",
+                    },
+                    {
+                      label: "P/N",
+                      key: "supplierNumber",
+                      width: "25%",
+                      align: "left",
+                    },
+                    {
+                      label: "Status",
+                      key: "qualificationStaus",
+                      width: "25%",
+                      align: "left",
+                    },
+                  ],
+                  "res-nobpn"
+                )}
+              </ConditionalField>
+            </ConditionalField>
+
+            {/* Air Coils */}
+            <ConditionalField
+              condition={
+                airCoil.numWithBpn + airCoil.numWithoutBpn > 0 ||
+                hasValue(airCoil.withBpn) ||
+                hasValue(airCoil.withoutBpn)
+              }
+            >
+              <Text style={styles.subHeading}>Air Coils</Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  marginBottom: 8,
+                }}
+              >
+                <ConditionalField
+                  condition={airCoil.numWithBpn + airCoil.numWithoutBpn > 0}
+                >
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Total Count:</Text>
+                    <Text style={styles.value}>
+                      {airCoil.numWithBpn + airCoil.numWithoutBpn}
+                    </Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={airCoil.numWithBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>With BPN:</Text>
+                    <Text style={styles.value}>{airCoil.numWithBpn}</Text>
+                  </View>
+                </ConditionalField>
+                <ConditionalField condition={airCoil.numWithoutBpn > 0}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>Without BPN:</Text>
+                    <Text style={styles.value}>{airCoil.numWithoutBpn}</Text>
+                  </View>
+                </ConditionalField>
+              </View>
+              <ConditionalField condition={hasValue(airCoil.withBpn)}>
+                {renderTable(
+                  airCoil.withBpn,
+                  [
+                    { label: "Name", key: "name", width: "50%", align: "left" },
+                    { label: "BPN", key: "bpn", width: "50%", align: "left" },
+                  ],
+                  "air-bpn"
+                )}
+              </ConditionalField>
+              <ConditionalField condition={hasValue(airCoil.withoutBpn)}>
+                {renderTable(
+                  airCoil.withoutBpn,
+                  [
+                    { label: "Name", key: "name", width: "12%", align: "left" },
+                    {
+                      label: "Wire",
+                      key: "wiregauge",
+                      width: "12%",
+                      align: "left",
+                    },
+                    {
+                      label: "Turns",
+                      key: "numberOfTurns",
+                      width: "12%",
+                      align: "center",
+                    },
+                    {
+                      label: "Inner Dia",
+                      key: "innerDiameter",
+                      width: "12%",
+                      align: "center",
+                    },
+                    {
+                      label: "Length",
+                      key: "lengthOfAircoil",
+                      width: "12%",
+                      align: "center",
+                    },
+                    {
+                      label: "Width",
+                      key: "widthOfAircoil",
+                      width: "12%",
+                      align: "center",
+                    },
+                    {
+                      label: "L-Bend",
+                      key: "lBendAircoil",
+                      width: "12%",
+                      align: "center",
+                    },
+                    {
+                      label: "Shorter Leg",
+                      key: "shorterLegAircoil",
+                      width: "16%",
+                      align: "center",
+                    },
+                  ],
+                  "air-nobpn"
+                )}
+              </ConditionalField>
+            </ConditionalField>
+
+            {/* Transformers */}
+            <ConditionalField
+              condition={
+                transformers.numberOfTransformers > 0 &&
+                hasValue(transformers.transformersList)
+              }
+            >
+              <Text style={styles.subHeading}>Transformers</Text>
+              {renderTable(
+                transformers.transformersList,
+                [
+                  { label: "Name", key: "name", width: "20%", align: "left" },
+                  {
+                    label: "Core Type",
+                    key: "coreType",
+                    width: "20%",
+                    align: "left",
+                  },
+                  {
+                    label: "Core BPN",
+                    key: "coreBPN",
+                    width: "20%",
+                    align: "left",
+                  },
+                  {
+                    label: "Wire Type",
+                    key: "wireType",
+                    width: "20%",
+                    align: "left",
+                  },
+                  {
+                    label: "Wire Gauge",
+                    key: "wireGauge",
+                    width: "20%",
+                    align: "left",
+                  },
+                ],
+                "transformer"
+              )}
             </ConditionalField>
           </View>
         </ConditionalField>
 
         {/* Can Details */}
         <ConditionalField
-          condition={
-            formData.isExistingCanAvailable ||
-            formData.can?.material ||
-            formData.can?.makingProcess
-          }
+          condition={hasSectionData({
+            isExistingCanAvailable: can.isExistingCanAvailable,
+            canMaterial: can.canMaterial,
+            canProcess: can.canProcess,
+            bpNumber: can.bpNumber,
+          })}
         >
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Can Details</Text>
-
-            <ConditionalField condition={formData.isExistingCanAvailable}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Existing Can Available:</Text>
-                <Text style={styles.value}>
-                  {formData.isExistingCanAvailable}
-                </Text>
-              </View>
-            </ConditionalField>
-
-            <ConditionalField condition={formData.can?.material}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Can Material:</Text>
-                <Text style={styles.value}>{formData.can?.material}</Text>
-              </View>
-            </ConditionalField>
-
-            <ConditionalField condition={formData.can?.makingProcess}>
-              <View style={styles.row}>
-                <Text style={styles.label}>Making Process:</Text>
-                <Text style={styles.value}>{formData.can?.makingProcess}</Text>
-              </View>
-            </ConditionalField>
-          </View>
-        </ConditionalField>
-
-        {/* PCB Details */}
-        <ConditionalField condition={formData.pcbList?.length > 0}>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>PCB Details</Text>
-
-            {formData.pcbList?.map((pcb, index) => (
-              <View key={index} style={{ marginBottom: 15 }}>
-                <Text style={styles.subHeader}>
-                  PCB {index + 1}: {pcb.name || "Unnamed PCB"}
-                </Text>
-
-                <ConditionalField condition={pcb.isExistingCanAvailable}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Existing Part:</Text>
-                    <Text style={styles.value}>
-                      {pcb.isExistingCanAvailable}
+            <Text style={styles.heading}>Can Details</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              {can.isExistingCanAvailable === "Yes" ? (
+                <ConditionalField condition={hasValue(can.bpNumber)}>
+                  <View style={{ ...styles.row, width: "50%" }}>
+                    <Text style={styles.label}>BP Number:</Text>
+                    <Text style={styles.value} wrap>
+                      {can.bpNumber}
                     </Text>
                   </View>
                 </ConditionalField>
+              ) : (
+                <>
+                  <ConditionalField
+                    condition={hasValue(can.isExistingCanAvailable)}
+                  >
+                    <View style={{ ...styles.row, width: "50%" }}>
+                      <Text style={styles.label}>Existing Can:</Text>
+                      <Text style={styles.value} wrap>
+                        {can.isExistingCanAvailable}
+                      </Text>
+                    </View>
+                  </ConditionalField>
+                  <ConditionalField condition={hasValue(can.canMaterial)}>
+                    <View style={{ ...styles.row, width: "50%" }}>
+                      <Text style={styles.label}>Material:</Text>
+                      <Text style={styles.value} wrap>
+                        {can.canMaterial}
+                      </Text>
+                    </View>
+                  </ConditionalField>
+                  <ConditionalField condition={hasValue(can.canProcess)}>
+                    <View style={{ ...styles.row, width: "50%" }}>
+                      <Text style={styles.label}>Process:</Text>
+                      <Text style={styles.value} wrap>
+                        {can.canProcess}
+                      </Text>
+                    </View>
+                  </ConditionalField>
+                  <ConditionalField condition={hasValue(can.bpNumber)}>
+                    <View style={{ ...styles.row, width: "50%" }}>
+                      <Text style={styles.label}>BP Number:</Text>
+                      <Text style={styles.value} wrap>
+                        {can.bpNumber}
+                      </Text>
+                    </View>
+                  </ConditionalField>
+                </>
+              )}
+            </View>
+          </View>
+        </ConditionalField>
 
+        {/* PCB List */}
+        <ConditionalField condition={hasValue(pcbList)}>
+          <View style={styles.section}>
+            <Text style={styles.heading}>PCB List</Text>
+            {pcbList.map((pcb, idx) => (
+              <View key={`pcb-${idx}`} style={{ marginBottom: 16 }}>
+                <Text style={styles.subHeading}>
+                  {pcb.name || `PCB ${idx + 1}`}
+                </Text>
+                {pcb.isExistingPCBAvailable === "Yes" ? (
+                  <ConditionalField
+                    condition={hasValue(getSafe(() => pcb.bpNumber))}
+                  >
+                    <View style={styles.row}>
+                      <Text style={styles.label}>BP Number:</Text>
+                      <Text style={styles.value} wrap>
+                        {getSafe(() => pcb.bpNumber)}
+                      </Text>
+                    </View>
+                  </ConditionalField>
+                ) : (
+                  renderTable(
+                    [pcb],
+                    [
+                      {
+                        label: "Name",
+                        key: "name",
+                        width: "14%",
+                        align: "left",
+                      },
+                      {
+                        label: "Material",
+                        key: "material",
+                        width: "14%",
+                        align: "left",
+                      },
+                      {
+                        label: "Layers",
+                        key: "layers",
+                        width: "14%",
+                        align: "center",
+                      },
+                      {
+                        label: "Substrate Thickness",
+                        key: "substrateThickness",
+                        width: "14%",
+                        align: "center",
+                      },
+                      {
+                        label: "Copper Thickness",
+                        key: "copperThickness",
+                        width: "14%",
+                        align: "center",
+                      },
+                      {
+                        label: "Overall Thickness",
+                        key: "overallThickness",
+                        width: "14%",
+                        align: "center",
+                      },
+                      {
+                        label: "Orientation",
+                        key: "mountingOrientation",
+                        width: "16%",
+                        align: "left",
+                      },
+                    ],
+                    `pcb-${idx}`
+                  )
+                )}
                 <ConditionalField
-                  condition={
-                    pcb.isExistingCanAvailable === "Yes" && pcb.bpNumber
-                  }
+                  condition={hasValue(getSafe(() => pcb.comments))}
                 >
-                  <View style={styles.row}>
-                    <Text style={styles.label}>BP Number:</Text>
-                    <Text style={styles.value}>{pcb.bpNumber}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.material}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Material:</Text>
-                    <Text style={styles.value}>{pcb.material}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.thickness}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Thickness:</Text>
-                    <Text style={styles.value}>{pcb.thickness}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.layers}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Layers:</Text>
-                    <Text style={styles.value}>{pcb.layers}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.mountingOrientation}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Mounting Orientation:</Text>
-                    <Text style={styles.value}>{pcb.mountingOrientation}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.substrateThickness}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Substrate Thickness:</Text>
-                    <Text style={styles.value}>{pcb.substrateThickness}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.rfLayerThickness}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>RF Layer Thickness:</Text>
-                    <Text style={styles.value}>{pcb.rfLayerThickness}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.overallThickness}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Overall Thickness:</Text>
-                    <Text style={styles.value}>{pcb.overallThickness}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.copperThickness}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Copper Thickness:</Text>
-                    <Text style={styles.value}>{pcb.copperThickness}</Text>
-                  </View>
-                </ConditionalField>
-
-                <ConditionalField condition={pcb.comments}>
-                  <View style={styles.row}>
-                    <Text style={styles.label}>Comments:</Text>
-                    <Text style={styles.value}>{pcb.comments}</Text>
+                  <View style={styles.commentBox}>
+                    <Text style={styles.commentText} wrap>
+                      Comments: {getSafe(() => pcb.comments)}
+                    </Text>
                   </View>
                 </ConditionalField>
               </View>
@@ -488,412 +1246,293 @@ const Page21PDFDocument = ({ formData }) => {
           </View>
         </ConditionalField>
 
-        {/* Components Summary */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Components Summary</Text>
-
-          {/* Capacitors */}
-          <Text style={styles.subHeader}>Capacitors</Text>
-          <View style={styles.row}>
-            <Text style={styles.label}>Total Capacitors:</Text>
-            <Text style={styles.value}>
-              {(formData.capacitor?.numWithBpn || 0) +
-                (formData.capacitor?.numWithoutBpn || 0)}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>With BPN:</Text>
-            <Text style={styles.value}>
-              {formData.capacitor?.numWithBpn || 0}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Without BPN:</Text>
-            <Text style={styles.value}>
-              {formData.capacitor?.numWithoutBpn || 0}
-            </Text>
-          </View>
-
-          {renderComponentTable(
-            "Capacitors",
-            formData.capacitor?.withBpn,
-            formData.capacitor?.withoutBpn
-          )}
-
-          {/* Inductors */}
-          <Text style={[styles.subHeader, { marginTop: 15 }]}>Inductors</Text>
-          <View style={styles.row}>
-            <Text style={styles.label}>Total Inductors:</Text>
-            <Text style={styles.value}>
-              {(formData.inductor?.numWithBpn || 0) +
-                (formData.inductor?.numWithoutBpn || 0)}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>With BPN:</Text>
-            <Text style={styles.value}>
-              {formData.inductor?.numWithBpn || 0}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Without BPN:</Text>
-            <Text style={styles.value}>
-              {formData.inductor?.numWithoutBpn || 0}
-            </Text>
-          </View>
-
-          {renderComponentTable(
-            "Inductors",
-            formData.inductor?.withBpn,
-            formData.inductor?.withoutBpn
-          )}
-
-          {/* Resistors */}
-          <Text style={[styles.subHeader, { marginTop: 15 }]}>Resistors</Text>
-          <View style={styles.row}>
-            <Text style={styles.label}>Total Resistors:</Text>
-            <Text style={styles.value}>
-              {(formData.resistor?.numWithBpn || 0) +
-                (formData.resistor?.numWithoutBpn || 0)}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>With BPN:</Text>
-            <Text style={styles.value}>
-              {formData.resistor?.numWithBpn || 0}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Without BPN:</Text>
-            <Text style={styles.value}>
-              {formData.resistor?.numWithoutBpn || 0}
-            </Text>
-          </View>
-
-          {renderComponentTable(
-            "Resistors",
-            formData.resistor?.withBpn,
-            formData.resistor?.withoutBpn
-          )}
-
-          {/* Air Coils */}
-          <Text style={[styles.subHeader, { marginTop: 15 }]}>Air Coils</Text>
-          <View style={styles.row}>
-            <Text style={styles.label}>Total Air Coils:</Text>
-            <Text style={styles.value}>
-              {(formData.airCoil?.numWithBpn || 0) +
-                (formData.airCoil?.numWithoutBpn || 0)}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>With BPN:</Text>
-            <Text style={styles.value}>
-              {formData.airCoil?.numWithBpn || 0}
-            </Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Without BPN:</Text>
-            <Text style={styles.value}>
-              {formData.airCoil?.numWithoutBpn || 0}
-            </Text>
-          </View>
-
-          {renderComponentTable(
-            "Air Coils",
-            formData.airCoil?.withBpn,
-            formData.airCoil?.withoutBpn
-          )}
-
-          {/* Transformers */}
-          <ConditionalField
-            condition={formData.transformers?.numberOfTransformers > 0}
-          >
-            <>
-              <Text style={[styles.subHeader, { marginTop: 15 }]}>
-                Transformers
-              </Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>Number of Transformers:</Text>
-                <Text style={styles.value}>
-                  {formData.transformers?.numberOfTransformers || 0}
-                </Text>
-              </View>
-
-              {formData.transformers?.transformersList?.map((tf, index) => (
-                <View key={index} style={{ marginTop: 10 }}>
-                  <ConditionalField condition={tf.coreType}>
-                    <View style={styles.row}>
-                      <Text style={styles.label}>Core Type:</Text>
-                      <Text style={styles.value}>{tf.coreType}</Text>
-                    </View>
-                  </ConditionalField>
-
-                  <ConditionalField condition={tf.wireType}>
-                    <View style={styles.row}>
-                      <Text style={styles.label}>Wire Type:</Text>
-                      <Text style={styles.value}>{tf.wireType}</Text>
-                    </View>
-                  </ConditionalField>
-
-                  <ConditionalField condition={tf.coreBPN?.length > 0}>
-                    <View style={styles.row}>
-                      <Text style={styles.label}>Core BPNs:</Text>
-                      <Text style={styles.value}>
-                        {tf.coreBPN?.join(", ") || "N/A"}
-                      </Text>
-                    </View>
-                  </ConditionalField>
-
-                  <ConditionalField condition={tf.wireGauge?.length > 0}>
-                    <View style={styles.row}>
-                      <Text style={styles.label}>Wire Gauges:</Text>
-                      <Text style={styles.value}>
-                        {tf.wireGauge?.join(", ") || "N/A"}
-                      </Text>
-                    </View>
-                  </ConditionalField>
-
-                  <ConditionalField condition={tf.numberOfTurns}>
-                    <View style={styles.row}>
-                      <Text style={styles.label}>Number of Turns:</Text>
-                      <Text style={styles.value}>{tf.numberOfTurns}</Text>
-                    </View>
-                  </ConditionalField>
-                </View>
-              ))}
-            </>
-          </ConditionalField>
-        </View>
-
-        {/* Additional Components */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Additional Components</Text>
-
-          {/* Shields */}
-          <ConditionalField
-            condition={
-              formData.shieldsList?.shieldRequired === "Yes" ||
-              formData.shieldsList?.numberOfShields > 0
-            }
-          >
-            <>
-              <Text style={styles.subHeader}>Shields</Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>Shield Required:</Text>
-                <Text style={styles.value}>
-                  {formData.shieldsList?.shieldRequired || "No"}
-                </Text>
-              </View>
-
+        {/* Shields */}
+        <ConditionalField
+          condition={
+            shieldsList.numberOfShields > 0 &&
+            (hasValue(shieldsList.shieldRequired) ||
+              hasValue(shieldsList.shields))
+          }
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>Shields</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <ConditionalField
-                condition={formData.shieldsList?.numberOfShields > 0}
+                condition={hasValue(shieldsList.shieldRequired)}
               >
-                <View style={styles.row}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Shield Required:</Text>
+                  <Text style={styles.value} wrap>
+                    {shieldsList.shieldRequired}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={shieldsList.numberOfShields > 0}>
+                <View style={{ ...styles.row, width: "50%" }}>
                   <Text style={styles.label}>Number of Shields:</Text>
                   <Text style={styles.value}>
-                    {formData.shieldsList?.numberOfShields || 0}
+                    {shieldsList.numberOfShields}
                   </Text>
                 </View>
-
-                {formData.shieldsList?.shields?.map((shield, index) => (
-                  <View key={index} style={styles.row}>
-                    <Text style={styles.label}>Shield {index + 1}:</Text>
-                    <Text style={styles.value}>
-                      {shield.partType || "N/A"} - {shield.partNumber || "N/A"}
-                    </Text>
-                  </View>
-                ))}
               </ConditionalField>
-            </>
-          </ConditionalField>
+            </View>
+            <ConditionalField condition={hasValue(shieldsList.shields)}>
+              {renderTable(
+                shieldsList.shields,
+                [
+                  {
+                    label: "Part Type",
+                    key: "partType",
+                    width: "50%",
+                    align: "left",
+                  },
+                  {
+                    label: "Part Number",
+                    key: "partNumber",
+                    width: "50%",
+                    align: "left",
+                  },
+                ],
+                "shield"
+              )}
+            </ConditionalField>
+          </View>
+        </ConditionalField>
 
-          {/* Fingers */}
-          <ConditionalField
-            condition={
-              formData.fingersList?.fingerRequired === "Yes" ||
-              formData.fingersList?.numberOfFingers > 0
-            }
-          >
-            <>
-              <Text style={[styles.subHeader, { marginTop: 10 }]}>Fingers</Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>Finger Required:</Text>
-                <Text style={styles.value}>
-                  {formData.fingersList?.fingerRequired || "No"}
-                </Text>
-              </View>
-
+        {/* Fingers */}
+        <ConditionalField
+          condition={
+            fingersList.numberOfFingers > 0 &&
+            (hasValue(fingersList.fingerRequired) ||
+              hasValue(fingersList.fingers))
+          }
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>Fingers</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
               <ConditionalField
-                condition={formData.fingersList?.numberOfFingers > 0}
+                condition={hasValue(fingersList.fingerRequired)}
               >
-                <View style={styles.row}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Finger Required:</Text>
+                  <Text style={styles.value} wrap>
+                    {fingersList.fingerRequired}
+                  </Text>
+                </View>
+              </ConditionalField>
+              <ConditionalField condition={fingersList.numberOfFingers > 0}>
+                <View style={{ ...styles.row, width: "50%" }}>
                   <Text style={styles.label}>Number of Fingers:</Text>
                   <Text style={styles.value}>
-                    {formData.fingersList?.numberOfFingers || 0}
+                    {fingersList.numberOfFingers}
                   </Text>
                 </View>
-
-                {formData.fingersList?.fingers?.map((finger, index) => (
-                  <View key={index} style={styles.row}>
-                    <Text style={styles.label}>Finger {index + 1}:</Text>
-                    <Text style={styles.value}>
-                      {finger.partType || "N/A"} - {finger.partNumber || "N/A"}
-                    </Text>
-                  </View>
-                ))}
               </ConditionalField>
-            </>
-          </ConditionalField>
+            </View>
+            <ConditionalField condition={hasValue(fingersList.fingers)}>
+              {renderTable(
+                fingersList.fingers,
+                [
+                  {
+                    label: "Part Type",
+                    key: "partType",
+                    width: "50%",
+                    align: "left",
+                  },
+                  {
+                    label: "Part Number",
+                    key: "partNumber",
+                    width: "50%",
+                    align: "left",
+                  },
+                ],
+                "finger"
+              )}
+            </ConditionalField>
+          </View>
+        </ConditionalField>
 
-          {/* Copper Flaps */}
-          <ConditionalField
-            condition={formData.cooperFlapDetails?.numberOfFlaps > 0}
-          >
-            <>
-              <Text style={[styles.subHeader, { marginTop: 10 }]}>
-                Copper Flaps
-              </Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>Number of Flaps:</Text>
-                <Text style={styles.value}>
-                  {formData.cooperFlapDetails?.numberOfFlaps || 0}
-                </Text>
-              </View>
-
-              {formData.cooperFlapDetails?.flaps?.map((flap, index) => (
-                <View key={index} style={styles.row}>
-                  <Text style={styles.label}>Flap {index + 1}:</Text>
+        {/* Copper Flaps */}
+        <ConditionalField
+          condition={
+            cooperFlapDetails.numberOfFlaps > 0 &&
+            hasValue(cooperFlapDetails.flaps)
+          }
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>Copper Flaps</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+              <ConditionalField condition={cooperFlapDetails.numberOfFlaps > 0}>
+                <View style={{ ...styles.row, width: "50%" }}>
+                  <Text style={styles.label}>Number of Flaps:</Text>
                   <Text style={styles.value}>
-                    {flap.bpType || "N/A"} - {flap.bpNumber || "N/A"}
-                    {(flap.length || flap.width || flap.thickness) &&
-                      ` (L: ${flap.length || "N/A"}, W: ${
-                        flap.width || "N/A"
-                      }, T: ${flap.thickness || "N/A"})`}
+                    {cooperFlapDetails.numberOfFlaps}
                   </Text>
                 </View>
-              ))}
-            </>
-          </ConditionalField>
-
-          {/* LTCC */}
-          <ConditionalField condition={formData.ltcc?.numberOfLtcc > 0}>
-            <>
-              <Text style={[styles.subHeader, { marginTop: 10 }]}>
-                LTCC Components
-              </Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>Number of LTCC:</Text>
-                <Text style={styles.value}>
-                  {formData.ltcc?.numberOfLtcc || 0}
-                </Text>
-              </View>
-
-              {formData.ltcc?.ltccItems?.map((ltcc, index) => (
-                <View key={index} style={styles.row}>
-                  <Text style={styles.label}>LTCC {index + 1}:</Text>
-                  <Text style={styles.value}>{ltcc.modelName || "N/A"}</Text>
-                </View>
-              ))}
-            </>
-          </ConditionalField>
-
-          {/* Resonators */}
-          <ConditionalField
-            condition={formData.resonatorList?.numberOfResonators > 0}
-          >
-            <>
-              <Text style={[styles.subHeader, { marginTop: 10 }]}>
-                Resonators
-              </Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>Number of Resonators:</Text>
-                <Text style={styles.value}>
-                  {formData.resonatorList?.numberOfResonators || 0}
-                </Text>
-              </View>
-            </>
-          </ConditionalField>
-        </View>
-
-        {/* Additional Information */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Additional Information</Text>
-
-          <ConditionalField condition={formData.bottomSolderMask}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Bottom Solder Mask:</Text>
-              <Text style={styles.value}>{formData.bottomSolderMask}</Text>
+              </ConditionalField>
             </View>
-          </ConditionalField>
+            {renderTable(
+              cooperFlapDetails.flaps,
+              [
+                {
+                  label: "BP Type",
+                  key: "bpType",
+                  width: "20%",
+                  align: "left",
+                },
+                {
+                  label: "BP Number",
+                  key: "bpNumber",
+                  width: "20%",
+                  align: "left",
+                },
+                {
+                  label: "Length",
+                  key: "length",
+                  width: "20%",
+                  align: "center",
+                },
+                { label: "Width", key: "width", width: "20%", align: "center" },
+                {
+                  label: "Thickness",
+                  key: "thickness",
+                  width: "20%",
+                  align: "center",
+                },
+              ],
+              "flap"
+            )}
+          </View>
+        </ConditionalField>
 
-          <ConditionalField condition={formData.halfMoonRequirement}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Half Moon Requirement:</Text>
-              <Text style={styles.value}>{formData.halfMoonRequirement}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.viaHolesRequirement}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Via Holes Requirement:</Text>
-              <Text style={styles.value}>{formData.viaHolesRequirement}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.signalLaunchType}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Signal Launch Type:</Text>
-              <Text style={styles.value}>{formData.signalLaunchType}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.coverType}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Cover Type:</Text>
-              <Text style={styles.value}>{formData.coverType}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.designRuleViolation}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Design Rule Violation:</Text>
-              <Text style={styles.value}>{formData.designRuleViolation}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.similarModel}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Similar Model:</Text>
-              <Text style={styles.value}>{formData.similarModel}</Text>
-            </View>
-          </ConditionalField>
-
-          <ConditionalField condition={formData.comments}>
-            <View style={styles.row}>
-              <Text style={styles.label}>Comments:</Text>
-              <Text style={styles.value}>{formData.comments || "N/A"}</Text>
-            </View>
-          </ConditionalField>
-        </View>
-
-        <Text
-          style={styles.pageNumber}
-          render={({ pageNumber, totalPages }) =>
-            `${pageNumber} / ${totalPages}`
+        {/* Resonators */}
+        <ConditionalField
+          condition={
+            resonatorList.numberOfResonators > 0 &&
+            hasValue(resonatorList.resonators)
           }
-          fixed
-        />
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>Resonators</Text>
+            {renderTable(
+              resonatorList.resonators,
+              [
+                {
+                  label: "BP Type",
+                  key: "bpType",
+                  width: "14%",
+                  align: "left",
+                },
+                {
+                  label: "BP Number",
+                  key: "bpNumber",
+                  width: "14%",
+                  align: "left",
+                },
+                {
+                  label: "Size",
+                  key: "resonatorSize",
+                  width: "14%",
+                  align: "center",
+                },
+                {
+                  label: "Dielectric Const.",
+                  key: "dielectricConstant",
+                  width: "14%",
+                  align: "center",
+                },
+                {
+                  label: "Length",
+                  key: "resonatorLength",
+                  width: "14%",
+                  align: "center",
+                },
+                {
+                  label: "Frequency",
+                  key: "resonatorFrequency",
+                  width: "14%",
+                  align: "center",
+                },
+                {
+                  label: "Assembly Type",
+                  key: "assemblyType",
+                  width: "16%",
+                  align: "left",
+                },
+              ],
+              "resonator"
+            )}
+            {resonatorList.resonators.map((resonator, idx) => (
+              <ConditionalField
+                key={`resonator-comment-${idx}`}
+                condition={hasValue(getSafe(() => resonator.comments))}
+              >
+                <View style={styles.commentBox}>
+                  <Text style={styles.commentText} wrap>
+                    Comments (Resonator {idx + 1}):{" "}
+                    {getSafe(() => resonator.comments)}
+                  </Text>
+                </View>
+              </ConditionalField>
+            ))}
+          </View>
+        </ConditionalField>
+
+        {/* LTCC Components */}
+        <ConditionalField
+          condition={ltcc.numberOfLtcc > 0 && hasValue(ltcc.ltccItems)}
+        >
+          <View style={styles.section}>
+            <Text style={styles.heading}>LTCC Components</Text>
+            {renderTable(
+              ltcc.ltccItems,
+              [
+                {
+                  label: "Model Name",
+                  key: "modelName",
+                  width: "100%",
+                  align: "left",
+                },
+              ],
+              "ltcc"
+            )}
+          </View>
+        </ConditionalField>
+
+        {/* Special Requirements */}
+        <ConditionalField condition={hasValue(specialRequirements)}>
+          <View style={styles.section}>
+            <Text style={styles.heading}>Special Requirements</Text>
+            <View style={styles.commentBox}>
+              <Text style={styles.commentText} wrap>
+                {specialRequirements}
+              </Text>
+            </View>
+          </View>
+        </ConditionalField>
+
+        {/* Footer */}
+        <View style={styles.footer} fixed>
+          <Text
+            render={({ pageNumber, totalPages }) =>
+              `Generated on ${new Date().toLocaleDateString()} | Page ${pageNumber} of ${totalPages}`
+            }
+          />
+        </View>
       </Page>
     </Document>
   );
 };
 
-export default Page21PDFDocument;
-
+// Export function
 export const generatePDF = async (formData) => {
-  const blob = await pdf(<Page21PDFDocument formData={formData} />).toBlob();
-  const filename = `${formData.modelName || "Component"}_${
-    formData.revisionNumber || "Spec"
-  }.pdf`;
-  saveAs(blob, filename);
+  try {
+    const blob = await pdf(<Page21PDFDocument formData={formData} />).toBlob();
+    const filename = `${formData?.modelName || "Component"}_${
+      formData?.revisionNumber || "Spec"
+    }.pdf`;
+    saveAs(blob, filename);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+  }
 };
