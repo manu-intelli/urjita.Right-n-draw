@@ -7,6 +7,7 @@ import ProtectedRoute from "../components/auth/ProtectedRoute";
 import { Sample } from "../pages/Sample";
 import RightDrawWrapper from "../pages/RightDrawWrapper";
 import CreationInterface from "../pages/page21-interfaces/Page21Creation/CreationInterface";
+import PibaseDashboard from "../pages/page21-interfaces/Page21Creation/Dashboard";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
@@ -51,6 +52,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <CreationInterface />
+          </Suspense>
+        ),
+      },
+          {
+        path: "page21Dashboard",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <PibaseDashboard />
           </Suspense>
         ),
       },
