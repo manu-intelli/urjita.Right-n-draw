@@ -8,6 +8,7 @@ import { Sample } from "../pages/Sample";
 import RightDrawWrapper from "../pages/RightDrawWrapper";
 import CreationInterface from "../pages/page21-interfaces/Page21Creation/CreationInterface";
 import PibaseDashboard from "../pages/page21-interfaces/Page21Creation/Dashboard";
+import ManageBOM from "../pages/MakeBill-interfaces/ManageBOM";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
@@ -55,11 +56,20 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-          {
+      {
         path: "page21Dashboard",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <PibaseDashboard />
+          </Suspense>
+        ),
+      },
+
+      {
+        path: "makebill",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ManageBOM />
           </Suspense>
         ),
       },
