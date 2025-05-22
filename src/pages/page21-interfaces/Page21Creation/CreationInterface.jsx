@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
 import { usePage21Context } from "../../../context/Page21Context";
 import {
   FormSection,
@@ -32,13 +38,118 @@ import {
   validateTransformers,
 } from "./ValidationHelpers";
 
+// Custom hook for step validation
+const useStepValidation = (currentStep, stepsForSelectedComponents, state) => {
+  return useMemo(() => {
+    const stepKey = stepsForSelectedComponents[currentStep];
+
+    if (!stepKey) return { isValid: true, errors: null };
+
+    try {
+      // Enhanced part validation that matches your existing functions
+      const validatePartState = (partType, partState) => {
+        if (!partState)
+          return { isValid: false, errors: ["Part configuration missing"] };
+
+        const isValid = validatePartDetails(partType, partState);
+        const errors = isValid
+          ? null
+          : getPartValidationErrors(partType, partState);
+
+        return { isValid, errors };
+      };
+
+      // Mapping of step keys to validation functions
+      const VALIDATION_MAP = {
+        // Part validations
+        [STEPS.CHIP_CAPACITORS]: () =>
+          validatePartState("capacitor", state.capacitor),
+        [STEPS.CHIP_RESISTORS]: () =>
+          validatePartState("resistor", state.resistor),
+        [STEPS.CHIP_AIRCOILS]: () =>
+          validatePartState("airCoil", state.airCoil),
+        [STEPS.CHIP_INDUCTORS]: () =>
+          validatePartState("inductor", state.inductor),
+
+        // Step validations
+        [STEPS.BASIC_DETAILS]: () => {
+          const { isValid, errors } = validateBasicDetails(state);
+          return { isValid, errors };
+        },
+        [STEPS.GENERAL_DETAILS]: () => {
+          const { isValid, errors } = validateGeneralDetails(state);
+          return { isValid, errors };
+        },
+        [STEPS.COMPONENTS]: () => {
+          const { isValid, errors } = validatePcbDetails(state);
+          return { isValid, errors };
+        },
+        [STEPS.RESONATORS]: () => {
+          const { isValid, errors } = validateResonators(state.resonatorList);
+          return { isValid, errors };
+        },
+        [STEPS.TRANSFORMER_OR_WOUND_INDUCTORS]: () => {
+          const { isValid, errors } = validateTransformers(state.transformers);
+          return { isValid, errors };
+        },
+        [STEPS.LTCC]: () => {
+          const { isValid, errors } = validateLtcc(state.ltcc);
+          return { isValid, errors };
+        },
+        [STEPS.COPPER_FLAPS]: () => {
+          const { isValid, errors } = validateCooperFlaps(
+            state.cooperFlapDetails
+          );
+          return { isValid, errors };
+        },
+        [STEPS.FINGERS]: () => {
+          const { isValid, errors } = validateFingers(state.fingersList);
+          return { isValid, errors };
+        },
+        [STEPS.SHIELDS]: () => {
+          const { isValid, errors } = validateShields(state.shieldsList);
+          return { isValid, errors };
+        },
+      };
+
+      // Get the appropriate validation function
+      const validationFn = VALIDATION_MAP[stepKey];
+
+      if (validationFn) {
+        const result = validationFn();
+        console.log(`Validation result for ${stepKey}:`, result);
+        return result;
+      }
+
+      // Default case for steps without specific validation
+      return { isValid: true, errors: null };
+    } catch (error) {
+      console.error("Validation error:", error);
+      return { isValid: false, errors: { general: "Validation failed" } };
+    }
+  }, [
+    currentStep,
+    stepsForSelectedComponents,
+    state.capacitor,
+    state.resistor,
+    state.airCoil,
+    state.inductor,
+    state.resonatorList,
+    state.transformers,
+    state.ltcc,
+    state.cooperFlapDetails,
+    state.fingersList,
+    state.shieldsList,
+    state, // For basic/general details that might need full state
+  ]);
+};
+
 const CreationInterface = () => {
   const { state, dispatch } = usePage21Context();
   const { currentStep, submitted, selectedComponents = [] } = state;
 
-  const [isNextDisabled, setIsNextDisabled] = useState(false);
-
-  const getStepsForSelectedComponents = () => {
+  // Memoize the steps based on selected components
+  const stepsForSelectedComponents = useMemo(() => {
     const mandatorySteps = [STEPS.BASIC_DETAILS, STEPS.GENERAL_DETAILS];
     const additionalSteps = new Set();
 
@@ -47,453 +158,108 @@ const CreationInterface = () => {
       steps.forEach((step) => additionalSteps.add(step));
     });
 
-    // if (selectedComponents.length > 0) {
-    //   additionalSteps.add(STEPS.COMPONENTS);
-    // }
-
     return [...mandatorySteps, ...Array.from(additionalSteps)];
-  };
+  }, [selectedComponents]);
 
-  const stepsForSelectedComponents = getStepsForSelectedComponents();
+  // Step validation hook
+  const { isValid: isCurrentStepValid } = useStepValidation(
+    currentStep,
+    stepsForSelectedComponents,
+    state
+  );
 
-  console.log("stepsForSelectedComponents", stepsForSelectedComponents);
+  // Determine if next button should be disabled
+  const isNextDisabled = useMemo(
+    () => !isCurrentStepValid,
+    [isCurrentStepValid]
+  );
 
-  const STEP_COMPONENT_MAP = {
-    [STEPS.BASIC_DETAILS]: {
-      component: BasicDetails,
-      title: "Basic Information",
-      stepName: "Basic Info",
-    },
-    [STEPS.GENERAL_DETAILS]: {
-      component: GeneralDetails,
-      title: "General Specifications",
-      stepName: "General Specs",
-    },
-    [STEPS.TRANSFORMER_OR_WOUND_INDUCTORS]: {
-      component: TransformersPage,
-      title: "Transformer/Wound Inductors Specifications",
-      stepName: "Transformer",
-    },
-    [STEPS.COMPONENTS]: {
-      component: ComponentsDetails,
-      title: "Component Configuration",
-      stepName: "PCB Config",
-    },
-    [STEPS.SHIELDS]: {
-      component: ShieldDetails,
-      title: "Shield Specifications",
-      stepName: "Shields",
-    },
-    [STEPS.FINGERS]: {
-      component: FingerDetails,
-      title: "Finger Specifications",
-      stepName: "Fingers",
-    },
-    [STEPS.COPPER_FLAPS]: {
-      component: CooperFlapDetails,
-      title: "Copper Flaps Specifications",
-      stepName: "Copper Flaps ",
-    },
-    [STEPS.RESONATORS]: {
-      component: ResonatorDetails,
-      title: "Resonator Specifications",
-      stepName: "Resonators",
-    },
-    [STEPS.LTCC]: {
-      component: LtccDetails,
-      title: "LTCC Specifications",
-      stepName: "LTCC",
-    },
-    [STEPS.OTHER]: {
-      component: OtherSpecialComponents,
-      title: "Special Requirements",
-      stepName: "Special Req",
-    },
-  };
+  // Memoized step component map
+  const STEP_COMPONENT_MAP = useMemo(
+    () => ({
+      [STEPS.BASIC_DETAILS]: {
+        component: BasicDetails,
+        title: "Basic Information",
+        stepName: "Basic Info",
+      },
+      [STEPS.GENERAL_DETAILS]: {
+        component: GeneralDetails,
+        title: "General Specifications",
+        stepName: "General Specs",
+      },
+      [STEPS.TRANSFORMER_OR_WOUND_INDUCTORS]: {
+        component: TransformersPage,
+        title: "Transformer/Wound Inductors Specifications",
+        stepName: "Transformer",
+      },
+      [STEPS.COMPONENTS]: {
+        component: ComponentsDetails,
+        title: "Component Configuration",
+        stepName: "PCB Config",
+      },
+      [STEPS.SHIELDS]: {
+        component: ShieldDetails,
+        title: "Shield Specifications",
+        stepName: "Shields",
+      },
+      [STEPS.FINGERS]: {
+        component: FingerDetails,
+        title: "Finger Specifications",
+        stepName: "Fingers",
+      },
+      [STEPS.COPPER_FLAPS]: {
+        component: CooperFlapDetails,
+        title: "Copper Flaps Specifications",
+        stepName: "Copper Flaps ",
+      },
+      [STEPS.RESONATORS]: {
+        component: ResonatorDetails,
+        title: "Resonator Specifications",
+        stepName: "Resonators",
+      },
+      [STEPS.LTCC]: {
+        component: LtccDetails,
+        title: "LTCC Specifications",
+        stepName: "LTCC",
+      },
+      [STEPS.OTHER]: {
+        component: OtherSpecialComponents,
+        title: "Special Requirements",
+        stepName: "Special Req",
+      },
+    }),
+    []
+  );
 
-  const handleSubmit = () => {
-    console.log("Form submitted", state);
+  // Memoized part step map
+  const PART_STEP_MAP = useMemo(
+    () => ({
+      [STEPS.CHIP_CAPACITORS]: {
+        type: "capacitor",
+        title: " Chip Capacitor",
+        stepName: "Chip Capacitor",
+      },
+      [STEPS.CHIP_RESISTORS]: {
+        type: "resistor",
+        title: " Chip Resistor",
+        stepName: "Chip Resistor",
+      },
+      [STEPS.CHIP_AIRCOILS]: {
+        type: "airCoil",
+        title: " Chip Air Coil",
+        stepName: "Chip Aircoil",
+      },
+      [STEPS.CHIP_INDUCTORS]: {
+        type: "inductor",
+        title: "Chip Inductor",
+        stepName: "Chip Inductor",
+      },
+    }),
+    []
+  );
 
-    const formData = {
-      currentStep: 13,
-      submitted: false,
-      selectedComponents: [
-        "chip-resonator",
-        "pcb",
-        "can",
-        "chip-capacitor",
-        "chip-inductor",
-        "chip-resistor",
-        "transformer",
-        "air-coil",
-        "shield",
-        "finger",
-        "copper-flap",
-        "ltcc",
-        "other",
-      ],
-      opNumber: "testPIBase1",
-      opuNumber: "testPIBase1",
-      eduNumber: "testPIBase1",
-      modelFamily: "FamilyA",
-      modelName: "testPIBase1",
-      technology: "ceramic_resonators",
-      revisionNumber: "",
-      impedance: "50 ohms",
-      customImpedance: "",
-      interfaces: "Connectorized",
-      ports: {
-        numberOfPorts: 3,
-        portDetails: [
-          {
-            connectorType: "conn1",
-            connectorGender: "Male",
-          },
-          {
-            connectorType: "conn2",
-            connectorGender: "Male",
-          },
-          {
-            connectorType: "conn3",
-            connectorGender: "Female",
-          },
-        ],
-      },
-      enclosureDetails: {
-        partType: "Existing",
-        partNumber: "test1part",
-      },
-      topcoverDetails: {
-        partType: "New",
-        partNumber: "",
-      },
-      caseStyle: "ModifyExisting",
-      selectedCaseStyle: "Case A",
-      caseDimensions: {
-        length: "",
-        width: "",
-        height: "",
-        pinOuts: "gjyghjhjhkjjjjjjjjjjjjjjjjjjjjjj",
-      },
-      bottomSolderMask: "Full solder mask",
-      halfMoonRequirement: "Yes",
-      viaHolesRequirement: "Yes",
-      signalLaunchType: "Lead",
-      coverType: "Open",
-      designRuleViolation: "Yes",
-      schematicFile: {},
-      similarModel: "trsr",
-
-      capacitor: {
-        numWithBpn: 2,
-        numWithoutBpn: 1,
-        withBpn: [
-          {
-            name: "testcap",
-            bpn: "testcap",
-          },
-          {
-            name: "testcap",
-            bpn: "testcap",
-          },
-        ],
-        withoutBpn: [
-          {
-            name: "testcap",
-            supplierName: "testcap",
-            supplierNumber: "testcap",
-            qualificationStaus: "Qualification",
-          },
-        ],
-      },
-      inductor: {
-        numWithBpn: 3,
-        numWithoutBpn: 2,
-        withBpn: [
-          {
-            name: "inctest",
-            bpn: "inctest",
-          },
-          {
-            name: "inctest",
-            bpn: "inctest",
-          },
-          {
-            name: "inctest",
-            bpn: "inctest",
-          },
-        ],
-        withoutBpn: [
-          {
-            name: "inctest",
-            supplierName: "inctest",
-            supplierNumber: "inctest",
-            qualificationStaus: "Qualification",
-          },
-          {
-            name: "inctest",
-            supplierName: "inctest",
-            supplierNumber: "inctest",
-            qualificationStaus: "Approval",
-          },
-        ],
-      },
-      airCoil: {
-        numWithBpn: 2,
-        numWithoutBpn: 2,
-        withBpn: [
-          {
-            name: "arctest",
-            bpn: "arctest",
-          },
-          {
-            name: "arctest",
-            bpn: "arctest",
-          },
-        ],
-        withoutBpn: [
-          {
-            name: "arctest",
-            supplierName: "",
-            supplierNumber: "",
-            qualificationStaus: "",
-            wiregauge: "arctest",
-            innnerDiameter: "3",
-            numberOfTurns: "2",
-            lengthOfAircoil: "3",
-            widthOfAircoil: "3",
-            lBendAircoil: "Yes",
-            shorterLegAircoil: "Yes",
-          },
-          {
-            name: "arctest",
-            supplierName: "",
-            supplierNumber: "",
-            qualificationStaus: "",
-            wiregauge: "5",
-            innnerDiameter: "6",
-            numberOfTurns: "7",
-            lengthOfAircoil: "5",
-            widthOfAircoil: "4",
-            lBendAircoil: "Yes",
-            shorterLegAircoil: "Yes",
-          },
-        ],
-      },
-      resistor: {
-        numWithBpn: 1,
-        numWithoutBpn: 2,
-        withBpn: [
-          {
-            name: "restest",
-            bpn: "restest",
-          },
-        ],
-        withoutBpn: [
-          {
-            name: "restest",
-            supplierName: "restest",
-            supplierNumber: "restest",
-            qualificationStaus: "Qualification",
-          },
-          {
-            name: "restest",
-            supplierName: "restest",
-            supplierNumber: "restest",
-            qualificationStaus: "Approval",
-          },
-        ],
-      },
-      transformers: {
-        transformersList: [
-          {
-            name: "test1",
-            coreType: "double",
-            wireType: "single",
-            coreBPN: ["test1", "test1"],
-            wireGauge: ["test1"],
-            numberOfTurns: "2",
-            orientation: "test1",
-          },
-          {
-            name: "test1",
-            coreType: "double",
-            wireType: "double",
-            coreBPN: ["test1", "test1"],
-            wireGauge: ["test1", "test1"],
-            numberOfTurns: "2",
-            orientation: "test1",
-          },
-        ],
-        numberOfTransformers: 2,
-      },
-      can: {
-        isExistingCanAvailable: "No",
-        canMaterial: "Metal",
-        canProcess: "Etched",
-        customCanMaterial: "",
-        bpNumber: "",
-      },
-      pcbList: [
-        {
-          name: "Base PCB",
-          material: "Material 1",
-          thickness: "",
-          layers: "Single",
-          mountingOrientation: "Horizontal",
-          comments: "commenttest23",
-          isExistingCanAvailable: "",
-          bpNumber: "",
-          customMaterial: "",
-          substrateThickness: "5",
-          rfLayerThickness: "",
-          overallThickness: "",
-          copperThickness: "4",
-          isExistingPCBAvailable: "No",
-        },
-        {
-          name: "Coupling PCB",
-          material: "",
-          thickness: "",
-          layers: "Single",
-          mountingOrientation: "Horizontal",
-          comments: "comment2",
-          isExistingPCBAvailable: "No",
-          bpNumber: "",
-          customMaterial: "",
-          substrateThickness: "5",
-          rfLayerThickness: "",
-          overallThickness: "",
-          copperThickness: "4",
-        },
-      ],
-      shieldsList: {
-        shieldRequired: "Yes",
-        numberOfShields: "2",
-        shields: [
-          {
-            partType: "Existing",
-            partNumber: "TestShield",
-          },
-          {
-            partType: "New",
-            partNumber: "TBD",
-          },
-        ],
-      },
-      fingersList: {
-        fingerRequired: "Yes",
-        numberOfFingers: "03",
-        fingers: [
-          {
-            partType: "Existing",
-            partNumber: "445Tesr",
-          },
-          {
-            partType: "New",
-            partNumber: "TBD",
-          },
-          {
-            partType: "Existing",
-            partNumber: "test3466",
-          },
-        ],
-      },
-      cooperFlapDetails: {
-        numberOfFlaps: "2",
-        flaps: [
-          {
-            bpType: "Existing",
-            bpNumber: "4556Test",
-            length: "",
-            width: "",
-            thickness: "",
-          },
-          {
-            bpType: "New",
-            bpNumber: "TBD",
-            length: "3",
-            width: "5",
-            thickness: "5",
-          },
-        ],
-      },
-      resonatorList: {
-        numberOfResonators: 2,
-        resonators: [
-          {
-            bpType: "New",
-            bpNumber: "TBD",
-            resonatorSize: "5",
-            dielectricConstant: "6",
-            resonatorLength: "7",
-            resonatorFrequency: "7",
-            assemblyType: "TAB",
-            comments: "fghhjhjjh",
-          },
-          {
-            bpType: "Existing",
-            bpNumber: "test1",
-            resonatorSize: "778",
-            dielectricConstant: "8",
-            resonatorLength: "7",
-            resonatorFrequency: "7",
-            assemblyType: "TAB",
-            comments: "tyuyuui",
-          },
-        ],
-      },
-      ltcc: {
-        numberOfLtcc: 3,
-        ltccItems: [
-          {
-            modelName: "LtccTest1",
-          },
-          {
-            modelName: "LtccTest1",
-          },
-          {
-            modelName: "LtccTest1",
-          },
-        ],
-      },
-      specialRequirements:
-        "testiing special requirement ttestiing special requirement testiing special requirement testiing special requirement testiing special requirement testiing special requirement estiing special requirement testiing special requirement testiing special requirement testiing special requirement ",
-    };
-    generatePDF(formData);
-    dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
-    dispatch({ type: "SET_SUBMITTED", payload: false });
-    alert("Form submitted successfully! The form has been reset.");
-  };
-
-  const setCurrentStep = (step) => {
-    dispatch({ type: "SET_CURRENT_STEP", payload: step });
-  };
-
-  const PART_STEP_MAP = {
-    [STEPS.CHIP_CAPACITORS]: {
-      type: "capacitor",
-      title: " Chip Capacitor",
-      stepName: "Chip Capacitor",
-    },
-    [STEPS.CHIP_RESISTORS]: {
-      type: "resistor",
-      title: " Chip Resistor",
-      stepName: "Chip Resistor",
-    },
-    [STEPS.CHIP_AIRCOILS]: {
-      type: "airCoil",
-      title: " Chip Air Coil",
-      stepName: "Chip Aircoil",
-    },
-    [STEPS.CHIP_INDUCTORS]: {
-      type: "inductor",
-      title: "Chip Inductor",
-      stepName: "Chip Inductor",
-    },
-  };
-
-  const renderStepContent = () => {
+  // Memoized renderStepContent function
+  const renderStepContent = useCallback(() => {
     const stepKey = stepsForSelectedComponents[currentStep];
 
     if (!stepKey) {
@@ -527,9 +293,48 @@ const CreationInterface = () => {
     }
 
     return <p className="text-gray-500 p-4">No content for this step.</p>;
-  };
+  }, [
+    currentStep,
+    stepsForSelectedComponents,
+    STEP_COMPONENT_MAP,
+    PART_STEP_MAP,
+  ]);
 
-  const renderStepIndicator = () => {
+  // Memoized handleSubmit function
+  const handleSubmit = useCallback(() => {
+    generatePDF(state);
+    dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
+    dispatch({ type: "SET_SUBMITTED", payload: false });
+    alert("Form submitted successfully! The form has been reset.");
+  }, [dispatch]);
+
+  // Memoized setCurrentStep function
+  const setCurrentStep = useCallback(
+    (step) => {
+      dispatch({ type: "SET_CURRENT_STEP", payload: step });
+    },
+    [dispatch]
+  );
+
+  // Optimized handleNext function
+  const handleNext = useCallback(() => {
+    if (!isCurrentStepValid) return;
+
+    if (currentStep < stepsForSelectedComponents.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleSubmit();
+    }
+  }, [
+    currentStep,
+    isCurrentStepValid,
+    stepsForSelectedComponents.length,
+    setCurrentStep,
+    handleSubmit,
+  ]);
+
+  // Step indicator component
+  const StepIndicator = useCallback(() => {
     const containerRef = useRef(null);
     const currentStepRef = useRef(null);
     const [visibleStart, setVisibleStart] = useState(0);
@@ -670,154 +475,13 @@ const CreationInterface = () => {
         )}
       </div>
     );
-  };
+  }, [
+    currentStep,
+    stepsForSelectedComponents,
+    STEP_COMPONENT_MAP,
+    PART_STEP_MAP,
+  ]);
 
-  const handleNext = () => {
-    // Validate current step before proceeding
-    // const isValid = validateCurrentStep();
-
-    // console.log("isValid", isValid);
-
-    // if (!isValid) {
-    //   return; // Don't proceed if validation fails
-    // }
-
-    if (currentStep < stepsForSelectedComponents.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleSubmit();
-    }
-  };
-
-  // In your component's validation logic:
-  // const validateCurrentStep = () => {
-  //   const stepKey = stepsForSelectedComponents[currentStep];
-  //   let isValid = false;
-  //   console.log("validateCurrentStep----stepKey", stepKey);
-
-  //   if (PART_STEP_MAP[stepKey]) {
-  //     const { type } = PART_STEP_MAP[stepKey];
-  //     const partState = state[type];
-  //     isValid = validatePartDetails(type, partState);
-  //     console.log("parts isValid", isValid);
-  //     return isValid;
-  //     //const errors = getPartValidationErrors(type, partState);
-  //   } else {
-  //     setIsNextDisabled(false);
-  //     // Validate other step types
-  //     return (isValid = true);
-  //   }
-  // };
-
-  const validateCurrentStep = () => {
-    const stepKey = stepsForSelectedComponents[currentStep];
-    console.log("Validating step:", stepKey);
-
-    try {
-      if (PART_STEP_MAP[stepKey]) {
-        // Part-specific validation
-        const { type } = PART_STEP_MAP[stepKey];
-        const partState = state[type];
-
-        if (!partState) {
-          console.warn(`No state found for part type: ${type}`);
-          return false;
-        }
-
-        const isValid = validatePartDetails(type, partState);
-        console.log(`${type} validation result:`, isValid);
-        return isValid;
-      } else if (stepKey === STEPS.BASIC_DETAILS) {
-        console.log("STEPS.GENERAL_DETAILS", STEPS.BASIC_DETAILS);
-
-        // General details validation
-        const validationResult = validateBasicDetails(state);
-        console.log("Basic details validation:", validationResult);
-
-        // Optional: Store errors in state for display
-        // dispatch({ type: 'SET_VALIDATION_ERRORS', payload: validationResult.errors });
-
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.GENERAL_DETAILS) {
-        console.log("STEPS.GENERAL_DETAILS", STEPS.GENERAL_DETAILS);
-
-        // General details validation
-        const validationResult = validateGeneralDetails(state);
-        console.log("General details validation:", validationResult);
-
-        // Optional: Store errors in state for display
-        // dispatch({ type: 'SET_VALIDATION_ERRORS', payload: validationResult.errors });
-
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.COMPONENTS) {
-        console.log("STEPS.GENERAL_DETAILS", STEPS.GENERAL_DETAILS);
-
-        // General details validation
-        const validationResult = validatePcbDetails(state);
-        console.log("Pcb details validation:", validationResult);
-
-        // Optional: Store errors in state for display
-        // dispatch({ type: 'SET_VALIDATION_ERRORS', payload: validationResult.errors });
-
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.RESONATORS) {
-        console.log("STEPS.RESONATORS", STEPS.RESONATORS);
-
-        // Resonators validation
-        const validationResult = validateResonators(state.resonatorList);
-        console.log("Resonator validation", validationResult);
-
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.TRANSFORMER_OR_WOUND_INDUCTORS) {
-        console.log(
-          "STEPS.TRANSFORMER_OR_WOUND_INDUCTORS",
-          STEPS.TRANSFORMER_OR_WOUND_INDUCTORS
-        );
-
-        // Transformers validation
-        const validationResult = validateTransformers(state.transformers);
-        console.log("Transformer validation:", validationResult);
-
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.LTCC) {
-        console.log("Validating LTCC components");
-
-        // LTCC validation
-        const validationResult = validateLtcc(state.ltcc);
-        console.log("LTCC validation:", validationResult);
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.COPPER_FLAPS) {
-        console.log("Validating copper flaps");
-
-        // Copper flaps validation
-        const validationResult = validateCooperFlaps(state.cooperFlapDetails);
-        console.log("Copper flaps validation:", validationResult);
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.FINGERS) {
-        console.log("Validating fingers");
-
-        // Fingers validation
-        const validationResult = validateFingers(state.fingersList);
-        console.log("Fingers validation:", validationResult);
-        return validationResult.isValid;
-      } else if (stepKey === STEPS.SHIELDS) {
-        console.log("Validating shields");
-
-        // Shields validation
-        const validationResult = validateShields(state.shieldsList);
-        console.log("Shields validation:", validationResult);
-        return validationResult.isValid;
-      } else {
-        // Non-validated steps
-        console.log(`No validation required for step: ${stepKey}`);
-        setIsNextDisabled(false);
-        return true;
-      }
-    } catch (error) {
-      console.error("Validation error:", error);
-      return false;
-    }
-  };
   return (
     <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
       <div className="bg-white rounded-xl shadow-sm border border-neutral-200 w-full max-w-7xl mx-auto">
@@ -827,7 +491,7 @@ const CreationInterface = () => {
               PiBase Creation Interface
             </h1>
 
-            {stepsForSelectedComponents.length > 1 && renderStepIndicator()}
+            {stepsForSelectedComponents.length > 1 && <StepIndicator />}
           </div>
         </div>
 
@@ -852,6 +516,7 @@ const CreationInterface = () => {
               variant="primary"
               onClick={handleNext}
               disabled={isNextDisabled}
+              className={isNextDisabled ? "opacity-50 cursor-not-allowed" : ""}
             >
               {currentStep === stepsForSelectedComponents.length - 1
                 ? "Submit"
@@ -864,4 +529,4 @@ const CreationInterface = () => {
   );
 };
 
-export default CreationInterface;
+export default React.memo(CreationInterface);

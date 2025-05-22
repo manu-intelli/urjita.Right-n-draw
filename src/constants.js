@@ -133,7 +133,7 @@ export const COMPONENT_STEP_MAP = Object.freeze({
       id: COMPONENT_TYPES.CAN,
       name: "CAN",
       icon: Box,
-      description: "Controller Area Network",
+      description: "Filter Cover",
     },
     {
       id: COMPONENT_TYPES.CHIP_CAPACITOR,
@@ -157,13 +157,13 @@ export const COMPONENT_STEP_MAP = Object.freeze({
       id: COMPONENT_TYPES.TRANSFORMER,
       name: "Transformer",
       icon: Radio,
-      description: "Power Transformer",
+      description: "Core Inductor",
     },
     {
       id: COMPONENT_TYPES.CHIP_RESONATOR,
-      name: "Chip Resonator",
+      name: "Resonator",
       icon: Cpu,
-      description: "Crystal Resonator",
+      description: "Coaxial Creamic Resonator",
     },
     {
       id: COMPONENT_TYPES.AIR_COIL,
@@ -187,7 +187,7 @@ export const COMPONENT_STEP_MAP = Object.freeze({
       id: COMPONENT_TYPES.COPPER_FLAP,
       name: "Copper Flap",
       icon: Square,
-      description: "Copper Connection",
+      description: "Copper Tab",
     },
     {
       id: COMPONENT_TYPES.LTCC,

@@ -256,7 +256,7 @@ const GeneralDetails = () => {
             value={state.caseDimensions?.pinOuts || ""}
             onChange={(value) => handleCaseDimensionsChange("pinOuts", Number(value))}
             required
-            disabled={state.caseStyle === "Existing"}
+            //disabled={state.caseStyle === "Existing"}
             compact
             rows={2}
           />

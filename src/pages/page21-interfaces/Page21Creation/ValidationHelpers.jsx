@@ -5,6 +5,8 @@
  * @returns {boolean} True if the part details are valid
  */
 export const validatePartDetails = (partType, partState) => {
+  console.log("partType, partState", partType, partState);
+
   if (!partState || typeof partState !== "object") return false;
 
   // Safely destructure with defaults and ensure proper types
