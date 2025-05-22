@@ -2,8 +2,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // Configuration
-const BASE_URL = "http://173.248.136.190:80";
-
+//const BASE_URL = "http://173.248.136.190:80";
+const BASE_URL = import.meta.env.VITE_API_URL;
 // Create axios instance
 const axiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -28,16 +28,16 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    const code = error?.response?.data?.code;
-    if (status === 401 && code === "token_not_valid") {
+   // const code = error?.response?.data?.code;
+    if (status === 401 ) {
       // Clear user from localStorage
       localStorage.removeItem("user");
       localStorage.removeItem("components");
+      window.location.href ="/";
     }
 
     return Promise.reject(error);
@@ -50,7 +50,7 @@ export const authAPI = {
       const response = await axiosInstance.post("/auth/login/", credentials);
       return response.data;
     } catch (error) {
-      console.log("error", error);
+      console.error("error", error);
       if (error.response?.status === 401) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
@@ -128,7 +128,7 @@ export const authAPI = {
       const res = await axiosInstance.get("auth/users/");
       return res.data;
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   },
 
@@ -139,7 +139,7 @@ export const authAPI = {
       return res;
     } catch (err) {
       toast.error("Failed to delete a user!");
-      console.log(err);
+      console.error(err);
     }
   },
 
@@ -150,7 +150,7 @@ export const authAPI = {
       return res;
     } catch (err) {
       toast.error("Failed to update a user!");
-      console.log(err);
+      console.error(err);
     }
   },
 };
@@ -242,7 +242,7 @@ export const rulesAPI = {
       );
       return response.data;
     } catch (err) {
-      console.log(err);
+      console.error(err);
       const errorMessage =
         err.response?.data?.message || "Failed to fetch design Options";
       throw new Error(errorMessage);
@@ -255,8 +255,6 @@ export const rulesAPI = {
       const response = await axiosInstance.get(
         `right-draw/design-rules/?${queryString}`
       );
-      console.log("first", response);
-
       return response.data;
     } catch (error) {
       const errorMessage =
@@ -305,7 +303,7 @@ export const verifierAPI = {
           sub_category_id: subcategoryId,
         },
       });
-      console.log("verifierfield", response.data);
+  
       return response.data;
     } catch (error) {
       const errorMessage =
@@ -321,7 +319,7 @@ export const verifierAPI = {
       );
       return response.data;
     } catch (error) {
-      console.log("error here", error);
+      console.error("error here", error);
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data?.non_field_errors?.reduce((eachMessage, acc) => {
@@ -373,7 +371,7 @@ export const approverAPI = {
       const errorMessage =
         error.response?.data?.error || "Failed to fetch approver template.";
 
-      console.log({ errorMessage });
+      console.error({ errorMessage });
       throw new Error(errorMessage);
     }
   },

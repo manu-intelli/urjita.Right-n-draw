@@ -44,7 +44,6 @@ const UpdatedSelect = ({
           const selectedOption = options.find(
             (option) => option.value === selectedValue
           );
-          console.log("selectedOption", selectedOption.des);
           onChange(e.target.value, selectedOption.des);
         }}
         className={`
@@ -154,7 +153,7 @@ const ApproverInterface = () => {
       const response = await approverAPI.getApproverTemplate(formData);
       setTemplateData(response.res);
     } catch (error) {
-      console.log("error", error);
+      console.error("error", error);
       toast.error(error.message);
     } finally {
       setCheckingTemplate(false);

@@ -14,6 +14,7 @@ import {
   Button,
   Card,
   FormSection,
+  TextArea,
 } from "../../components/common/ReusableComponents";
 import {
   pcbAPI,
@@ -27,6 +28,7 @@ import generatePDF from "../pdf-creators/PDFDocumentVerifierInterface";
 import { useNavigate } from "react-router-dom";
 import { BASIC_DETAILS_LENGTH, basicInfoFields } from "../../constants";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import Modal from "../../components/common/Modal";
 
 const STEPS = {
   BASIC_INFO: "basicInfo",
@@ -98,10 +100,11 @@ const VerifierInterface = () => {
   const [templateExists, setTemplateExists] = useState(false);
   const [checkingTemplate, setCheckingTemplate] = useState(false);
   const [selectedComponent, setSelectedComponent] = useState("");
-  const navigate = useNavigate();
 
-  console.log("formData", formData);
-  console.log("ApiData", apiData);
+  const [isRemarksReq, setIsRemarksReq] = useState(false);
+  const [openRemarksModal, setOpenRemarksModal] = useState(false);
+  const [mapForZero, setMapForZero] = useState({});
+  const navigate = useNavigate();
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -169,11 +172,64 @@ const VerifierInterface = () => {
     navigate("/");
   };
 
-  const handleSubmit = async () => {
+  // const handleSubmit = async () => {
+  //   setLoading((prev) => ({ ...prev, submission: true }));
+  //   try {
+  //     const processedSpecs = Object.entries(
+  //       formData[STEPS.PCB_SPECS].selectedSpecs
+  //     ).reduce((acc, [key, value]) => {
+  //       const spec = apiData.specifications.find(
+  //         (s) => s.category_id.toString() === key
+  //       );
+  //       if (spec && INPUT_FIELD_SPECS.includes(spec.category_name)) {
+  //         acc[key] = parseFloat(value);
+  //       } else {
+  //         acc[key] = value;
+  //       }
+  //       return acc;
+  //     }, {});
+
+  //     const submitData = {
+  //       oppNumber: formData[STEPS.BASIC_INFO].oppNumber,
+  //       opuNumber: formData[STEPS.BASIC_INFO].opuNumber,
+  //       eduNumber: formData[STEPS.BASIC_INFO].eduNumber,
+  //       modelName: formData[STEPS.BASIC_INFO].modelName,
+  //       partNumber: formData[STEPS.BASIC_INFO].partNumber,
+  //       component: formData[STEPS.BASIC_INFO].component,
+  //       revisionNumber: formData[STEPS.BASIC_INFO].revisionNumber,
+  //       componentSpecifications: processedSpecs,
+  //       verifierQueryData: formData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+  //       ...(formData?.remarks && { remarks: formData.remarks }),
+  //     };
+
+  //     await verifierAPI.createVerifierTemplate(submitData);
+  //     const results = await verifierAPI.getVerifyResults(submitData);
+  //     setApiData((prev) => ({ ...prev, verifyResults: results.res }));
+
+  //     generatePDF(
+  //       formData,
+  //       results.res,
+  //       apiData.specifications,
+  //       selectedComponent
+  //     );
+
+  //     setCurrentStep((prev) => prev + 1);
+  //     setSubmitted(true);
+  //     toast.success("Successfully submitted the details!");
+  //   } catch (error) {
+  //     toast.error(
+  //       error.message || "An error occurred while creating the template"
+  //     );
+  //   } finally {
+  //     setLoading((prev) => ({ ...prev, submission: false }));
+  //   }
+  // };
+
+  const handleSubmit = async (incomingFormData = formData) => {
     setLoading((prev) => ({ ...prev, submission: true }));
     try {
       const processedSpecs = Object.entries(
-        formData[STEPS.PCB_SPECS].selectedSpecs
+        incomingFormData[STEPS.PCB_SPECS].selectedSpecs
       ).reduce((acc, [key, value]) => {
         const spec = apiData.specifications.find(
           (s) => s.category_id.toString() === key
@@ -187,15 +243,17 @@ const VerifierInterface = () => {
       }, {});
 
       const submitData = {
-        oppNumber: formData[STEPS.BASIC_INFO].oppNumber,
-        opuNumber: formData[STEPS.BASIC_INFO].opuNumber,
-        eduNumber: formData[STEPS.BASIC_INFO].eduNumber,
-        modelName: formData[STEPS.BASIC_INFO].modelName,
-        partNumber: formData[STEPS.BASIC_INFO].partNumber,
-        component: formData[STEPS.BASIC_INFO].component,
-        revisionNumber: formData[STEPS.BASIC_INFO].revisionNumber,
+        oppNumber: incomingFormData[STEPS.BASIC_INFO].oppNumber,
+        opuNumber: incomingFormData[STEPS.BASIC_INFO].opuNumber,
+        eduNumber: incomingFormData[STEPS.BASIC_INFO].eduNumber,
+        modelName: incomingFormData[STEPS.BASIC_INFO].modelName,
+        partNumber: incomingFormData[STEPS.BASIC_INFO].partNumber,
+        component: incomingFormData[STEPS.BASIC_INFO].component,
+        revisionNumber: incomingFormData[STEPS.BASIC_INFO].revisionNumber,
         componentSpecifications: processedSpecs,
-        verifierQueryData: formData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+        verifierQueryData:
+          incomingFormData[STEPS.VERIFIER_FIELDS].verifierQueryData,
+        ...(incomingFormData?.remarks && { remarks: incomingFormData.remarks }),
       };
 
       await verifierAPI.createVerifierTemplate(submitData);
@@ -203,7 +261,7 @@ const VerifierInterface = () => {
       setApiData((prev) => ({ ...prev, verifyResults: results.res }));
 
       generatePDF(
-        formData,
+        incomingFormData,
         results.res,
         apiData.specifications,
         selectedComponent
@@ -256,8 +314,6 @@ const VerifierInterface = () => {
       fetchVerifierFields(cat?.category_id, subCat?.id);
     }
   };
-
-  console.log("Current Step:", STEP_ORDER[currentStep]);
 
   const renderStepContent = () => {
     switch (STEP_ORDER[currentStep]) {
@@ -345,7 +401,8 @@ const VerifierInterface = () => {
                     ""
                   }
                   onChange={(value) => {
-                    if (value === "" || !isNaN(value)) {
+                    const numValue = Number(value);
+                    if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
                       handleFieldChange(STEPS.PCB_SPECS, "selectedSpecs", {
                         ...formData[STEPS.PCB_SPECS].selectedSpecs,
                         [spec.category_id]: value,
@@ -379,7 +436,7 @@ const VerifierInterface = () => {
                     ] ?? ""
                   }
                   onChange={(value) => {
-                    const numValue = Number(value);
+                    var numValue = Number(value);
                     if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
                       handleFieldChange(
                         STEPS.VERIFIER_FIELDS,
@@ -389,6 +446,27 @@ const VerifierInterface = () => {
                           [field.id]: value === "" ? "" : numValue,
                         }
                       );
+                    }
+                    // If the value is 0, add it to the map and show modal
+                    if (numValue === 0) {
+                      setMapForZero((prev) => {
+                        const updated = {
+                          ...prev,
+                          [field.field_name]: numValue,
+                        };
+                        setIsRemarksReq(true); // Show modal
+                        return updated;
+                      });
+                    } else {
+                      // If it's not 0, remove it from the map and close modal if empty
+                      setMapForZero((prev) => {
+                        const updated = { ...prev };
+                        delete updated[field.field_name];
+                        if (Object.keys(updated).length === 0) {
+                          setIsRemarksReq(false); // Close modal
+                        }
+                        return updated;
+                      });
                     }
                   }}
                   required
@@ -539,7 +617,7 @@ const VerifierInterface = () => {
   //   }
   // };
 
-  // console.log({ formData });
+
 
   const renderStepIndicator = () => (
     <div className="flex items-center mb-2 px-4">
@@ -572,11 +650,56 @@ const VerifierInterface = () => {
       ))}
     </div>
   );
-  console.log("Verifier Fields:", apiData.verifierFields);
-  console.log(
-    "Query Data:",
-    formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData
-  );
+
+
+  const RemarksModal = () => {
+    const [value, setValue] = useState("");
+
+    const handleRemarksSubmit = () => {
+      const updatedFormData = {
+        ...formData, // use latest formData from state
+        remarks: value,
+      };
+
+      // Submit with the new data
+      handleSubmit(updatedFormData);
+
+      // Update local state for future reference
+      setFormData(updatedFormData);
+
+      // Close modal
+      setOpenRemarksModal(false);
+    };
+    return (
+      <Modal isOpen title="Remarks" styleClass="max-w-md">
+        <div className="p-6">
+          <TextArea
+            label="Remarks"
+            value={value}
+            onChange={setValue}
+            multiline
+            required
+            placeholder="Remarks regarding zero values entered."
+          />
+          <div className="flex justify-end gap-4 mt-6">
+            <Button
+              variant="secondary"
+              onClick={() => setOpenRemarksModal(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleRemarksSubmit}
+              disabled={!value.trim()}
+            >
+              Submit
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-neutral-900 p-4 sm:p-8 md:p-16">
@@ -645,13 +768,19 @@ const VerifierInterface = () => {
             ) : (
               <Button
                 variant="primary"
-                onClick={
-                  currentStep === 0
-                    ? checkTemplateExistence
-                    : currentStep === STEP_ORDER.length - 2
-                    ? handleSubmit
-                    : () => setCurrentStep((prev) => prev + 1)
-                }
+                onClick={() => {
+                  if (isRemarksReq) {
+                    setOpenRemarksModal(true);
+                    return;
+                  }
+                  if (currentStep === 0) {
+                    checkTemplateExistence();
+                  } else if (currentStep === STEP_ORDER.length - 2) {
+                    handleSubmit(formData); // <- no remarks needed
+                  } else {
+                    setCurrentStep((prev) => prev + 1);
+                  }
+                }}
                 disabled={
                   loading.submission ||
                   checkingTemplate ||
@@ -665,14 +794,14 @@ const VerifierInterface = () => {
                     apiData.specifications?.length !==
                       Object.values(
                         formData?.[STEPS.PCB_SPECS]?.selectedSpecs
-                      ).filter((itr) => itr).length) ||
+                      ).filter((itr) => itr && itr !=="0").length) ||
                   (currentStep === 2 &&
                     !apiData.verifierFields.every(({ id }) => {
                       const val =
                         formData?.[STEPS.VERIFIER_FIELDS].verifierQueryData?.[
                           id
                         ];
-                      return [9, 15, 16, 18].includes(id)
+                      return [9, 14, 15, 18,33,34,35].includes(id)
                         ? val !== null && val !== undefined && val !== ""
                         : Number(val) > 0;
                     }))
@@ -697,6 +826,7 @@ const VerifierInterface = () => {
           </div>
         </div>
       </div>
+      {openRemarksModal && <RemarksModal />}
     </div>
   );
 };
