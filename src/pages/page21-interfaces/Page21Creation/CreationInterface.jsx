@@ -310,9 +310,10 @@ const CreationInterface = () => {
   // Memoized handleSubmit function
   const handleSubmit = useCallback(
     (formData) => {
-      generatePDF(formData);
       dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
       dispatch({ type: "SET_SUBMITTED", payload: false });
+      generatePDF(formData);
+
       alert("Form submitted successfully! The form has been reset.");
     },
     [dispatch]
