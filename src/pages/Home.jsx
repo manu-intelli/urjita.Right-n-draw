@@ -21,7 +21,14 @@ const Home = () => {
     return <AdminInterface />;
   }
 
-  const features = getFeatures(user);
+  const allowedRoles = ["CADesigner", "Approver", "Verifier"];
+
+  const allRolesAllowed =
+    user && Array.isArray(user.role)
+      ? user.role.every((role) => allowedRoles.includes(role))
+      : false;
+
+  const features = allRolesAllowed ? getFeatures(user) : [];
 
 
   return user ? (
@@ -35,18 +42,20 @@ const Home = () => {
             Select a tool to get started with your project
           </p>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {features.map((feature, index) => (
-            <FeatureGroup
-              key={index}
-              feature={{
-                ...feature,
-                icon: feature.title === "RightDraw" ? null : feature.icon,
-              }}
-            />
-          ))}
-        </div>
+        {features.length > 0 ?
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {features.map((feature, index) => (
+              <FeatureGroup
+                key={index}
+                feature={{
+                  ...feature,
+                  icon: feature.title === "RightDraw" ? null : feature.icon,
+                }}
+              />
+            ))}
+          </div> : <div className="text-white rounded p-4 text-center font-semibold h-[400px] flex items-center justify-center">
+            Design Engineer feature Screens
+          </div>}
       </div>
     </div>
   ) : null;

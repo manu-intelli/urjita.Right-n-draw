@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 // Configuration
-//const BASE_URL = "http://173.248.136.190:80";
+//const BASE_URL = "http://172.228.136.120:80";
 const BASE_URL = import.meta.env.VITE_API_URL;
 // Create axios instance
 const axiosInstance = axios.create({
@@ -139,6 +139,17 @@ export const authAPI = {
       console.error(err);
     }
   },
+    getRoles: async () => {
+    try {
+      const response = await axiosInstance.get("/auth/users/roles/");
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch roles.";
+      throw new Error(errorMessage);
+    }
+  },
+
 };
 
 // PCB Specifications API

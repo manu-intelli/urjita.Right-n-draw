@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { UserPlus, UserMinus, Settings, X, UserPen } from "lucide-react";
@@ -48,6 +48,9 @@ const AddUserForm = ({ onClose }) => {
     email: false,
   });
   const [loading, setLoading] = useState(false);
+
+  // Inside AddUserForm component
+  const [availableRoles, setAvailableRoles] = useState();
 
   const validatePassword = (password) => {
     const errors = [];
@@ -146,18 +149,18 @@ const AddUserForm = ({ onClose }) => {
           password: Array.isArray(err.password)
             ? err.password
             : err.password
-            ? [err.password]
-            : [],
+              ? [err.password]
+              : [],
           email: Array.isArray(err.email)
             ? err.email
             : err.email
-            ? [err.email]
-            : [],
+              ? [err.email]
+              : [],
           general: Array.isArray(err.general)
             ? err.general
             : err.general
-            ? [err.general]
-            : [],
+              ? [err.general]
+              : [],
         }));
 
         // Set touched state for fields with errors
@@ -188,6 +191,19 @@ const AddUserForm = ({ onClose }) => {
         : [...prev.role, role],
     }));
   };
+
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const response = await authAPI.getRoles(); // Replace with actual API call
+        setAvailableRoles(response); // Adjust based on response structure
+      } catch (error) {
+        console.error("Failed to load roles:", error);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -226,10 +242,9 @@ const AddUserForm = ({ onClose }) => {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            ${
-              touched.email && errors.email?.length > 0
-                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                : "border-neutral-300"
+            ${touched.email && errors.email?.length > 0
+              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+              : "border-neutral-300"
             }`}
           required
         />
@@ -254,10 +269,9 @@ const AddUserForm = ({ onClose }) => {
           onChange={handlePasswordChange}
           onBlur={() => handleBlur("password")}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            ${
-              touched.password && errors.password.length > 0
-                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                : "border-neutral-300"
+            ${touched.password && errors.password.length > 0
+              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+              : "border-neutral-300"
             }`}
           required
         />
@@ -282,10 +296,9 @@ const AddUserForm = ({ onClose }) => {
           onChange={handleConfirmPasswordChange}
           onBlur={() => handleBlur("password2")}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            ${
-              touched.password2 && errors.password2.length > 0
-                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                : "border-neutral-300"
+            ${touched.password2 && errors.password2.length > 0
+              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+              : "border-neutral-300"
             }`}
           required
         />
@@ -304,19 +317,21 @@ const AddUserForm = ({ onClose }) => {
         <label className="block text-sm font-medium text-neutral-700 mb-1">
           Roles (Select multiple)
         </label>
-        <div className="space-y-2">
-          {["CADesigner", "Verifier", "Approver"].map((rol) => (
-            <label key={rol} className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={formData.role.includes(rol)}
-                onChange={() => handleRoleChange(rol)}
-                className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="text-sm text-neutral-700">{rol}</span>
-            </label>
-          ))}
+        <div className="grid grid-cols-3 gap-2">
+          {Array.isArray(availableRoles) &&
+            availableRoles.map((rol) => (
+              <label key={rol.id} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={formData.role.includes(rol.name)}
+                  onChange={() => handleRoleChange(rol.name)}
+                  className="rounded border-neutral-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span className="text-sm text-neutral-700">{rol.name}</span>
+              </label>
+            ))}
         </div>
+
       </div>
 
       <div className="flex justify-end space-x-3 pt-4">
@@ -331,10 +346,9 @@ const AddUserForm = ({ onClose }) => {
           type="submit"
           disabled={loading || !isFormValid()}
           className={`px-4 py-2 bg-blue-600 text-white rounded-lg transition-colors
-            ${
-              loading || !isFormValid()
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:bg-blue-700"
+            ${loading || !isFormValid()
+              ? "opacity-50 cursor-not-allowed"
+              : "hover:bg-blue-700"
             }`}
         >
           {loading ? "Adding..." : "Add User"}
