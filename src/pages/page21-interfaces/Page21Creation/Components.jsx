@@ -7,6 +7,7 @@ import {
 import { usePage21Context } from "../../../context/Page21Context";
 import { Tooltip } from "@mui/material";
 import { useEffect } from "react";
+import { MOUNTING_ORIENTATION_OPTIONS } from "../../../Utils/dropDownOptions";
 
 const ComponentsDetails = () => {
   const { state, dispatch } = usePage21Context();
@@ -26,7 +27,7 @@ const ComponentsDetails = () => {
 
   // Reset CAN-related fields when coverType is not "Open"
   useEffect(() => {
-    if (coverType !== "Open") {
+    if (coverType === "Open") {
       dispatch({
         type: "UPDATE_CAN",
         field: "isExistingCanAvailable",
@@ -100,7 +101,7 @@ const ComponentsDetails = () => {
         material: "",
         thickness: "",
         layers: "Single",
-        mountingOrientation: "Horizontal",
+        mountingOrientation: "",
         comments: "",
         isExistingPCBAvailable: "No",
         bpNumber: "",
@@ -156,116 +157,117 @@ const ComponentsDetails = () => {
 
   return (
     <div className="p-6 bg-white shadow rounded-md">
-      {coverType === "Open" && (
-        <>
-          <h3 className="text-md font-semibold mb-4">CAN</h3>
+      {coverType !== "Open" &&
+        state.selectedComponents.includes("can")(
+          <>
+            <h3 className="text-md font-semibold mb-4">CAN</h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-            <Select
-              label="Existing Can Available"
-              value={isExistingCanAvailable}
-              options={yesNoOptions}
-              onChange={(value) => {
-                dispatch({
-                  type: "UPDATE_CAN",
-                  field: "isExistingCanAvailable",
-                  value,
-                });
-
-                // Reset other fields when switching to existing can
-                if (value === "Yes") {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              <Select
+                label="Existing Can Available"
+                value={isExistingCanAvailable}
+                options={yesNoOptions}
+                onChange={(value) => {
                   dispatch({
                     type: "UPDATE_CAN",
-                    field: "canMaterial",
-                    value: "",
+                    field: "isExistingCanAvailable",
+                    value,
                   });
-                  dispatch({
-                    type: "UPDATE_CAN",
-                    field: "canProcess",
-                    value: "",
-                  });
-                  dispatch({
-                    type: "UPDATE_CAN",
-                    field: "customCanMaterial",
-                    value: "",
-                  });
-                }
-              }}
-            />
 
-            {isExistingCanAvailable === "Yes" && (
-              <Input
-                label="B-P/N"
-                value={bpNumber || ""}
-                onChange={(val) =>
-                  dispatch({
-                    type: "UPDATE_CAN",
-                    field: "bpNumber",
-                    value: val,
-                  })
-                }
-                placeholder="Enter BP Number"
-              />
-            )}
-
-            {isExistingCanAvailable === "No" && (
-              <>
-                <Select
-                  label="Can Material"
-                  value={canMaterial}
-                  options={canMaterialOptions}
-                  onChange={(value) => {
+                  // Reset other fields when switching to existing can
+                  if (value === "Yes") {
                     dispatch({
                       type: "UPDATE_CAN",
                       field: "canMaterial",
-                      value,
+                      value: "",
                     });
+                    dispatch({
+                      type: "UPDATE_CAN",
+                      field: "canProcess",
+                      value: "",
+                    });
+                    dispatch({
+                      type: "UPDATE_CAN",
+                      field: "customCanMaterial",
+                      value: "",
+                    });
+                  }
+                }}
+              />
 
-                    // Reset custom material if not "Others"
-                    if (value !== "Others") {
-                      dispatch({
-                        type: "UPDATE_CAN",
-                        field: "customCanMaterial",
-                        value: "",
-                      });
-                    }
-                  }}
+              {isExistingCanAvailable === "Yes" && (
+                <Input
+                  label="B-P/N"
+                  value={bpNumber || ""}
+                  onChange={(val) =>
+                    dispatch({
+                      type: "UPDATE_CAN",
+                      field: "bpNumber",
+                      value: val,
+                    })
+                  }
+                  placeholder="Enter BP Number"
                 />
+              )}
 
-                {canMaterial && (
+              {isExistingCanAvailable === "No" && (
+                <>
                   <Select
-                    label="Can Making Process"
-                    value={canProcess}
-                    options={canMakingProcessOptions}
-                    onChange={(value) =>
+                    label="Can Material"
+                    value={canMaterial}
+                    options={canMaterialOptions}
+                    onChange={(value) => {
                       dispatch({
                         type: "UPDATE_CAN",
-                        field: "canProcess",
+                        field: "canMaterial",
                         value,
-                      })
-                    }
-                  />
-                )}
+                      });
 
-                {canMaterial === "Others" && (
-                  <Input
-                    label="Custom Can Material"
-                    value={customCanMaterial || ""}
-                    onChange={(val) =>
-                      dispatch({
-                        type: "UPDATE_CAN",
-                        field: "customCanMaterial",
-                        value: val,
-                      })
-                    }
-                    placeholder="Enter custom material"
+                      // Reset custom material if not "Others"
+                      if (value !== "Others") {
+                        dispatch({
+                          type: "UPDATE_CAN",
+                          field: "customCanMaterial",
+                          value: "",
+                        });
+                      }
+                    }}
                   />
-                )}
-              </>
-            )}
-          </div>
-        </>
-      )}
+
+                  {canMaterial && (
+                    <Select
+                      label="Can Making Process"
+                      value={canProcess}
+                      options={canMakingProcessOptions}
+                      onChange={(value) =>
+                        dispatch({
+                          type: "UPDATE_CAN",
+                          field: "canProcess",
+                          value,
+                        })
+                      }
+                    />
+                  )}
+
+                  {canMaterial === "Others" && (
+                    <Input
+                      label="Custom Can Material"
+                      value={customCanMaterial || ""}
+                      onChange={(val) =>
+                        dispatch({
+                          type: "UPDATE_CAN",
+                          field: "customCanMaterial",
+                          value: val,
+                        })
+                      }
+                      placeholder="Enter custom material"
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          </>
+        )}
 
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">PCB Details</h3>
@@ -423,11 +425,9 @@ const ComponentsDetails = () => {
 
                       <Select
                         label="Mounting Orientation"
-                        value={pcb.mountingOrientation}
-                        options={mountingOrientationOptions}
-                        onChange={(val) =>
-                          handlePcbChange(index, "mountingOrientation", val)
-                        }
+                        value="Horizontal"
+                        options={[{ label: "Horizontal", value: "Horizontal" }]}
+                        disabled
                       />
 
                       <div className="md:col-span-3">
@@ -482,9 +482,11 @@ const ComponentsDetails = () => {
 
                   <Select
                     label="Mounting Orientation"
-                    value="Horizontal"
-                    options={[{ label: "Horizontal", value: "Horizontal" }]}
-                    disabled
+                    value={pcb.mountingOrientation}
+                    options={MOUNTING_ORIENTATION_OPTIONS}
+                    onChange={(val) =>
+                      handlePcbChange(index, "mountingOrientation", val)
+                    }
                   />
 
                   <div className="md:col-span-2">

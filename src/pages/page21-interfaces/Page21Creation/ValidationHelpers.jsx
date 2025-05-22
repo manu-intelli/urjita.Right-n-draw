@@ -47,7 +47,7 @@ export const validatePartDetails = (partType, partState) => {
     return (
       item?.supplierName?.trim() &&
       item?.supplierNumber?.trim() &&
-      item?.qualificationStaus !== undefined
+      item?.qualificationStaus?.trim()
     );
   });
 
@@ -358,7 +358,7 @@ export const validatePcbDetails = (formData) => {
   let isValid = true;
 
   // CAN validation (only required if coverType is "Open")
-  if (formData.coverType === "Open") {
+  if (formData.coverType !== "Open") {
     if (!formData.can.isExistingCanAvailable) {
       errors.isExistingCanAvailable = "Existing Can Available is required";
       isValid = false;
@@ -848,8 +848,11 @@ export const validateSpecialRequirements = (specialRequirements = "") => {
   const errors = {};
   let isValid = true;
 
-  // Add any specific validation rules for special requirements here
-  // For now, we'll just check if it exists (optional field)
+  if (!specialRequirements.trim()) {
+    errors.specialRequirements =
+      "Special requirements are required when 'Other' is selected";
+    isValid = false;
+  }
 
   return { isValid, errors };
 };

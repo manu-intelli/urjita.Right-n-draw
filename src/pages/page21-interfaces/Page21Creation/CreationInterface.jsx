@@ -35,6 +35,7 @@ import {
   validatePcbDetails,
   validateResonators,
   validateShields,
+  validateSpecialRequirements,
   validateTransformers,
 } from "./ValidationHelpers";
 
@@ -108,6 +109,12 @@ const useStepValidation = (currentStep, stepsForSelectedComponents, state) => {
         },
         [STEPS.SHIELDS]: () => {
           const { isValid, errors } = validateShields(state.shieldsList);
+          return { isValid, errors };
+        },
+        [STEPS.OTHER]: () => {
+          const { isValid, errors } = validateSpecialRequirements(
+            state.specialRequirements
+          );
           return { isValid, errors };
         },
       };
@@ -301,12 +308,15 @@ const CreationInterface = () => {
   ]);
 
   // Memoized handleSubmit function
-  const handleSubmit = useCallback(() => {
-    generatePDF(state);
-    dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
-    dispatch({ type: "SET_SUBMITTED", payload: false });
-    alert("Form submitted successfully! The form has been reset.");
-  }, [dispatch]);
+  const handleSubmit = useCallback(
+    (formData) => {
+      generatePDF(formData);
+      dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
+      dispatch({ type: "SET_SUBMITTED", payload: false });
+      alert("Form submitted successfully! The form has been reset.");
+    },
+    [dispatch]
+  );
 
   // Memoized setCurrentStep function
   const setCurrentStep = useCallback(
@@ -323,7 +333,7 @@ const CreationInterface = () => {
     if (currentStep < stepsForSelectedComponents.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      handleSubmit();
+      handleSubmit(state);
     }
   }, [
     currentStep,

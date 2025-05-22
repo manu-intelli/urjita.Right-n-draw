@@ -70,3 +70,8 @@ export const QUALIFICATION_STATUS_OPTIONS = [
   { label: "Qualification", value: "Qualification" },
   { label: "Approval", value: "Approval" },
 ];
+
+  export const MOUNTING_ORIENTATION_OPTIONS = [
+    { label: "Horizontal", value: "Horizontal" },
+    { label: "Vertical", value: "Vertical" },
+  ];

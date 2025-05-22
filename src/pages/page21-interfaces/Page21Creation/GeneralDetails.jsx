@@ -1,10 +1,19 @@
 import React, { useState, useRef } from "react";
 import { usePage21Context } from "../../../context/Page21Context";
-import { Input, Select, TextArea } from "../../../components/common/ReusableComponents";
-import { BOTTOM_SOLIDER_MASK_OPTIONS, CONNECTOR_GENDER_OPTIONS, COVER_TYPE_OPTIONS, IMPEDANCE_OPTIONS, INTERFACE_OPTIONS, SIGNAL_LAUNCH_TYPE_OPTIONS, YES_OR_NO_OPTIONS } from "../../../Utils/dropDownOptions";
-
-
-
+import {
+  Input,
+  Select,
+  TextArea,
+} from "../../../components/common/ReusableComponents";
+import {
+  BOTTOM_SOLIDER_MASK_OPTIONS,
+  CONNECTOR_GENDER_OPTIONS,
+  COVER_TYPE_OPTIONS,
+  IMPEDANCE_OPTIONS,
+  INTERFACE_OPTIONS,
+  SIGNAL_LAUNCH_TYPE_OPTIONS,
+  YES_OR_NO_OPTIONS,
+} from "../../../Utils/dropDownOptions";
 
 const EXISTING_CASE_STYLES = [
   { label: "Case A", value: "Case A" },
@@ -12,8 +21,6 @@ const EXISTING_CASE_STYLES = [
   { label: "Case C", value: "Case C" },
   { label: "Case D", value: "Case D" },
 ];
-
-
 
 const GeneralDetails = () => {
   const { state, dispatch } = usePage21Context();
@@ -25,63 +32,69 @@ const GeneralDetails = () => {
     const resetActions = {
       impedance: (value) => {
         if (value !== "Others") {
-          dispatch({ type: "SET_FIELD", payload: { field: "customImpedance", value: "" } });
+          dispatch({
+            type: "SET_FIELD",
+            payload: { field: "customImpedance", value: "" },
+          });
         }
       },
-      
+
       interfaces: (value) => {
         if (value !== "Connectorized") {
           dispatch({ type: "SET_NUMBER_OF_PORTS", value: "" });
           dispatch({ type: "RESET_PORTS" });
-          dispatch({ 
-            type: "UPDATE_ENCLOSURE_DETAILS", 
-            payload: { 
+          dispatch({
+            type: "UPDATE_ENCLOSURE_DETAILS",
+            payload: {
               partType: "Existing",
-              partNumber: ""
-            }
+              partNumber: "",
+            },
           });
-          dispatch({ 
-            type: "UPDATE_TOPCOVER_DETAILS", 
-            payload: { 
+          dispatch({
+            type: "UPDATE_TOPCOVER_DETAILS",
+            payload: {
               partType: "Existing",
-              partNumber: ""
-            }
+              partNumber: "",
+            },
           });
         }
       },
-      
+
       caseStyle: (value) => {
         if (value !== "New") {
-          dispatch({ 
-            type: "SET_CASE_DIMENSIONS", 
-            payload: { 
-              length: "", 
-              width: "", 
-              height: "" 
-            } 
+          dispatch({
+            type: "SET_CASE_DIMENSIONS",
+            payload: {
+              length: "",
+              width: "",
+              height: "",
+            },
           });
         }
-        
+
         if (value === "New") {
-          dispatch({ type: "SET_FIELD", payload: { field: "selectedCaseStyle", value: "" } });
+          dispatch({
+            type: "SET_FIELD",
+            payload: { field: "selectedCaseStyle", value: "" },
+          });
           dispatch({ type: "SET_CASE_DIMENSIONS", payload: { pinOuts: "" } });
         }
       },
-      
+
       coverType: (value) => {
         if (value !== "Open") {
-          dispatch({ 
-            type: "UPDATE_CAN", 
+          dispatch({
+            type: "UPDATE_CAN",
             payload: {
               isExistingCanAvailable: "No",
               bpNumber: "",
               canMaterial: "",
               canProcess: "",
-              customCanMaterial: ""
-            }
+              customCanMaterial: "",
+            },
           });
         }
-      }
+      },
     };
 
     if (resetActions[field]) {
@@ -92,6 +105,13 @@ const GeneralDetails = () => {
   // Handlers
   const handleChange = (field, value) => {
     dispatch({ type: "SET_FIELD", payload: { field, value } });
+
+    if (field === "interfaces") {
+      if (value === "Connectorized") {
+        // Set default number of ports to 2
+        dispatch({ type: "SET_NUMBER_OF_PORTS", value: 2 });
+      }
+    }
     resetDependentFields(field, value);
   };
 
@@ -103,7 +123,8 @@ const GeneralDetails = () => {
     const file = e.target.files[0];
     if (file) {
       dispatch({ type: "SET_FILE", payload: { file } });
-      const isPreviewable = file.type === "application/pdf" || file.type.startsWith("image/");
+      const isPreviewable =
+        file.type === "application/pdf" || file.type.startsWith("image/");
       setPreviewUrl(isPreviewable ? URL.createObjectURL(file) : null);
     }
   };
@@ -141,9 +162,14 @@ const GeneralDetails = () => {
   // Helper components
   const renderPortFields = () => {
     return state.ports.portDetails.map((port, index) => {
-      const portLabel = state.ports.numberOfPorts === 2
-        ? index === 0 ? "Input Port" : "Output Port"
-        : index === 0 ? "Input Port" : `Channel ${index}`;
+      const portLabel =
+        state.ports.numberOfPorts === 2
+          ? index === 0
+            ? "Input Port"
+            : "Output Port"
+          : index === 0
+          ? "Input Port"
+          : `Channel ${index}`;
 
       return (
         <div key={index} className="bg-gray-50 p-2 rounded-md space-y-2">
@@ -152,14 +178,18 @@ const GeneralDetails = () => {
             <Input
               label="Connector Type"
               value={port.connectorType}
-              onChange={(value) => handlePortChange(index, "connectorType", value)}
+              onChange={(value) =>
+                handlePortChange(index, "connectorType", value)
+              }
               compact
             />
             <Select
               label="Connector Gender"
               options={CONNECTOR_GENDER_OPTIONS}
               value={port.connectorGender}
-              onChange={(value) => handlePortChange(index, "connectorGender", value)}
+              onChange={(value) =>
+                handlePortChange(index, "connectorGender", value)
+              }
               compact
             />
           </div>
@@ -178,14 +208,17 @@ const GeneralDetails = () => {
             </h3>
             <div className="flex space-x-3">
               {["Existing", "New"].map((option) => (
-                <label key={option} className="inline-flex items-center space-x-1.5">
+                <label
+                  key={option}
+                  className="inline-flex items-center space-x-1.5"
+                >
                   <input
                     type="radio"
                     name={`${type}Type-${option}`}
                     value={option}
                     checked={state[`${type}Details`].partType === option}
-                    onChange={() => 
-                      type === "enclosure" 
+                    onChange={() =>
+                      type === "enclosure"
                         ? handleEnclosureChange("partType", option)
                         : handleTopcoverChange("partType", option)
                     }
@@ -202,7 +235,7 @@ const GeneralDetails = () => {
                   ? "TBD"
                   : state[`${type}Details`]?.partNumber || ""
               }
-              onChange={(value) => 
+              onChange={(value) =>
                 type === "enclosure"
                   ? handleEnclosureChange(
                       "partNumber",
@@ -232,7 +265,9 @@ const GeneralDetails = () => {
               label={dimension.charAt(0).toUpperCase() + dimension.slice(1)}
               type="number"
               value={state.caseDimensions[dimension] || ""}
-              onChange={(value) => handleCaseDimensionsChange(dimension, Number(value))}
+              onChange={(value) =>
+                handleCaseDimensionsChange(dimension, Number(value))
+              }
               required
               disabled={state.caseStyle === "Existing"}
               compact
@@ -254,7 +289,7 @@ const GeneralDetails = () => {
           <TextArea
             label="PinOuts"
             value={state.caseDimensions?.pinOuts || ""}
-            onChange={(value) => handleCaseDimensionsChange("pinOuts",value)}
+            onChange={(value) => handleCaseDimensionsChange("pinOuts", value)}
             required
             //disabled={state.caseStyle === "Existing"}
             compact
@@ -326,7 +361,10 @@ const GeneralDetails = () => {
             </label>
             <div className="flex flex-wrap gap-2">
               {["Existing", "ModifyExisting", "New"].map((option) => (
-                <label key={option} className="inline-flex items-center space-x-1.5">
+                <label
+                  key={option}
+                  className="inline-flex items-center space-x-1.5"
+                >
                   <input
                     type="radio"
                     name="caseStyle"
@@ -364,7 +402,9 @@ const GeneralDetails = () => {
                   label="Half Moon Requirement"
                   value={state.halfMoonRequirement}
                   options={YES_OR_NO_OPTIONS}
-                  onChange={(value) => handleChange("halfMoonRequirement", value)}
+                  onChange={(value) =>
+                    handleChange("halfMoonRequirement", value)
+                  }
                   required
                   compact
                 />
@@ -374,7 +414,9 @@ const GeneralDetails = () => {
                   label="Via Holes Requirement"
                   value={state.viaHolesRequirement}
                   options={YES_OR_NO_OPTIONS}
-                  onChange={(value) => handleChange("viaHolesRequirement", value)}
+                  onChange={(value) =>
+                    handleChange("viaHolesRequirement", value)
+                  }
                   required
                   compact
                 />
@@ -445,24 +487,51 @@ const GeneralDetails = () => {
                 htmlFor="schematic-upload"
                 className="cursor-pointer flex flex-col items-center justify-center space-y-2"
               >
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                <svg
+                  className="w-8 h-8 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                  />
                 </svg>
-                <p className="text-xs text-gray-500">Drag & drop files here or click to browse</p>
-                <p className="text-xs text-gray-400">Supported formats: PDF, DWG, DXF, JPG, PNG</p>
+                <p className="text-xs text-gray-500">
+                  Drag & drop files here or click to browse
+                </p>
+                <p className="text-xs text-gray-400">
+                  Supported formats: PDF, DWG, DXF, JPG, PNG
+                </p>
               </label>
             </div>
             {state.schematicFile && (
               <div className="mt-2 flex items-center justify-between bg-gray-50 p-2 rounded-md">
                 <div className="flex items-center space-x-2">
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    />
                   </svg>
                   <span className="text-xs font-medium text-gray-700 truncate max-w-xs">
                     {state.schematicFile.name}
                   </span>
                 </div>
-                <button onClick={clearSchematic} className="text-red-500 hover:text-red-700 text-xs font-medium">
+                <button
+                  onClick={clearSchematic}
+                  className="text-red-500 hover:text-red-700 text-xs font-medium"
+                >
                   Remove
                 </button>
               </div>

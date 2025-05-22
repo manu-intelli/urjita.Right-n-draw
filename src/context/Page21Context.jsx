@@ -5,7 +5,8 @@ const Page21Context = createContext();
 const initialState = {
   currentStep: 0,
   submitted: false,
-  selectedComponents: [], // Store as array
+  specialRequirements: "",
+  selectedComponents: ["pcb"], // Store as array
   opNumber: "",
   opuNumber: "",
   eduNumber: "",
@@ -121,7 +122,6 @@ const initialState = {
     numberOfLtcc: 0,
     ltccItems: [],
   },
-  specialRequirements: "",
 };
 
 const reducer = (state, action) => {

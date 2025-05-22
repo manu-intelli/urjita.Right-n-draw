@@ -239,6 +239,8 @@ const renderTable = (data, columns, keyPrefix, width = "auto") => {
 
 // PDF Component
 export const Page21PDFDocument = ({ formData = {} }) => {
+  console.log("pdfformData", formData);
+
   // Check which components are selected
   const { selectedComponents = [] } = formData;
 
@@ -258,6 +260,7 @@ export const Page21PDFDocument = ({ formData = {} }) => {
 
   const generalInfo = {
     impedance: getSafe(() => formData.impedance),
+    customImpedance: getSafe(() => formData.customImpedance),
     interfaces: getSafe(() => formData.interfaces),
     caseStyle: getSafe(() => formData.caseStyle),
     selectedCaseStyle: getSafe(() => formData.selectedCaseStyle),
@@ -336,6 +339,7 @@ export const Page21PDFDocument = ({ formData = {} }) => {
     canMaterial: getSafe(() => formData.can?.canMaterial),
     canProcess: getSafe(() => formData.can?.canProcess),
     bpNumber: getSafe(() => formData.can?.bpNumber),
+    customCanMaterial: getSafe(() => formData.can?.customCanMaterial),
   };
 
   const pcbList = getSafe(() => formData.pcbList || [], []);
@@ -469,6 +473,14 @@ export const Page21PDFDocument = ({ formData = {} }) => {
                 <Text style={styles.label}>Impedance (Ω):</Text>
                 <Text style={styles.value} wrap>
                   {generalInfo.impedance}
+                </Text>
+              </View>
+            </ConditionalField>
+            <ConditionalField condition={hasValue(generalInfo.customImpedance)}>
+              <View style={{ ...styles.row, width: "50%" }}>
+                <Text style={styles.label}> Custom Impedance (Ω):</Text>
+                <Text style={styles.value} wrap>
+                  {generalInfo.customImpedance}
                 </Text>
               </View>
             </ConditionalField>
@@ -1154,6 +1166,7 @@ export const Page21PDFDocument = ({ formData = {} }) => {
               canMaterial: can.canMaterial,
               canProcess: can.canProcess,
               bpNumber: can.bpNumber,
+              customCanMaterial: can.customCanMaterial,
             })}
           >
             <View style={styles.section}>
@@ -1201,6 +1214,16 @@ export const Page21PDFDocument = ({ formData = {} }) => {
                         <Text style={styles.label}>BP Number:</Text>
                         <Text style={styles.value} wrap>
                           {can.bpNumber}
+                        </Text>
+                      </View>
+                    </ConditionalField>
+                    <ConditionalField
+                      condition={hasValue(can.customCanMaterial)}
+                    >
+                      <View style={{ ...styles.row, width: "50%" }}>
+                        <Text style={styles.label}>Custom CanMaterial:</Text>
+                        <Text style={styles.value} wrap>
+                          {can.customCanMaterial}
                         </Text>
                       </View>
                     </ConditionalField>
