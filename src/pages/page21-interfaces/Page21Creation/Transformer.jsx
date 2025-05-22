@@ -133,7 +133,7 @@ const TransformersPage = () => {
               <Input
                 label="Number of Turns"
                 type="number"
-                value={item.numberOfTurns}
+                value={Number(item.numberOfTurns)}
                 onChange={(value) =>
                   handleChange(index, "numberOfTurns", value)
                 }

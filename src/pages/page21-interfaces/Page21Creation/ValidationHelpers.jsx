@@ -894,7 +894,7 @@ export const validateBasicDetails = (formData) => {
   const errors = {};
   let isValid = true;
 
-  // Required fields validation
+  // Only validate that required fields are not empty
   const requiredFields = [
     "opNumber",
     "opuNumber",
@@ -905,38 +905,17 @@ export const validateBasicDetails = (formData) => {
   ];
 
   requiredFields.forEach((field) => {
-    if (!formData[field]) {
+    if (!formData[field] || formData[field].toString().trim() === "") {
       const fieldName = field
-        .replace(/([A-Z])/g, " $1")
+        .replace(/([A-Z])/g, " $1") // Convert camelCase to readable text
         .replace(/^./, (str) => str.toUpperCase());
       errors[field] = `${fieldName} is required`;
       isValid = false;
     }
   });
 
-  // Alphanumeric validation for number fields
-  const alphanumericFields = ["opNumber", "opuNumber", "eduNumber"];
-  alphanumericFields.forEach((field) => {
-    if (formData[field] && !/^[A-Za-z0-9-]+$/.test(formData[field])) {
-      errors[field] = "Only alphanumeric characters and hyphens allowed";
-      isValid = false;
-    }
-  });
-
-  // Model name length validation
-  if (
-    formData.modelName &&
-    (formData.modelName.length < 2 || formData.modelName.length > 50)
-  ) {
-    errors.modelName = "Must be between 2-50 characters";
-    isValid = false;
-  }
-
-  // Component selection validation
-  if (
-    !formData.selectedComponents ||
-    formData.selectedComponents.length === 0
-  ) {
+  // Validate at least one component is selected
+  if (!formData.selectedComponents?.length) {
     errors.selectedComponents = "At least one component must be selected";
     isValid = false;
   }

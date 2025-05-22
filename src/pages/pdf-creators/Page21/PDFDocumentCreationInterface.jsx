@@ -243,6 +243,7 @@ export const Page21PDFDocument = ({ formData = {} }) => {
   const { selectedComponents = [] } = formData;
 
   const hasComponent = (component) => selectedComponents.includes(component);
+  console.log("hasComponent", selectedComponents);
 
   // Extract data with safe defaults
   const basicInfo = {
@@ -368,11 +369,6 @@ export const Page21PDFDocument = ({ formData = {} }) => {
     numberOfLtcc: getSafe(() => formData.ltcc?.numberOfLtcc, 0),
     ltccItems: getSafe(() => formData.ltcc?.ltccItems || [], []),
   };
-
-  const specialRequirements = truncateText(
-    getSafe(() => formData.specialRequirements),
-    500
-  );
 
   const hasSectionData = (fields, arrays = []) => {
     const hasFieldData = Object.values(fields).some(hasValue);
@@ -611,7 +607,12 @@ export const Page21PDFDocument = ({ formData = {} }) => {
           <View style={styles.section}>
             <Text style={styles.heading}>Physical Design Specifications</Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-              <ConditionalField condition={ generalInfo.interfaces === "Connectorized" && hasValue(enclosureDetails.partType)}>
+              <ConditionalField
+                condition={
+                  generalInfo.interfaces === "Connectorized" &&
+                  hasValue(enclosureDetails.partType)
+                }
+              >
                 <View style={{ ...styles.row, width: "50%" }}>
                   <Text style={styles.label}>Enclosure Type:</Text>
                   <Text style={styles.value} wrap>
@@ -620,7 +621,10 @@ export const Page21PDFDocument = ({ formData = {} }) => {
                 </View>
               </ConditionalField>
               <ConditionalField
-                condition={generalInfo.interfaces === "Connectorized" && hasValue(enclosureDetails.partNumber)}
+                condition={
+                  generalInfo.interfaces === "Connectorized" &&
+                  hasValue(enclosureDetails.partNumber)
+                }
               >
                 <View style={{ ...styles.row, width: "50%" }}>
                   <Text style={styles.label}>Enclosure P/N:</Text>
@@ -629,7 +633,12 @@ export const Page21PDFDocument = ({ formData = {} }) => {
                   </Text>
                 </View>
               </ConditionalField>
-              <ConditionalField  condition={generalInfo.interfaces === "Connectorized" && hasValue(topcoverDetails.partType)}>
+              <ConditionalField
+                condition={
+                  generalInfo.interfaces === "Connectorized" &&
+                  hasValue(topcoverDetails.partType)
+                }
+              >
                 <View style={{ ...styles.row, width: "50%" }}>
                   <Text style={styles.label}>Topcover Type:</Text>
                   <Text style={styles.value} wrap>
@@ -638,7 +647,10 @@ export const Page21PDFDocument = ({ formData = {} }) => {
                 </View>
               </ConditionalField>
               <ConditionalField
-                condition={ generalInfo.interfaces === "Connectorized" && hasValue(topcoverDetails.partNumber)}
+                condition={
+                  generalInfo.interfaces === "Connectorized" &&
+                  hasValue(topcoverDetails.partNumber)
+                }
               >
                 <View style={{ ...styles.row, width: "50%" }}>
                   <Text style={styles.label}>Topcover P/N:</Text>
@@ -675,7 +687,7 @@ export const Page21PDFDocument = ({ formData = {} }) => {
                 <View style={{ ...styles.row, width: "50%" }}>
                   <Text style={styles.label}>Pin Outs:</Text>
                   <Text style={styles.value} wrap>
-                    {truncateText(caseDimensions.pinOuts)}
+                    {caseDimensions.pinOuts}
                   </Text>
                 </View>
               </ConditionalField>
@@ -1555,13 +1567,15 @@ export const Page21PDFDocument = ({ formData = {} }) => {
 
         {/* Special Requirements */}
         <ConditionalField
-          condition={hasComponent("other") && hasValue(specialRequirements)}
+          condition={
+            hasComponent("other") && hasValue(formData.specialRequirements)
+          }
         >
           <View style={styles.section}>
             <Text style={styles.heading}>Special Requirements</Text>
             <View style={styles.commentBox}>
               <Text style={styles.commentText} wrap>
-                {specialRequirements}
+                {formData?.specialRequirements}
               </Text>
             </View>
           </View>

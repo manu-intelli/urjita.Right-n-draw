@@ -254,7 +254,7 @@ const GeneralDetails = () => {
           <TextArea
             label="PinOuts"
             value={state.caseDimensions?.pinOuts || ""}
-            onChange={(value) => handleCaseDimensionsChange("pinOuts", Number(value))}
+            onChange={(value) => handleCaseDimensionsChange("pinOuts",value)}
             required
             //disabled={state.caseStyle === "Existing"}
             compact
