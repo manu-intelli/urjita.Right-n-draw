@@ -156,7 +156,33 @@ const useStepValidation = (currentStep, stepsForSelectedComponents, state) => {
 const CreationInterface = () => {
   const { state, dispatch } = usePage21Context();
   const { currentStep, submitted, selectedComponents = [] } = state;
+  const [dropDownOptions, setDropDownOptions] = useState();
 
+  useEffect(() => {
+    const fetchDropdownOptions = async () => {
+      try {
+        // Fetch all options in one API call
+        const response = await pibaseAPI.getAllOptions();
+           dispatch({ 
+          type: 'FETCH_DROPDOWN_OPTIONS', 
+          payload: response 
+        });
+      } catch (err) {
+        setError(err.message || "Failed to load dropdown options");
+        console.error("Error fetching dropdown options:", err);
+      }
+    };
+
+    fetchDropdownOptions();
+  }, []);
+
+
+    const mapOptions = (options) => {
+    return options?.map(option => ({
+      label: option.name || option.label || option.value,
+      value: option.id || option.value,
+    })) || [];
+  };
   // Memoize the steps based on selected components
   const stepsForSelectedComponents = useMemo(() => {
     const mandatorySteps = [
@@ -566,8 +592,8 @@ const CreationInterface = () => {
             <Button
               variant="primary"
               onClick={handleNextForm}
-            //  disabled={isNextDisabled}
-             // className={isNextDisabled ? "opacity-50 cursor-not-allowed" : ""}
+              //  disabled={isNextDisabled}
+              // className={isNextDisabled ? "opacity-50 cursor-not-allowed" : ""}
             >
               {currentStep === stepsForSelectedComponents.length - 1
                 ? "Submit"

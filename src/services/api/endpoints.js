@@ -482,13 +482,15 @@ export const templatesAPI = {
 };
 
 export const pibaseAPI = {
-  getModelFamily: async () => {
+  getAllOptions: async () => {
     try {
-      const response = await axiosInstance.get("/right-draw/user-templates/");
+      const response = await axiosInstance.get(
+        "/pibase/field-options/grouped/"
+      );
       return response.data;
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to fetch user templates.";
+        error.response?.data || "Failed to fetch user templates.";
       throw new Error(errorMessage);
     }
   },
@@ -502,7 +504,7 @@ export const pibaseAPI = {
       return response.data;
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to create Pibase record.";
+        error.response?.data || "Failed to create Pibase record.";
       throw new Error(errorMessage);
     }
   },

@@ -50,7 +50,7 @@ const BasicDetails = () => {
           <Select
             label="Model Family"
             value={state.modelFamily}
-            options={modelFamilyOptions}
+            options={state.dropdownOptions?.MODEL_FAMILY_OPTIONS}
             onChange={(value) => handleChange("modelFamily", value)}
             required
             error={state.isSubmitting.modelFamily?.[0]}
@@ -65,7 +65,7 @@ const BasicDetails = () => {
           <Select
             label="Technology"
             value={state.technology}
-            options={TECHNOLOGY_OPTIONS}
+            options={state.dropdownOptions?.TECHNOLOGY_OPTIONS}
             onChange={(value) => handleChange("technology", value)}
             required
             error={state.isSubmitting.technology?.[0]}

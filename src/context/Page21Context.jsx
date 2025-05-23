@@ -15,6 +15,7 @@ const initialState = {
   submitted: false,
   isSubmitting: false,
   submitError: null,
+  dropdownOptions: null,
   specialRequirements: "",
   selectedComponents: ["pcb"], // Store as array
   opNumber: "",
@@ -153,6 +154,12 @@ const reducer = (state, action) => {
         ...state,
         isSubmitting: false,
         submitError: null,
+      };
+
+    case "FETCH_DROPDOWN_OPTIONS":
+      return {
+        ...state,
+        dropdownOptions: action.payload,
       };
     case "SET_FIELD":
       return {
