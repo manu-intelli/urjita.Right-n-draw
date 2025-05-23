@@ -7,6 +7,8 @@ import ProtectedRoute from "../components/auth/ProtectedRoute";
 
 import { Sample } from "../pages/Sample";
 import RightDrawWrapper from "../pages/RightDrawWrapper";
+import DesignEngineer from "../pages/pibase/DesignEngineer";
+import CreateAndEditRecord from "../pages/pibase/CreateAndEditRecord";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
@@ -29,7 +31,9 @@ export const router = createBrowserRouter([
         path: "right-draw/:role",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
-            <ProtectedRoute allowedRoles={["CADesigner", "Approver", "Verifier"]}>
+            <ProtectedRoute
+              allowedRoles={["CADesigner", "Approver", "Verifier"]}
+            >
               <RightDrawWrapper />
             </ProtectedRoute>
           </Suspense>
@@ -66,17 +70,17 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <ProtectedRoute allowedRoles={["DesignEngineer"]}>
-              <DesignEngineer />
+              <DesignEngineer/>
             </ProtectedRoute>
           </Suspense>
         ),
       },
       {
-        path: "pibase/:action",// action can be "create" or "edit"
+        path: "pibase/:action", // action can be "create" or "edit"
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <ProtectedRoute allowedRoles={["DesignEngineer"]}>
-              <CreateAndEditRecord />
+              <CreateAndEditRecord/>
             </ProtectedRoute>
           </Suspense>
         ),
