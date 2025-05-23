@@ -918,10 +918,10 @@ export const validateBasicDetails = (formData) => {
   });
 
   // Validate at least one component is selected
-  if (!formData.selectedComponents?.length) {
-    errors.selectedComponents = "At least one component must be selected";
-    isValid = false;
-  }
+  // if (!formData.selectedComponents?.length) {
+  //   errors.selectedComponents = "At least one component must be selected";
+  //   isValid = false;
+  // }
 
   return { isValid, errors };
 };

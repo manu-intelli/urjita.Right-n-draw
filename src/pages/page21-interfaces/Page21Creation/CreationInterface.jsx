@@ -38,6 +38,7 @@ import {
   validateSpecialRequirements,
   validateTransformers,
 } from "./ValidationHelpers";
+import ComponentSelection from "./ComponentsSelection";
 
 // Custom hook for step validation
 const useStepValidation = (currentStep, stepsForSelectedComponents, state) => {
@@ -81,7 +82,7 @@ const useStepValidation = (currentStep, stepsForSelectedComponents, state) => {
           const { isValid, errors } = validateGeneralDetails(state);
           return { isValid, errors };
         },
-        [STEPS.COMPONENTS]: () => {
+        [STEPS.PCB_AND_CAN]: () => {
           const { isValid, errors } = validatePcbDetails(state);
           return { isValid, errors };
         },
@@ -157,7 +158,11 @@ const CreationInterface = () => {
 
   // Memoize the steps based on selected components
   const stepsForSelectedComponents = useMemo(() => {
-    const mandatorySteps = [STEPS.BASIC_DETAILS, STEPS.GENERAL_DETAILS];
+    const mandatorySteps = [
+      STEPS.BASIC_DETAILS,
+      STEPS.GENERAL_DETAILS,
+      STEPS.COMPONENTS_SELECTION,
+    ];
     const additionalSteps = new Set();
 
     selectedComponents.forEach((componentId) => {
@@ -194,14 +199,19 @@ const CreationInterface = () => {
         title: "General Specifications",
         stepName: "General Specs",
       },
+      [STEPS.COMPONENTS_SELECTION]: {
+        component: ComponentSelection,
+        title: "Components Selection",
+        stepName: "Components",
+      },
       [STEPS.TRANSFORMER_OR_WOUND_INDUCTORS]: {
         component: TransformersPage,
         title: "Transformer/Wound Inductors Specifications",
         stepName: "Transformer",
       },
-      [STEPS.COMPONENTS]: {
+      [STEPS.PCB_AND_CAN]: {
         component: ComponentsDetails,
-        title: "Component Configuration",
+        title: "PCB Config",
         stepName: "PCB Config",
       },
       [STEPS.SHIELDS]: {

@@ -14,8 +14,6 @@ const BasicDetails = () => {
   const { state, dispatch } = usePage21Context();
   const { selectedComponents = [] } = state; // Now using array from context
 
-
-
   const handleChange = (field, value) => {
     dispatch({ type: "SET_FIELD", payload: { field, value } });
   };
@@ -27,9 +25,6 @@ const BasicDetails = () => {
   return (
     <div className="space-y-6">
       <div className="p-6 bg-white shadow rounded-md">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Basic Information
-        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Input
             label="OP Number"
@@ -72,7 +67,7 @@ const BasicDetails = () => {
         </div>
       </div>
 
-      <div className="p-6 bg-white shadow-lg rounded-md">
+      {/* <div className="p-6 bg-white shadow-lg rounded-md">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Component Selection
         </h2>
@@ -135,7 +130,7 @@ const BasicDetails = () => {
             )}
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

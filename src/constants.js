@@ -91,7 +91,8 @@ export const COMPONENT_TYPES = Object.freeze({
 export const STEPS = {
   BASIC_DETAILS: "basicDetails",
   GENERAL_DETAILS: "general_details",
-  COMPONENTS: "components",
+  COMPONENTS_SELECTION:"components_selection",
+  PCB_AND_CAN: "pcb_and_can",
   CHIP_AIRCOILS: "chip_aircoils",
   CHIP_INDUCTORS: "chip_inductors",
   CHIP_CAPACITORS: "chip_capacitors",
@@ -106,8 +107,8 @@ export const STEPS = {
 };
 
 export const COMPONENT_STEP_MAP = Object.freeze({
-  [COMPONENT_TYPES.PCB]: [STEPS.COMPONENTS],
-  [COMPONENT_TYPES.CAN]: [STEPS.COMPONENTS],
+  [COMPONENT_TYPES.PCB]: [STEPS.PCB_AND_CAN],
+  [COMPONENT_TYPES.CAN]: [STEPS.PCB_AND_CAN],
   [COMPONENT_TYPES.CHIP_CAPACITOR]: [STEPS.CHIP_CAPACITORS],
   [COMPONENT_TYPES.CHIP_INDUCTOR]: [STEPS.CHIP_INDUCTORS],
   [COMPONENT_TYPES.CHIP_RESISTOR]: [STEPS.CHIP_RESISTORS],
