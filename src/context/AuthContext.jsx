@@ -6,7 +6,9 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
   const login = (userData) => {
+    console.log("AuthContext login", userData);
     setUser(userData);
+    console.log("AuthContext login setUser", user);
   };
 
   const logout = () => {
@@ -14,6 +16,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('token');
   };
 
+  console.log("AuthContext user", user);
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}

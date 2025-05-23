@@ -1,17 +1,15 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
+
 import Layout from "../components/layout/Layout";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ProtectedRoute from "../components/auth/ProtectedRoute";
 
 import { Sample } from "../pages/Sample";
 import RightDrawWrapper from "../pages/RightDrawWrapper";
-import CreationInterface from "../pages/page21-interfaces/Page21Creation/CreationInterface";
-import PibaseDashboard from "../pages/page21-interfaces/Page21Creation/Dashboard";
 
 // Lazy load pages
 const Home = lazy(() => import("../pages/Home"));
-//const About = lazy(() => import("../pages/About"));
 const Login = lazy(() => import("../pages/Login"));
 
 export const router = createBrowserRouter([
@@ -31,7 +29,7 @@ export const router = createBrowserRouter([
         path: "right-draw/:role",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["CADesigner", "Approver", "Verifier"]}>
               <RightDrawWrapper />
             </ProtectedRoute>
           </Suspense>
@@ -41,28 +39,20 @@ export const router = createBrowserRouter([
         path: "sample",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles={["Admin"]}>
               <Sample />
             </ProtectedRoute>
           </Suspense>
         ),
       },
-      {
-        path: "page21",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <CreationInterface />
-          </Suspense>
-        ),
-      },
-          {
-        path: "page21Dashboard",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <PibaseDashboard />
-          </Suspense>
-        ),
-      },
+      // {
+      //   path: "about",
+      //   element: (
+      //     <Suspense fallback={<LoadingSpinner />}>
+      //       <About />
+      //     </Suspense>
+      //   ),
+      // },
       {
         path: "login",
         element: (
@@ -71,7 +61,26 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      ,
+      {
+        path: "pibase",
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ProtectedRoute allowedRoles={["DesignEngineer"]}>
+              <DesignEngineer />
+            </ProtectedRoute>
+          </Suspense>
+        ),
+      },
+      {
+        path: "pibase/:action",// action can be "create" or "edit"
+        element: (
+          <Suspense fallback={<LoadingSpinner />}>
+            <ProtectedRoute allowedRoles={["DesignEngineer"]}>
+              <CreateAndEditRecord />
+            </ProtectedRoute>
+          </Suspense>
+        ),
+      },
     ],
   },
 ]);
