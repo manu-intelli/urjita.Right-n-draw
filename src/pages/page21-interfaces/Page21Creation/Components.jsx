@@ -157,117 +157,116 @@ const ComponentsDetails = () => {
 
   return (
     <div className="p-6 bg-white shadow rounded-md">
-      {coverType !== "Open" &&
-        state.selectedComponents.includes("can")(
-          <>
-            <h3 className="text-md font-semibold mb-4">CAN</h3>
+      {coverType !== "Open" && state.selectedComponents.includes("can") && (
+        <>
+          <h3 className="text-md font-semibold mb-4">CAN</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-              <Select
-                label="Existing Can Available"
-                value={isExistingCanAvailable}
-                options={yesNoOptions}
-                onChange={(value) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <Select
+              label="Existing Can Available"
+              value={isExistingCanAvailable}
+              options={yesNoOptions}
+              onChange={(value) => {
+                dispatch({
+                  type: "UPDATE_CAN",
+                  field: "isExistingCanAvailable",
+                  value,
+                });
+
+                // Reset other fields when switching to existing can
+                if (value === "Yes") {
                   dispatch({
                     type: "UPDATE_CAN",
-                    field: "isExistingCanAvailable",
-                    value,
+                    field: "canMaterial",
+                    value: "",
                   });
+                  dispatch({
+                    type: "UPDATE_CAN",
+                    field: "canProcess",
+                    value: "",
+                  });
+                  dispatch({
+                    type: "UPDATE_CAN",
+                    field: "customCanMaterial",
+                    value: "",
+                  });
+                }
+              }}
+            />
 
-                  // Reset other fields when switching to existing can
-                  if (value === "Yes") {
+            {isExistingCanAvailable === "Yes" && (
+              <Input
+                label="B-P/N"
+                value={bpNumber || ""}
+                onChange={(val) =>
+                  dispatch({
+                    type: "UPDATE_CAN",
+                    field: "bpNumber",
+                    value: val,
+                  })
+                }
+                placeholder="Enter BP Number"
+              />
+            )}
+
+            {isExistingCanAvailable === "No" && (
+              <>
+                <Select
+                  label="Can Material"
+                  value={canMaterial}
+                  options={canMaterialOptions}
+                  onChange={(value) => {
                     dispatch({
                       type: "UPDATE_CAN",
                       field: "canMaterial",
-                      value: "",
+                      value,
                     });
-                    dispatch({
-                      type: "UPDATE_CAN",
-                      field: "canProcess",
-                      value: "",
-                    });
-                    dispatch({
-                      type: "UPDATE_CAN",
-                      field: "customCanMaterial",
-                      value: "",
-                    });
-                  }
-                }}
-              />
 
-              {isExistingCanAvailable === "Yes" && (
-                <Input
-                  label="B-P/N"
-                  value={bpNumber || ""}
-                  onChange={(val) =>
-                    dispatch({
-                      type: "UPDATE_CAN",
-                      field: "bpNumber",
-                      value: val,
-                    })
-                  }
-                  placeholder="Enter BP Number"
-                />
-              )}
-
-              {isExistingCanAvailable === "No" && (
-                <>
-                  <Select
-                    label="Can Material"
-                    value={canMaterial}
-                    options={canMaterialOptions}
-                    onChange={(value) => {
+                    // Reset custom material if not "Others"
+                    if (value !== "Others") {
                       dispatch({
                         type: "UPDATE_CAN",
-                        field: "canMaterial",
-                        value,
+                        field: "customCanMaterial",
+                        value: "",
                       });
+                    }
+                  }}
+                />
 
-                      // Reset custom material if not "Others"
-                      if (value !== "Others") {
-                        dispatch({
-                          type: "UPDATE_CAN",
-                          field: "customCanMaterial",
-                          value: "",
-                        });
-                      }
-                    }}
+                {canMaterial && (
+                  <Select
+                    label="Can Making Process"
+                    value={canProcess}
+                    options={canMakingProcessOptions}
+                    onChange={(value) =>
+                      dispatch({
+                        type: "UPDATE_CAN",
+                        field: "canProcess",
+                        value,
+                      })
+                    }
                   />
+                )}
 
-                  {canMaterial && (
-                    <Select
-                      label="Can Making Process"
-                      value={canProcess}
-                      options={canMakingProcessOptions}
-                      onChange={(value) =>
-                        dispatch({
-                          type: "UPDATE_CAN",
-                          field: "canProcess",
-                          value,
-                        })
-                      }
-                    />
-                  )}
-
-                  {canMaterial === "Others" && (
-                    <Input
-                      label="Custom Can Material"
-                      value={customCanMaterial || ""}
-                      onChange={(val) =>
-                        dispatch({
-                          type: "UPDATE_CAN",
-                          field: "customCanMaterial",
-                          value: val,
-                        })
-                      }
-                      placeholder="Enter custom material"
-                    />
-                  )}
-                </>
-              )}
-            </div>
-          </>
-        )}
+                {canMaterial === "Others" && (
+                  <Input
+                    label="Custom Can Material"
+                    value={customCanMaterial || ""}
+                    onChange={(val) =>
+                      dispatch({
+                        type: "UPDATE_CAN",
+                        field: "customCanMaterial",
+                        value: val,
+                      })
+                    }
+                    placeholder="Enter custom material"
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </>
+      )}
 
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">PCB Details</h3>

@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from "react";
-import { usePage21Context } from "../../../context/Page21Context";
+import { ACTIONS, usePage21Context } from "../../../context/Page21Context";
 import {
   FormSection,
   Button,
@@ -39,6 +39,7 @@ import {
   validateTransformers,
 } from "./ValidationHelpers";
 import ComponentSelection from "./ComponentsSelection";
+import { pibaseAPI } from "../../../services/api/endpoints";
 
 // Custom hook for step validation
 const useStepValidation = (currentStep, stepsForSelectedComponents, state) => {
@@ -319,12 +320,32 @@ const CreationInterface = () => {
 
   // Memoized handleSubmit function
   const handleSubmit = useCallback(
-    (formData) => {
-      dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
-      dispatch({ type: "SET_SUBMITTED", payload: false });
-      generatePDF(formData);
+    async (formData) => {
+      dispatch({ type: ACTIONS.SET_SUBMITTING, payload: true });
+      dispatch({ type: ACTIONS.SET_SUBMIT_ERROR, payload: null });
 
-      alert("Form submitted successfully! The form has been reset.");
+      try {
+        const { data, error } = await pibaseAPI.createPibase(formData);
+
+        if (error) {
+          throw new Error(error);
+        }
+
+        // On successful submission
+        dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
+        dispatch({ type: "SET_SUBMITTED", payload: false });
+        generatePDF(formData);
+
+        alert("Form submitted successfully! The form has been reset.");
+      } catch (error) {
+        console.error("Submission error:", error);
+        dispatch({
+          type: ACTIONS.SET_SUBMIT_ERROR,
+          payload: error.message || "Submission failed",
+        });
+      } finally {
+        dispatch({ type: ACTIONS.SET_SUBMITTING, payload: false }); // Fixed: Using dispatch instead of setIsSubmitting
+      }
     },
     [dispatch]
   );
@@ -338,13 +359,22 @@ const CreationInterface = () => {
   );
 
   // Optimized handleNext function
-  const handleNext = useCallback(() => {
-    if (!isCurrentStepValid) return;
+  const handleNextForm = useCallback(() => {
+    // if (!isCurrentStepValid) return;
 
     if (currentStep < stepsForSelectedComponents.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      handleSubmit(state);
+      const formdata = {
+        opNumber: "OP018",
+        opuNumber: "OPU018",
+        eduNumber: "EDU018",
+        modelName: "Model 18",
+        technology: 1,
+        modelFamily: 2,
+      };
+
+      handleSubmit(formdata);
     }
   }, [
     currentStep,
@@ -535,9 +565,9 @@ const CreationInterface = () => {
 
             <Button
               variant="primary"
-              onClick={handleNext}
-              disabled={isNextDisabled}
-              className={isNextDisabled ? "opacity-50 cursor-not-allowed" : ""}
+              onClick={handleNextForm}
+            //  disabled={isNextDisabled}
+             // className={isNextDisabled ? "opacity-50 cursor-not-allowed" : ""}
             >
               {currentStep === stepsForSelectedComponents.length - 1
                 ? "Submit"

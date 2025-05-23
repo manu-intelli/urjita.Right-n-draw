@@ -32,12 +32,12 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-   // const code = error?.response?.data?.code;
-    if (status === 401 ) {
+    // const code = error?.response?.data?.code;
+    if (status === 401) {
       // Clear user from localStorage
       localStorage.removeItem("user");
       localStorage.removeItem("components");
-      window.location.href ="/";
+      window.location.href = "/";
     }
 
     return Promise.reject(error);
@@ -153,7 +153,7 @@ export const authAPI = {
       console.error(err);
     }
   },
-    getRoles: async () => {
+  getRoles: async () => {
     try {
       const response = await axiosInstance.get("/auth/users/roles/");
       return response.data;
@@ -163,7 +163,6 @@ export const authAPI = {
       throw new Error(errorMessage);
     }
   },
-
 };
 
 // PCB Specifications API
@@ -314,7 +313,7 @@ export const verifierAPI = {
           sub_category_id: subcategoryId,
         },
       });
-  
+
       return response.data;
     } catch (error) {
       const errorMessage =
@@ -477,6 +476,33 @@ export const templatesAPI = {
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to fetch user templates.";
+      throw new Error(errorMessage);
+    }
+  },
+};
+
+export const pibaseAPI = {
+  getModelFamily: async () => {
+    try {
+      const response = await axiosInstance.get("/right-draw/user-templates/");
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to fetch user templates.";
+      throw new Error(errorMessage);
+    }
+  },
+
+  createPibase: async (pibaseData) => {
+    try {
+      const response = await axiosInstance.post(
+        "/pibase/pi-base-record/step-one/",
+        pibaseData
+      );
+      return response.data;
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to create Pibase record.";
       throw new Error(errorMessage);
     }
   },

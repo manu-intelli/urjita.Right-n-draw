@@ -2,9 +2,19 @@ import React, { createContext, useReducer, useContext } from "react";
 
 const Page21Context = createContext();
 
+export const ACTIONS = {
+  // ... your existing action types
+  SET_SUBMITTING: "SET_SUBMITTING",
+  SET_SUBMIT_ERROR: "SET_SUBMIT_ERROR",
+  RESET_SUBMISSION: "RESET_SUBMISSION",
+};
+
 const initialState = {
   currentStep: 0,
+  loading: false,
   submitted: false,
+  isSubmitting: false,
+  submitError: null,
   specialRequirements: "",
   selectedComponents: ["pcb"], // Store as array
   opNumber: "",
@@ -126,6 +136,24 @@ const initialState = {
 
 const reducer = (state, action) => {
   switch (action.type) {
+    case ACTIONS.SET_SUBMITTING:
+      return {
+        ...state,
+        isSubmitting: action.payload,
+      };
+
+    case ACTIONS.SET_SUBMIT_ERROR:
+      return {
+        ...state,
+        submitError: action.payload,
+      };
+
+    case ACTIONS.RESET_SUBMISSION:
+      return {
+        ...state,
+        isSubmitting: false,
+        submitError: null,
+      };
     case "SET_FIELD":
       return {
         ...state,

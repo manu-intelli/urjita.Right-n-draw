@@ -88,12 +88,7 @@ const VerifierInterface = () => {
     verifierFields: [],
     verifyResults: null,
   });
-  const [loading, setLoading] = useState({
-    initial: true,
-    verifierFields: false,
-    submission: false,
-    results: false,
-  });
+
   const [errors, setErrors] = useState({});
   const [hasVerifierFields, setHasVerifierFields] = useState(false);
   const [submitted, setSubmitted] = useState(false);

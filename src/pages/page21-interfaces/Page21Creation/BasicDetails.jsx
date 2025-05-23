@@ -31,18 +31,21 @@ const BasicDetails = () => {
             value={state.opNumber || ""}
             onChange={(value) => handleChange("opNumber", value)}
             required
+            error={state.isSubmitting.opNumber?.[0]}
           />
           <Input
             label="OPU Number"
             value={state.opuNumber || ""}
             onChange={(value) => handleChange("opuNumber", value)}
             required
+            error={state.isSubmitting.opuNumber?.[0]}
           />
           <Input
             label="EDU Number"
             value={state.eduNumber || ""}
             onChange={(value) => handleChange("eduNumber", value)}
             required
+            error={state.isSubmitting.eduNumber?.[0]}
           />
           <Select
             label="Model Family"
@@ -50,12 +53,14 @@ const BasicDetails = () => {
             options={modelFamilyOptions}
             onChange={(value) => handleChange("modelFamily", value)}
             required
+            error={state.isSubmitting.modelFamily?.[0]}
           />
           <Input
             label="Model Name"
             value={state.modelName || ""}
             onChange={(value) => handleChange("modelName", value)}
             required
+            error={state.isSubmitting.modelName?.[0]}
           />
           <Select
             label="Technology"
@@ -63,6 +68,7 @@ const BasicDetails = () => {
             options={TECHNOLOGY_OPTIONS}
             onChange={(value) => handleChange("technology", value)}
             required
+            error={state.isSubmitting.technology?.[0]}
           />
         </div>
       </div>
