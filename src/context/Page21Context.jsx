@@ -4,7 +4,7 @@ const Page21Context = createContext();
 
 const initialState = {
   currentStep: 0,
-  submitted: false,
+  submitted: true,
   specialRequirements: "",
   selectedComponents: ["pcb"], // Store as array
   opNumber: "",
