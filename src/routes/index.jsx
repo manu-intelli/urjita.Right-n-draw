@@ -55,23 +55,22 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-          {
-        path: "page21Dashboard",
+      {
+        path: "login",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <PibaseDashboard />
           </Suspense>
         ),
       },
-      {
-        path: "login",
-        element: (
-          <Suspense fallback={<LoadingSpinner />}>
-            <Login />
-          </Suspense>
-        ),
-      },
-      ,
+      // {
+      //   path: "login",
+      //   element: (
+      //     <Suspense fallback={<LoadingSpinner />}>
+      //       <Login />
+      //     </Suspense>
+      //   ),
+      // },
     ],
   },
 ]);
