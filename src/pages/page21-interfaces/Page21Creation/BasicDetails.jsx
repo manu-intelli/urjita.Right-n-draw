@@ -70,7 +70,7 @@ const BasicDetails = () => {
         </div>
       </div>
 
-      <div className="p-6 bg-white shadow-lg rounded-md">
+      {/* <div className="p-6 bg-white shadow-lg rounded-md">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Component Selection
         </h2>
@@ -111,7 +111,7 @@ const BasicDetails = () => {
           })}
         </div>
 
-        {/* <div className="mt-8 p-6 bg-gray-100 rounded-lg">
+        <div className="mt-8 p-6 bg-gray-100 rounded-lg">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Selected Components
           </h2>
@@ -132,8 +132,8 @@ const BasicDetails = () => {
               <p className="text-gray-500 italic">No components selected</p>
             )}
           </div>
-        </div> */}
-      </div>
+        </div>
+      </div> */}
     </div>
   );
 };
