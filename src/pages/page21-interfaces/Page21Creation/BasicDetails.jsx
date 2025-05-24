@@ -14,8 +14,6 @@ const BasicDetails = () => {
   const { state, dispatch } = usePage21Context();
   const { selectedComponents = [] } = state; // Now using array from context
 
-
-
   const handleChange = (field, value) => {
     dispatch({ type: "SET_FIELD", payload: { field, value } });
   };
@@ -113,7 +111,7 @@ const BasicDetails = () => {
           })}
         </div>
 
-        <div className="mt-8 p-6 bg-gray-100 rounded-lg">
+        {/* <div className="mt-8 p-6 bg-gray-100 rounded-lg">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">
             Selected Components
           </h2>
@@ -134,7 +132,7 @@ const BasicDetails = () => {
               <p className="text-gray-500 italic">No components selected</p>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

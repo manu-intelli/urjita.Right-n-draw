@@ -91,7 +91,8 @@ export const COMPONENT_TYPES = Object.freeze({
 export const STEPS = {
   BASIC_DETAILS: "basicDetails",
   GENERAL_DETAILS: "general_details",
-  COMPONENTS: "components",
+  PCB_AND_CAN: "pcb_and_Can",
+  COMPONENTS_SELECTION: "components_selection",
   CHIP_AIRCOILS: "chip_aircoils",
   CHIP_INDUCTORS: "chip_inductors",
   CHIP_CAPACITORS: "chip_capacitors",
@@ -106,8 +107,8 @@ export const STEPS = {
 };
 
 export const COMPONENT_STEP_MAP = Object.freeze({
-  [COMPONENT_TYPES.PCB]: [STEPS.COMPONENTS],
-  [COMPONENT_TYPES.CAN]: [STEPS.COMPONENTS],
+  [COMPONENT_TYPES.PCB]: [STEPS.PCB_AND_CAN],
+  [COMPONENT_TYPES.CAN]: [STEPS.PCB_AND_CAN],
   [COMPONENT_TYPES.CHIP_CAPACITOR]: [STEPS.CHIP_CAPACITORS],
   [COMPONENT_TYPES.CHIP_INDUCTOR]: [STEPS.CHIP_INDUCTORS],
   [COMPONENT_TYPES.CHIP_RESISTOR]: [STEPS.CHIP_RESISTORS],
@@ -121,84 +122,83 @@ export const COMPONENT_STEP_MAP = Object.freeze({
   [COMPONENT_TYPES.OTHER]: [STEPS.OTHER], // Explicitly handle "other" components
 });
 
-
- export  const COMPONENTS = [
-    {
-      id: COMPONENT_TYPES.PCB,
-      name: "PCB",
-      icon: CircuitBoard,
-      description: "Printed Circuit Board",
-    },
-    {
-      id: COMPONENT_TYPES.CAN,
-      name: "CAN",
-      icon: Box,
-      description: "Filter Cover",
-    },
-    {
-      id: COMPONENT_TYPES.CHIP_CAPACITOR,
-      name: "Chip Capacitor",
-      icon: Zap,
-      description: "Surface Mount Capacitor",
-    },
-    {
-      id: COMPONENT_TYPES.CHIP_INDUCTOR,
-      name: "Chip Inductor",
-      icon: Coil,
-      description: "Surface Mount Inductor",
-    },
-    {
-      id: COMPONENT_TYPES.CHIP_RESISTOR,
-      name: "Chip Resistor",
-      icon: WaveformSine,
-      description: "Surface Mount Resistor",
-    },
-    {
-      id: COMPONENT_TYPES.TRANSFORMER,
-      name: "Transformer",
-      icon: Radio,
-      description: "Core Inductor",
-    },
-    {
-      id: COMPONENT_TYPES.CHIP_RESONATOR,
-      name: "Resonator",
-      icon: Cpu,
-      description: "Coaxial Creamic Resonator",
-    },
-    {
-      id: COMPONENT_TYPES.AIR_COIL,
-      name: "Aircoil",
-      icon: Coil,
-      description: "Air-core Inductor",
-    },
-    {
-      id: COMPONENT_TYPES.SHIELD,
-      name: "Shield",
-      icon: Shield,
-      description: "EMI Shield",
-    },
-    {
-      id: COMPONENT_TYPES.FINGER,
-      name: "Finger",
-      icon: Fingerprint,
-      description: "Contact Finger",
-    },
-    {
-      id: COMPONENT_TYPES.COPPER_FLAP,
-      name: "Copper Flap",
-      icon: Square,
-      description: "Copper Tab",
-    },
-    {
-      id: COMPONENT_TYPES.LTCC,
-      name: "LTCC",
-      icon: CircuitBoard,
-      description: "Low Temperature Co-fired Ceramic",
-    },
-    {
-      id: COMPONENT_TYPES.OTHER,
-      name: "Others",
-      icon: Plus,
-      description: "Other Components",
-    },
-  ];
+export const COMPONENTS = [
+  {
+    id: COMPONENT_TYPES.PCB,
+    name: "PCB",
+    icon: CircuitBoard,
+    description: "Printed Circuit Board",
+  },
+  {
+    id: COMPONENT_TYPES.CAN,
+    name: "CAN",
+    icon: Box,
+    description: "Filter Cover",
+  },
+  {
+    id: COMPONENT_TYPES.CHIP_CAPACITOR,
+    name: "Chip Capacitor",
+    icon: Zap,
+    description: "Surface Mount Capacitor",
+  },
+  {
+    id: COMPONENT_TYPES.CHIP_INDUCTOR,
+    name: "Chip Inductor",
+    icon: Coil,
+    description: "Surface Mount Inductor",
+  },
+  {
+    id: COMPONENT_TYPES.CHIP_RESISTOR,
+    name: "Chip Resistor",
+    icon: WaveformSine,
+    description: "Surface Mount Resistor",
+  },
+  {
+    id: COMPONENT_TYPES.TRANSFORMER,
+    name: "Transformer",
+    icon: Radio,
+    description: "Core Inductor",
+  },
+  {
+    id: COMPONENT_TYPES.CHIP_RESONATOR,
+    name: "Resonator",
+    icon: Cpu,
+    description: "Coaxial Creamic Resonator",
+  },
+  {
+    id: COMPONENT_TYPES.AIR_COIL,
+    name: "Aircoil",
+    icon: Coil,
+    description: "Air-core Inductor",
+  },
+  {
+    id: COMPONENT_TYPES.SHIELD,
+    name: "Shield",
+    icon: Shield,
+    description: "EMI Shield",
+  },
+  {
+    id: COMPONENT_TYPES.FINGER,
+    name: "Finger",
+    icon: Fingerprint,
+    description: "Contact Finger",
+  },
+  {
+    id: COMPONENT_TYPES.COPPER_FLAP,
+    name: "Copper Flap",
+    icon: Square,
+    description: "Copper Tab",
+  },
+  {
+    id: COMPONENT_TYPES.LTCC,
+    name: "LTCC",
+    icon: CircuitBoard,
+    description: "Low Temperature Co-fired Ceramic",
+  },
+  {
+    id: COMPONENT_TYPES.OTHER,
+    name: "Others",
+    icon: Plus,
+    description: "Other Components",
+  },
+];

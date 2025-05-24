@@ -38,6 +38,7 @@ import {
   validateSpecialRequirements,
   validateTransformers,
 } from "./ValidationHelpers";
+import ComponentSelection from "./ComponentsSelection";
 
 // Custom hook for step validation
 const useStepValidation = (currentStep, stepsForSelectedComponents, state) => {
@@ -157,7 +158,11 @@ const CreationInterface = () => {
 
   // Memoize the steps based on selected components
   const stepsForSelectedComponents = useMemo(() => {
-    const mandatorySteps = [STEPS.BASIC_DETAILS, STEPS.GENERAL_DETAILS];
+    const mandatorySteps = [
+      STEPS.BASIC_DETAILS,
+      STEPS.GENERAL_DETAILS,
+      STEPS.COMPONENTS_SELECTION,
+    ];
     const additionalSteps = new Set();
 
     selectedComponents.forEach((componentId) => {
@@ -199,9 +204,14 @@ const CreationInterface = () => {
         title: "Transformer/Wound Inductors Specifications",
         stepName: "Transformer",
       },
-      [STEPS.COMPONENTS]: {
+      [STEPS.COMPONENTS_SELECTION]: {
+        component: ComponentSelection,
+        title: "Components Selection",
+        stepName: "Components",
+      },
+      [STEPS.PCB_AND_CAN]: {
         component: ComponentsDetails,
-        title: "Component Configuration",
+        title: "PCB Config",
         stepName: "PCB Config",
       },
       [STEPS.SHIELDS]: {
@@ -306,14 +316,18 @@ const CreationInterface = () => {
     STEP_COMPONENT_MAP,
     PART_STEP_MAP,
   ]);
+  const formDataRef = useRef(null);
+  useEffect(() => {
+    if (state.currentStep === 0 && state.submitted === false) {
+      generatePDF(state); // use a ref to persist formData
+    }
+  }, [state.currentStep, state.submitted]);
 
-  // Memoized handleSubmit function
   const handleSubmit = useCallback(
     (formData) => {
+      formDataRef.current = formData;
       dispatch({ type: "SET_CURRENT_STEP", payload: 0 });
       dispatch({ type: "SET_SUBMITTED", payload: false });
-      generatePDF(formData);
-
       alert("Form submitted successfully! The form has been reset.");
     },
     [dispatch]
