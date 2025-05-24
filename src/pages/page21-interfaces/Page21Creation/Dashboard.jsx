@@ -88,7 +88,7 @@ const PibaseDashboard = () => {
   };
 
   const handleCreate = () => {
-    navigate(`/page21`);
+    navigate(`/pibase`);
     console.log("Create new template");
     // Implement modal or navigation for creating a new template
   };

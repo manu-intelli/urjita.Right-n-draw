@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "page21",
+        path: "pibase",
         element: (
           <Suspense fallback={<LoadingSpinner />}>
             <CreationInterface />
